@@ -77,15 +77,13 @@ export default function App() {
       const art = form.querySelector('#art-number');
       const quantity = form.querySelector('#quantity');
 
-      setSearchResult(true);
+      if (art.value.length) {
+        setSearchResult(true);
 
-      createNotification(
-        'success',
-        `Номер компонента: ${art.value}`,
-        `Количество: ${quantity.value}`,
-      );
+        createNotification('success', `Номер компонента: ${art.value}`, `Количество: ${quantity.value}`);
 
-      history.push(`/search/?art=${art.value || ''}&q=${quantity.value || 1}`);
+        history.push(`/search/?art=${art.value || ''}&q=${quantity.value || 1}`);
+      }
     }
 
     console.log('onSubmitForm', evt);
@@ -120,10 +118,7 @@ export default function App() {
 
   const appHeight = () => {
     const doc = document.documentElement;
-    const sab =
-      parseInt(
-        getComputedStyle(document.documentElement).getPropertyValue('--sab'),
-      ) || 0;
+    const sab = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--sab')) || 0;
     doc.style.setProperty('--app-height', `${window.innerHeight - sab}px`);
   };
 
@@ -170,9 +165,7 @@ export default function App() {
             {orderSent ? (
               <article className="article text-center __lg">
                 <h1 className="article-title">Готово! Заказ отправлен!</h1>
-                <p>
-                  Спасибо за заказ. В течение 5 минут счет будет на вашей почте.
-                </p>
+                <p>Спасибо за заказ. В течение 5 минут счет будет на вашей почте.</p>
               </article>
             ) : (
               <Switch>
@@ -182,24 +175,21 @@ export default function App() {
                   component={() => (
                     <Helmet>
                       <title>Home Page</title>
-                      <meta
-                        name="description"
-                        content="A catpart.ru application SearchForm"
-                      />
+                      <meta name="description" content="A catpart.ru application SearchForm" />
                     </Helmet>
                   )}
                 />
-                <Route path="/about" component={FeaturePage} />
-                <Route path="/search" component={FilterForm} />
+                {/* <Route path="/about" component={FeaturePage} /> */}
+                {/* <Route path="/search" component={FilterForm} /> */}
+                <Route path="/about" render={routeProps => <FeaturePage {...routeProps} />} />
+                <Route path="/search" render={routeProps => <FilterForm showResults props={{ ...routeProps }} />} />
+
                 <Route path="" component={NotFoundPage} />
               </Switch>
             )}
           </div>
 
-          <SearchForm
-            onSubmitForm={onSubmitSearchForm}
-            notificationFunc={createNotification}
-          />
+          <SearchForm onSubmitForm={onSubmitSearchForm} notificationFunc={createNotification} />
         </main>
         <Footer />
       </div>

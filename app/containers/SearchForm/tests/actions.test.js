@@ -1,9 +1,9 @@
 import { CHANGE_ARTNUMBER } from '../constants';
 
-import { changeUsername } from '../actions';
+import { changeArtNumber } from '../actions';
 
 describe('Home Actions', () => {
-  describe('changeUsername', () => {
+  describe('changeArtNumber', () => {
     it('should return the correct type and the passed name', () => {
       const fixture = 'Max';
       const expectedResult = {
@@ -11,7 +11,7 @@ describe('Home Actions', () => {
         username: fixture,
       };
 
-      expect(changeUsername(fixture)).toEqual(expectedResult);
+      expect(changeArtNumber(fixture)).toEqual(expectedResult);
     });
   });
 });

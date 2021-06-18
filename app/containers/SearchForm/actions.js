@@ -24,7 +24,7 @@ import { CHANGE_ARTNUMBER } from './constants';
  *
  * @return {object} An action object with a type of CHANGE_ARTNUMBER
  */
-export function changeUsername(username) {
+export function changeArtNumber(username) {
   return {
     type: CHANGE_ARTNUMBER,
     username,

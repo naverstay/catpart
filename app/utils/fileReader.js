@@ -10,6 +10,7 @@ export const readFile = (file, cb) => {
   const response = obj => {
     if (typeof cb === 'function') {
       obj.name = file.name;
+      obj.size = file.size;
       cb(obj);
     }
   };

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { FormattedMessage } from 'react-intl';
 
 import { Link } from 'react-router-dom';
+import Ripples from 'react-ripples';
 import A from './A';
 import Img from './Img';
 import NavBar from './NavBar';
@@ -74,18 +75,20 @@ function Header() {
           Личный кабинет
         </Link>
         <div className="header-order">
-          <div className="btn __blue">
-            <span
-              style={{
-                borderRight: '1px solid #97a4f9',
-                paddingRight: '6px',
-                marginRight: '8px',
-              }}
-            >
-              Заказ
-            </span>
-            <span>12345</span>
-          </div>
+          <Ripples during={1000}>
+            <div className="btn __blue">
+              <span
+                style={{
+                  borderRight: '1px solid #97a4f9',
+                  paddingRight: '6px',
+                  marginRight: '8px',
+                }}
+              >
+                Заказ
+              </span>
+              <span>12345</span>
+            </div>
+          </Ripples>
         </div>
       </div>
     </header>

@@ -11,42 +11,26 @@ import { FormattedMessage } from 'react-intl';
 import { connect } from 'react-redux';
 import { compose } from 'redux';
 import { createStructuredSelector } from 'reselect';
+import Ripples from 'react-ripples';
 
 import { useInjectReducer } from 'utils/injectReducer';
 import { useInjectSaga } from 'utils/injectSaga';
-import {
-  makeSelectRepos,
-  makeSelectLoading,
-  makeSelectError,
-} from 'containers/App/selectors';
-import H2 from 'components/H2';
-import ReposList from 'components/ReposList';
-import { readFile } from '../../utils/fileReader';
-import AtPrefix from './AtPrefix';
-import CenteredSection from './CenteredSection';
-import Form from './Form';
-import Input from './Input';
-import Section from './Section';
-import messages from './messages';
-import { loadRepos } from '../App/actions';
+import { makeSelectRepos, makeSelectLoading, makeSelectError } from 'containers/App/selectors';
+
 import { changeCurrency } from './actions';
 import { makeSelectCurrency } from './selectors';
 import reducer from './reducer';
 import saga from './saga';
 import Share from '../../components/Share';
+import { SearchResults } from '../SearchResults';
 
 const key = 'home';
 
-export function FilterForm({
-  notificationFunc,
-  currency,
-  loading,
-  error,
-  repos,
-  onChangeCurrency,
-}) {
+export function FilterForm({ props, showResults, notificationFunc, currency, loading, error, onChangeCurrency }) {
   useInjectReducer({ key, reducer });
   useInjectSaga({ key, saga });
+
+  const query = new URLSearchParams(props.location.search);
 
   // const [currency, setCurrency] = useState('RUR');
   const [centeredForm, setCenteredForm] = useState(true);
@@ -88,87 +72,228 @@ export function FilterForm({
   const reposListProps = {
     loading,
     error,
-    repos,
   };
+
+  const searchData = [
+    {
+      provider: 'Rochester (возможен старый DC)',
+      item: 'SMBJ40AHE3/52 (DC:1851)',
+      brand: 'Yangjie Electronic Technology',
+      available: 705000,
+      multiplicity: 24000,
+      min: 24000,
+      norm: 24000,
+      term: '3-4 недели',
+      price: {
+        '1': 19.3,
+        '10': 18.66,
+        '25': 18.47,
+        '100': 12.52,
+        '250': 9.46,
+        '4000': 9.27,
+      },
+    },
+    {
+      provider: 'Digi-Key Electronics',
+      item: 'SMBJ40A-E3/52',
+      brand: 'Yangjie Electronic Technology',
+      available: 284,
+      multiplicity: 1,
+      min: 1,
+      norm: 1,
+      term: '3-4 недели',
+      price: {
+        '5': 49.67,
+        '10': 37.09,
+        '100': 23.07,
+      },
+    },
+    {
+      provider: 'Rochester (возможен старый DC)',
+      item: 'SMBJ40AHE3/52 (DC:1851)',
+      brand: 'Yangjie Electronic Technology',
+      available: 705000,
+      multiplicity: 24000,
+      min: 24000,
+      norm: 24000,
+      term: '3-4 недели',
+      price: {
+        '1': 19.3,
+        '10': 18.66,
+        '25': 18.47,
+        '100': 12.52,
+        '250': 9.46,
+        '4000': 9.27,
+      },
+    },
+    {
+      provider: 'Digi-Key Electronics',
+      item: 'SMBJ40A-E3/52',
+      brand: 'Yangjie Electronic Technology',
+      available: 284,
+      multiplicity: 1,
+      min: 1,
+      norm: 1,
+      term: '3-4 недели',
+      price: {
+        '5': 49.67,
+        '10': 37.09,
+        '100': 23.07,
+      },
+    },
+    {
+      provider: 'Rochester (возможен старый DC)',
+      item: 'SMBJ40AHE3/52 (DC:1851)',
+      brand: 'Yangjie Electronic Technology',
+      available: 705000,
+      multiplicity: 24000,
+      min: 24000,
+      norm: 24000,
+      term: '3-4 недели',
+      price: {
+        '1': 19.3,
+        '10': 18.66,
+        '25': 18.47,
+        '100': 12.52,
+        '250': 9.46,
+        '4000': 9.27,
+      },
+    },
+    {
+      provider: 'Digi-Key Electronics',
+      item: 'SMBJ40A-E3/52',
+      brand: 'Yangjie Electronic Technology',
+      available: 284,
+      multiplicity: 1,
+      min: 1,
+      norm: 1,
+      term: '3-4 недели',
+      price: {
+        '5': 49.67,
+        '10': 37.09,
+        '100': 23.07,
+      },
+    },
+    {
+      provider: 'Rochester (возможен старый DC)',
+      item: 'SMBJ40AHE3/52 (DC:1851)',
+      brand: 'Yangjie Electronic Technology',
+      available: 705000,
+      multiplicity: 24000,
+      min: 24000,
+      norm: 24000,
+      term: '3-4 недели',
+      price: {
+        '1': 19.3,
+        '10': 18.66,
+        '25': 18.47,
+        '100': 12.52,
+        '250': 9.46,
+        '4000': 9.27,
+      },
+    },
+    {
+      provider: 'Digi-Key Electronics',
+      item: 'SMBJ40A-E3/52',
+      brand: 'Yangjie Electronic Technology',
+      available: 284,
+      multiplicity: 1,
+      min: 1,
+      norm: 1,
+      term: '3-4 недели',
+      price: {
+        '5': 49.67,
+        '10': 37.09,
+        '100': 23.07,
+      },
+    },
+  ];
 
   const onChangeSwitch = evt => {
-    console.log('onChangeSwitch', currency, evt.currentTarget);
-
-    onChangeCurrency(evt.currentTarget);
+    console.log('onChangeSwitch', currency, evt.target);
+    onChangeCurrency(evt.target);
   };
 
+  useEffect(() => {
+    console.log('props', props);
+  });
+
   return (
-    <div className="form-filter">
-      <div className="form-filter__stat">
-        По запросу «SMBJ40A» найдено 124 наименования.
+    <>
+      <div className="form-filter">
+        {<div className="form-filter__stat">По запросу «{query.get('art') || ''}» найдено 124 наименования.</div>}
+
+        <div className="form-filter__controls">
+          <div className="form-filter__controls_left">
+            <Ripples className="form-filter__control" during={1000}>
+              <div className="btn __gray">
+                <span className="btn __blue">
+                  <span className="btn-icon icon icon-download" />
+                </span>
+                <span>Скачать результат поиска</span>
+              </div>
+            </Ripples>
+            <Ripples className="form-filter__control" during={1000}>
+              <div className="btn __gray">Поделиться</div>
+            </Ripples>
+
+            {/* <Share /> */}
+          </div>
+
+          <div onChange={onChangeSwitch} className="form-filter__controls_right">
+            <Ripples className="form-filter__control" during={1000}>
+              <label className="form-radio__btn">
+                <input
+                  name="currency"
+                  className="hide"
+                  // defaultChecked={currency === 'USD'}
+                  data-currency="USD"
+                  type="radio"
+                  value="72.28"
+                />
+                <span className="btn __gray">
+                  <b>USD</b>
+                  <span>72.28</span>
+                </span>
+              </label>
+            </Ripples>
+            <Ripples className="form-filter__control" during={1000}>
+              <label className="form-radio__btn">
+                <input
+                  name="currency"
+                  className="hide"
+                  // defaultChecked={currency === 'EUR'}
+                  data-currency="EUR"
+                  type="radio"
+                  value="88.01"
+                />
+                <span className="btn __gray">
+                  <b>EUR</b>
+                  <span>88.01</span>
+                </span>
+              </label>
+            </Ripples>
+            <Ripples className="form-filter__control" during={1000}>
+              <label className="form-radio__btn">
+                <input name="currency" className="hide" defaultChecked data-currency="RUB" type="radio" value="1" />
+                <span className="btn __gray">
+                  <b>RUB</b>
+                </span>
+              </label>
+            </Ripples>
+          </div>
+        </div>
       </div>
 
-      <div className="form-filter__controls">
-        <div className="form-filter__controls_left">
-          <span className="btn __gray">
-            <span className="btn __blue">
-              <span className="btn-icon icon icon-download" />
-            </span>
-            <span>Скачать результат поиска</span>
-          </span>
-          <span className="btn __gray">Поделиться</span>
-
-          {/* <Share /> */}
-        </div>
-
-        <div className="form-filter__controls_right">
-          <label className="form-radio__btn">
-            <input
-              className="hide"
-              checked={currency === 'USD'}
-              data-currency="USD"
-              onChange={onChangeSwitch}
-              type="radio"
-              value="72.28"
-            />
-            <span className="btn __gray">
-              <b>USD</b>
-              <span>72.28</span>
-            </span>
-          </label>
-          <label className="form-radio__btn">
-            <input
-              className="hide"
-              checked={currency === 'EUR'}
-              data-currency="EUR"
-              onChange={onChangeSwitch}
-              type="radio"
-              value="88.01"
-            />
-            <span className="btn __gray">
-              <b>EUR</b>
-              <span>88.01</span>
-            </span>
-          </label>
-          <label className="form-radio__btn">
-            <input
-              className="hide"
-              checked={currency === 'RUB'}
-              data-currency="RUB"
-              onChange={onChangeSwitch}
-              type="radio"
-              value="1"
-            />
-            <span className="btn __gray">
-              <b>RUB</b>
-            </span>
-          </label>
-        </div>
-      </div>
-    </div>
+      {showResults && <SearchResults list={searchData} />}
+    </>
   );
 }
 
 FilterForm.propTypes = {
-  dndFile: PropTypes.string,
+  showResults: PropTypes.bool,
   loading: PropTypes.bool,
   error: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
-  repos: PropTypes.oneOfType([PropTypes.array, PropTypes.bool]),
   notificationFunc: PropTypes.func,
   onSubmitForm: PropTypes.func,
   currency: PropTypes.string,
@@ -176,7 +301,6 @@ FilterForm.propTypes = {
 };
 
 const mapStateToProps = createStructuredSelector({
-  repos: makeSelectRepos(),
   currency: makeSelectCurrency(),
   loading: makeSelectLoading(),
   error: makeSelectError(),
@@ -184,8 +308,7 @@ const mapStateToProps = createStructuredSelector({
 
 export function mapDispatchToProps(dispatch) {
   return {
-    onChangeCurrency: input =>
-      dispatch(changeCurrency(input.value, input.dataset.currency)),
+    onChangeCurrency: (exchange, currency) => dispatch(changeCurrency(exchange, currency)),
   };
 }
 

@@ -11,6 +11,14 @@
   --animate-repeat: 1;
 }
 
+* {
+  outline: 0;
+}
+
+html {
+  overflow: hidden;
+}
+
 html,
 body {
   height: 100%;
@@ -22,6 +30,7 @@ body {
 }
 
 body {
+  overflow-y: scroll;
   font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
 }
 

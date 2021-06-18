@@ -191,7 +191,7 @@
       }
 
       &_left {
-        > .btn {
+        .form-filter__control  > .btn {
           padding: 0 17px;
           letter-spacing: -.025em;
         }
@@ -204,7 +204,7 @@
         display: flex;
         flex-flow: row wrap;
 
-        .btn {
+        .form-filter__control {
           white-space: nowrap;
           margin: 0 5px 10px;
         }

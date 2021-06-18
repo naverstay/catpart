@@ -1,7 +1,7 @@
 import produce from 'immer';
 
 import searchReducer from '../reducer';
-import { changeUsername } from '../actions';
+import { changeArtNumber } from '../actions';
 
 /* eslint-disable default-case, no-param-reassign */
 describe('searchReducer', () => {
@@ -17,14 +17,12 @@ describe('searchReducer', () => {
     expect(searchReducer(undefined, {})).toEqual(expectedResult);
   });
 
-  it('should handle the changeUsername action correctly', () => {
+  it('should handle the changeArtNumber action correctly', () => {
     const fixture = 'mxstbr';
     const expectedResult = produce(state, draft => {
       draft.username = fixture;
     });
 
-    expect(searchReducer(state, changeUsername(fixture))).toEqual(
-      expectedResult,
-    );
+    expect(searchReducer(state, changeArtNumber(fixture))).toEqual(expectedResult);
   });
 });

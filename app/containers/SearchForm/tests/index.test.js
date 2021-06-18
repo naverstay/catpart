@@ -9,7 +9,7 @@ import { Provider } from 'react-redux';
 import { browserHistory } from 'react-router-dom';
 
 import { SearchForm, mapDispatchToProps } from '../index';
-import { changeUsername } from '../actions';
+import { changeArtNumber } from '../actions';
 import { loadRepos } from '../../App/actions';
 import configureStore from '../../../configureStore';
 
@@ -38,11 +38,7 @@ describe('<SearchForm />', () => {
     render(
       <Provider store={store}>
         <IntlProvider locale="en">
-          <SearchForm
-            username="Not Empty"
-            onChangeUsername={() => {}}
-            onSubmitForm={submitSpy}
-          />
+          <SearchForm username="Not Empty" onChangeUsername={() => {}} onSubmitForm={submitSpy} />
         </IntlProvider>
       </Provider>,
     );
@@ -66,11 +62,7 @@ describe('<SearchForm />', () => {
     render(
       <Provider store={store}>
         <IntlProvider locale="en">
-          <SearchForm
-            username=""
-            onChangeUsername={() => {}}
-            onSubmitForm={submitSpy}
-          />
+          <SearchForm username="" onChangeUsername={() => {}} onSubmitForm={submitSpy} />
         </IntlProvider>
       </Provider>,
     );
@@ -85,12 +77,12 @@ describe('<SearchForm />', () => {
         expect(result.onChangeUsername).toBeDefined();
       });
 
-      it('should dispatch changeUsername when called', () => {
+      it('should dispatch changeArtNumber when called', () => {
         const dispatch = jest.fn();
         const result = mapDispatchToProps(dispatch);
         const username = 'mxstbr';
         result.onChangeUsername({ target: { value: username } });
-        expect(dispatch).toHaveBeenCalledWith(changeUsername(username));
+        expect(dispatch).toHaveBeenCalledWith(changeArtNumber(username));
       });
     });
 

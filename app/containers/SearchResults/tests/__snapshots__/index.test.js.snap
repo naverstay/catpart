@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`<RepoListItem /> should render a ListItem 1`] = `
+exports[`<SearchResults /> should render a ListItem 1`] = `
 <li
   class="Wrapper-euo0oy-0 jLvxtc"
 >

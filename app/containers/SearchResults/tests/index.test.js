@@ -6,16 +6,16 @@ import React from 'react';
 import { getByText, render } from 'react-testing-library';
 import { IntlProvider } from 'react-intl';
 
-import { RepoListItem } from '../index';
+import { SearchResults } from '../index';
 
 const renderComponent = (props = {}) =>
   render(
     <IntlProvider locale="en">
-      <RepoListItem {...props} />
+      <SearchResults {...props} />
     </IntlProvider>,
   );
 
-describe('<RepoListItem />', () => {
+describe('<SearchResults />', () => {
   let item;
 
   // Before each test reset the item data for safety
@@ -49,23 +49,17 @@ describe('<RepoListItem />', () => {
       item,
       currentUser: 'nikgraf',
     });
-    expect(
-      getByText(container, content => content.startsWith(item.owner.login)),
-    ).not.toBeNull();
+    expect(getByText(container, content => content.startsWith(item.owner.login))).not.toBeNull();
   });
 
   it('should render the repo name', () => {
     const { container } = renderComponent({ item });
-    expect(
-      getByText(container, content => content.endsWith(item.name)),
-    ).not.toBeNull();
+    expect(getByText(container, content => content.endsWith(item.name))).not.toBeNull();
   });
 
   it('should render the issue count', () => {
     const { container } = renderComponent({ item });
-    expect(
-      getByText(container, item.open_issues_count.toString(10)),
-    ).not.toBeNull();
+    expect(getByText(container, item.open_issues_count.toString(10))).not.toBeNull();
   });
 
   it('should render the IssueIcon', () => {
