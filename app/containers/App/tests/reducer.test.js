@@ -1,10 +1,10 @@
-import produce from "immer";
+import produce from 'immer';
 
-import appReducer from "../reducer";
-import { loadRepos, reposLoaded, repoLoadingError } from "../actions";
+import appReducer from '../reducer';
+import { loadRepos, reposLoaded, repoLoadingError } from '../actions';
 
 /* eslint-disable default-case, no-param-reassign */
-describe("appReducer", () => {
+describe('appReducer', () => {
   let state;
   beforeEach(() => {
     state = {
@@ -12,17 +12,17 @@ describe("appReducer", () => {
       error: false,
       currentUser: false,
       userData: {
-        repositories: false
-      }
+        repositories: false,
+      },
     };
   });
 
-  it("should return the initial state", () => {
+  it('should return the initial state', () => {
     const expectedResult = state;
     expect(appReducer(undefined, {})).toEqual(expectedResult);
   });
 
-  it("should handle the loadRepos action correctly", () => {
+  it('should handle the loadRepos action correctly', () => {
     const expectedResult = produce(state, draft => {
       draft.loading = true;
       draft.error = false;
@@ -32,13 +32,13 @@ describe("appReducer", () => {
     expect(appReducer(state, loadRepos())).toEqual(expectedResult);
   });
 
-  it("should handle the reposLoaded action correctly", () => {
+  it('should handle the reposLoaded action correctly', () => {
     const fixture = [
       {
-        name: "My Repo"
-      }
+        name: 'My Repo',
+      },
     ];
-    const username = "test";
+    const username = 'test';
     const expectedResult = produce(state, draft => {
       draft.userData.repositories = fixture;
       draft.loading = false;
@@ -46,13 +46,13 @@ describe("appReducer", () => {
     });
 
     expect(appReducer(state, reposLoaded(fixture, username))).toEqual(
-      expectedResult
+      expectedResult,
     );
   });
 
-  it("should handle the repoLoadingError action correctly", () => {
+  it('should handle the repoLoadingError action correctly', () => {
     const fixture = {
-      msg: "Not found"
+      msg: 'Not found',
     };
     const expectedResult = produce(state, draft => {
       draft.error = fixture;
@@ -60,7 +60,7 @@ describe("appReducer", () => {
     });
 
     expect(appReducer(state, repoLoadingError(fixture))).toEqual(
-      expectedResult
+      expectedResult,
     );
   });
 });

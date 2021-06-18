@@ -7,12 +7,12 @@
  *
  */
 
-import produce from "immer";
-import { CHANGE_ARTNUMBER } from "./constants";
+import produce from 'immer';
+import { CHANGE_ARTNUMBER } from './constants';
 
 // The initial state of the App
 export const initialState = {
-  artNumber: ""
+  artNumber: '',
 };
 
 /* eslint-disable default-case, no-param-reassign */
@@ -21,7 +21,7 @@ const searchReducer = (state = initialState, action) =>
     switch (action.type) {
       case CHANGE_ARTNUMBER:
         // Delete prefixed '@' from the github artNumber
-        draft.artNumber = action.artNumber.replace(/@/gi, "");
+        draft.artNumber = action.artNumber.replace(/@/gi, '');
         break;
     }
   });

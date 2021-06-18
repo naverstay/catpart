@@ -1,8 +1,8 @@
-import styled from "styled-components";
+import styled from 'styled-components';
 
-import buttonStyles from "./buttonStyles";
+import buttonStyles from './buttonStyles';
 
-let A = styled.a`
+const A = styled.a`
   ${buttonStyles};
 `;
 

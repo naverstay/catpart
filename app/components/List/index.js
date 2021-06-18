@@ -1,8 +1,8 @@
-import React from "react";
-import PropTypes from "prop-types";
+import React from 'react';
+import PropTypes from 'prop-types';
 
-import Ul from "./Ul";
-import Wrapper from "./Wrapper";
+import Ul from './Ul';
+import Wrapper from './Wrapper';
 
 function List(props) {
   const ComponentToRender = props.component;
@@ -27,7 +27,7 @@ function List(props) {
 
 List.propTypes = {
   component: PropTypes.elementType.isRequired,
-  items: PropTypes.array
+  items: PropTypes.array,
 };
 
 export default List;

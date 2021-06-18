@@ -1,28 +1,30 @@
-import produce from "immer";
+import produce from 'immer';
 
-import searchReducer from "../reducer";
-import { changeUsername } from "../actions";
+import searchReducer from '../reducer';
+import { changeUsername } from '../actions';
 
 /* eslint-disable default-case, no-param-reassign */
-describe("searchReducer", () => {
+describe('searchReducer', () => {
   let state;
   beforeEach(() => {
     state = {
-      username: ""
+      username: '',
     };
   });
 
-  it("should return the initial state", () => {
+  it('should return the initial state', () => {
     const expectedResult = state;
     expect(searchReducer(undefined, {})).toEqual(expectedResult);
   });
 
-  it("should handle the changeUsername action correctly", () => {
-    const fixture = "mxstbr";
+  it('should handle the changeUsername action correctly', () => {
+    const fixture = 'mxstbr';
     const expectedResult = produce(state, draft => {
       draft.username = fixture;
     });
 
-    expect(searchReducer(state, changeUsername(fixture))).toEqual(expectedResult);
+    expect(searchReducer(state, changeUsername(fixture))).toEqual(
+      expectedResult,
+    );
   });
 });

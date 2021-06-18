@@ -1,25 +1,25 @@
-import { selectHome, makeSelectArtNumber } from "../selectors";
+import { selectHome, makeSelectArtNumber } from '../selectors';
 
-describe("selectHome", () => {
-  it("should select the home state", () => {
+describe('selectHome', () => {
+  it('should select the home state', () => {
     const homeState = {
-      userData: {}
+      userData: {},
     };
     const mockedState = {
-      home: homeState
+      home: homeState,
     };
     expect(selectHome(mockedState)).toEqual(homeState);
   });
 });
 
-describe("makeSelectArtNumber", () => {
+describe('makeSelectArtNumber', () => {
   const usernameSelector = makeSelectArtNumber();
-  it("should select the username", () => {
-    const username = "mxstbr";
+  it('should select the username', () => {
+    const username = 'mxstbr';
     const mockedState = {
       home: {
-        username
-      }
+        username,
+      },
     };
     expect(usernameSelector(mockedState)).toEqual(username);
   });

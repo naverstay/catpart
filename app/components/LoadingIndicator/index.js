@@ -1,9 +1,9 @@
-import React from "react";
+import React from 'react';
 
-import Circle from "./Circle";
+import Circle from './Circle';
 
 const LoadingIndicator = () => (
-  <div className={"loader"}>
+  <div className="loader">
     <Circle />
     <Circle rotate={30} delay={-1.1} />
     <Circle rotate={60} delay={-1} />

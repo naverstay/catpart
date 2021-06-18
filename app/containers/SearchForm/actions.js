@@ -15,7 +15,7 @@
  *    }
  */
 
-import { CHANGE_ARTNUMBER } from "./constants";
+import { CHANGE_ARTNUMBER } from './constants';
 
 /**
  * Changes the input field of the form
@@ -27,6 +27,6 @@ import { CHANGE_ARTNUMBER } from "./constants";
 export function changeUsername(username) {
   return {
     type: CHANGE_ARTNUMBER,
-    username
+    username,
   };
 }

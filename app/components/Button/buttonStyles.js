@@ -1,7 +1,5 @@
-import { css } from "styled-components";
+import { css } from 'styled-components';
 
-const buttonStyles = css`
-
-`;
+const buttonStyles = css``;
 
 export default buttonStyles;

@@ -3,17 +3,17 @@
  *
  * This contains all the text for the SearchForm component.
  */
-import { defineMessages } from "react-intl";
+import { defineMessages } from 'react-intl';
 
-export const scope = "boilerplate.components.Header";
+export const scope = 'boilerplate.components.Header';
 
 export default defineMessages({
   home: {
     id: `${scope}.home`,
-    defaultMessage: "Home"
+    defaultMessage: 'Home',
   },
   features: {
     id: `${scope}.features`,
-    defaultMessage: "Features"
-  }
+    defaultMessage: 'Features',
+  },
 });

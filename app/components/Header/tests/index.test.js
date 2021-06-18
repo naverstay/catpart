@@ -1,18 +1,18 @@
-import React from "react";
-import { render } from "react-testing-library";
-import { Provider } from "react-redux";
-import { IntlProvider } from "react-intl";
-import { ConnectedRouter } from "connected-react-router/immutable";
-import { createMemoryHistory } from "history";
+import React from 'react';
+import { render } from 'react-testing-library';
+import { Provider } from 'react-redux';
+import { IntlProvider } from 'react-intl';
+import { ConnectedRouter } from 'connected-react-router/immutable';
+import { createMemoryHistory } from 'history';
 
-import Header from "../index";
-import configureStore from "../../../configureStore";
+import Header from '../index';
+import configureStore from '../../../configureStore';
 
-describe("<Header />", () => {
+describe('<Header />', () => {
   const history = createMemoryHistory();
   const store = configureStore({}, history);
 
-  it("should render a div", () => {
+  it('should render a div', () => {
     const { container } = render(
       <Provider store={store}>
         <IntlProvider locale="en">
@@ -20,7 +20,7 @@ describe("<Header />", () => {
             <Header />
           </ConnectedRouter>
         </IntlProvider>
-      </Provider>
+      </Provider>,
     );
     expect(container.firstChild).toMatchSnapshot();
   });

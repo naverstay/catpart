@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 import {
   FacebookShareCount,
@@ -49,12 +49,12 @@ import {
   PocketIcon,
   InstapaperIcon,
   WeiboIcon,
-  HatenaIcon
-} from "react-share";
+  HatenaIcon,
+} from 'react-share';
 
 function Share() {
-  const shareUrl = "http://github.com";
-  const title = "GitHub";
+  const shareUrl = 'http://github.com';
+  const title = 'GitHub';
 
   return (
     <div className="share-container">
@@ -68,7 +68,10 @@ function Share() {
         </FacebookShareButton>
 
         <div>
-          <FacebookShareCount url={shareUrl} className="share-some-network__share-count">
+          <FacebookShareCount
+            url={shareUrl}
+            className="share-some-network__share-count"
+          >
             {count => count}
           </FacebookShareCount>
         </div>
@@ -122,7 +125,10 @@ function Share() {
       </div>
 
       <div className="share-some-network">
-        <LinkedinShareButton url={shareUrl} className="share-some-network__share-button">
+        <LinkedinShareButton
+          url={shareUrl}
+          className="share-some-network__share-button"
+        >
           <LinkedinIcon size={32} round />
         </LinkedinShareButton>
       </div>
@@ -137,7 +143,10 @@ function Share() {
         </PinterestShareButton>
 
         <div>
-          <PinterestShareCount url={shareUrl} className="share-some-network__share-count" />
+          <PinterestShareCount
+            url={shareUrl}
+            className="share-some-network__share-count"
+          />
         </div>
       </div>
 
@@ -151,7 +160,10 @@ function Share() {
         </VKShareButton>
 
         <div>
-          <VKShareCount url={shareUrl} className="share-some-network__share-count" />
+          <VKShareCount
+            url={shareUrl}
+            className="share-some-network__share-count"
+          />
         </div>
       </div>
 
@@ -165,7 +177,10 @@ function Share() {
         </OKShareButton>
 
         <div>
-          <OKShareCount url={shareUrl} className="share-some-network__share-count" />
+          <OKShareCount
+            url={shareUrl}
+            className="share-some-network__share-count"
+          />
         </div>
       </div>
 
@@ -181,7 +196,10 @@ function Share() {
         </RedditShareButton>
 
         <div>
-          <RedditShareCount url={shareUrl} className="share-some-network__share-count" />
+          <RedditShareCount
+            url={shareUrl}
+            className="share-some-network__share-count"
+          />
         </div>
       </div>
 
@@ -195,7 +213,10 @@ function Share() {
         </TumblrShareButton>
 
         <div>
-          <TumblrShareCount url={shareUrl} className="share-some-network__share-count" />
+          <TumblrShareCount
+            url={shareUrl}
+            className="share-some-network__share-count"
+          />
         </div>
       </div>
 
@@ -303,7 +324,10 @@ function Share() {
         </HatenaShareButton>
 
         <div>
-          <HatenaShareCount url={shareUrl} className="share-some-network__share-count" />
+          <HatenaShareCount
+            url={shareUrl}
+            className="share-some-network__share-count"
+          />
         </div>
       </div>
     </div>
