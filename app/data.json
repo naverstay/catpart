@@ -1,0 +1,56 @@
+[
+  {
+    "provider": "Rochester (возможен старый DC)",
+    "item": "SMBJ40AHE3/52 (DC:1851)",
+    "brand": "Yangjie Electronic Technology",
+    "available": 705000,
+    "multiplicity ": 24000,
+    "min": 24000,
+    "norm": 24000,
+    "term": "3-4 недели",
+    "price": {
+      "1": 19.30,
+      "10": 18.66,
+      "25": 18.47,
+      "100": 12.52,
+      "250": 9.46,
+      "4000": 9.27
+    }
+  },
+  {
+    "provider": "Rochester (возможен старый DC)",
+    "item": "SMBJ40AHE3/52 (DC:1851)",
+    "brand": "Yangjie Electronic Technology",
+    "available": 705000,
+    "multiplicity ": 24000,
+    "min": 24000,
+    "norm": 24000,
+    "term": "3-4 недели",
+    "price": {
+      "1": 19.30,
+      "10": 18.66,
+      "25": 18.47,
+      "100": 12.52,
+      "250": 9.46,
+      "4000": 9.27
+    }
+  },
+  {
+    "provider": "Rochester (возможен старый DC)",
+    "item": "SMBJ40AHE3/52 (DC:1851)",
+    "brand": "Yangjie Electronic Technology",
+    "available": 705000,
+    "multiplicity ": 24000,
+    "min": 24000,
+    "norm": 24000,
+    "term": "3-4 недели",
+    "price": {
+      "1": 19.30,
+      "10": 18.66,
+      "25": 18.47,
+      "100": 12.52,
+      "250": 9.46,
+      "4000": 9.27
+    }
+  }
+]

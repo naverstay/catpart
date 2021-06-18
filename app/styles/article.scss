@@ -1,0 +1,26 @@
+.article {
+  color: $main_gray;
+
+  &-title {
+    font-size: 36px;
+    margin: 0 0 15px;
+  }
+
+  p {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.5;
+
+    + p {
+      margin-top: 15px;
+    }
+  }
+
+  &.__lg {
+    min-height: 78%;
+    display: flex;
+    flex-flow: column nowrap;
+    align-items: center;
+    justify-content: center;
+  }
+}

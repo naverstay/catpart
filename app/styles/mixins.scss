@@ -1,0 +1,89 @@
+@mixin respond-to-max($custom) {
+  @media only screen and (max-width: $custom - 1) {
+    @content;
+  }
+}
+
+@mixin respond-to-min($custom1) {
+  @media only screen and (min-width: $custom1) {
+    @content;
+  }
+}
+
+@mixin btn() {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  height: 30px;
+  padding: 0 10px;
+  min-width: 30px;
+  border-radius: 4px;
+  user-select: none;
+  cursor: pointer;
+  outline: 0;
+  font-weight: bold;
+  font-size: 12px;
+  border: 0;
+  transition: color .3s, background-color .3s, box-shadow .3s;
+
+  &-icon {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  &.__blue {
+    color: #fff;
+    background: $main_blue;
+
+    &:hover {
+      background: $main_blue_light;
+      box-shadow: 0 0 20px rgba(71, 93, 244, 0.5);
+    }
+
+    &.active,
+    &:active {
+      background: $main_blue;
+    }
+  }
+
+  &.__gray {
+    color: $main_gray;
+    background: $main_gray_light;
+
+    &:hover {
+      background: $main_gray_hover;
+    }
+
+    input:checked + &,
+    &.active,
+    &:active {
+      color: #fff;
+      background: $main_gray;
+    }
+  }
+
+  &.__gray-dash {
+    color: $gray_text;
+    background: #fff;
+    border: 2px dashed $gray_border;
+
+    &:hover {
+      background: $main_gray_light;
+    }
+
+    &.active,
+    &:active {
+      background: $main_gray_light;
+    }
+  }
+
+  &.__lg {
+    font-size: 14px;
+    height: 50px;
+  }
+}
+

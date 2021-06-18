@@ -6,6 +6,7 @@ const OfflinePlugin = require('offline-plugin');
 const { HashedModuleIdsPlugin } = require('webpack');
 const TerserPlugin = require('terser-webpack-plugin');
 const CompressionPlugin = require('compression-webpack-plugin');
+const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 
 module.exports = require('./webpack.base.babel')({
   mode: 'production',
@@ -42,6 +43,7 @@ module.exports = require('./webpack.base.babel')({
         cache: true,
         sourceMap: true,
       }),
+      new OptimizeCSSAssetsPlugin({})
     ],
     nodeEnv: 'production',
     sideEffects: true,

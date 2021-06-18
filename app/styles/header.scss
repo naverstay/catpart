@@ -1,0 +1,221 @@
+.header {
+  position: relative;
+  padding-top: 30px;
+
+  @include respond-to-min($tablet) {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  &-navbar {
+    position: relative;
+
+    &__link {
+      color: $gray_link;
+      font-size: 12px;
+      text-decoration: none;
+      white-space: nowrap;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+
+      &:hover {
+        color: $main_blue_light;
+      }
+    }
+
+    &__list {
+      list-style: none;
+
+      li {
+        display: flex;
+      }
+
+      @include respond-to-min($wide) {
+        height: 100%;
+        display: flex;
+        align-items: center;
+        flex-flow: row nowrap;
+        padding-right: 12px;
+
+        li {
+          margin: 0 15px;
+        }
+      }
+    }
+
+    @include respond-to-max($wide) {
+      transition: transform .3s, box-shadow .3s;
+      z-index: 9;
+      padding-top: 115px;
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      width: 200px;
+      background: #fff;
+      transform: translateX(-100%);
+
+      .__open-mob-menu & {
+        transform: translateX(0);
+        box-shadow: 0 0 20px rgba(71, 93, 244, 0.1);
+      }
+
+      &__list {
+        height: 100%;
+        overflow-y: auto;
+
+        .header-navbar__link {
+          display: flex;
+          align-items: center;
+          justify-content: flex-start;
+          width: 100%;
+          height: 30px;
+          padding: 0 30px;
+
+          &:hover {
+            color: #fff;
+            background: $main_blue_light;
+          }
+        }
+      }
+    }
+  }
+
+  &-menu {
+    position: relative;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    z-index: 10;
+
+    span {
+      position: relative;
+      z-index: 1;
+      background: #fff;
+      border-radius: 10px;
+      height: 2px;
+      margin: 1px auto;
+      width: 50%;
+      transition: all .4s cubic-bezier(0.68, -0.6, 0.32, 1.6);
+    }
+
+    .__open-mob-menu & {
+
+      span {
+        &:nth-of-type(1) {
+          width: 30%;
+          margin: 0;
+          transform-origin: bottom;
+          transform: rotatez(45deg) translate(-2px, 2px)
+        }
+
+        &:nth-of-type(2) {
+          width: 60%;
+          transform-origin: top;
+          transform: rotatez(-45deg)
+        }
+
+        &:nth-of-type(3) {
+          margin: 0;
+          transform-origin: bottom;
+          width: 30%;
+          transform: translate(3px, -1px) rotatez(45deg);
+        }
+      }
+    }
+
+    @include respond-to-min($tablet) {
+      position: fixed;
+      top: 30px;
+      left: 30px;
+    }
+
+    @include respond-to-min($wide) {
+      display: none;
+    }
+  }
+
+  &-order {
+    white-space: nowrap;
+    margin-left: 35px;
+
+    @include respond-to-min($tablet) {
+      margin-left: 45px;
+    }
+
+    @include respond-to-min($dt) {
+      margin-left: 60px;
+    }
+  }
+
+  &-phone {
+    color: $gray_link;
+    font-size: 12px;
+    position: relative;
+    text-decoration: none;
+
+    .btn__icon {
+      display: none;
+    }
+
+    &:hover {
+      color: $main_blue_light;
+    }
+
+    @include respond-to-max($tablet) {
+      @include btn();
+
+      .btn__icon {
+        display: block;
+
+        + span {
+          display: none;
+        }
+      }
+
+    }
+  }
+
+  &-logo {
+    text-transform: uppercase;
+    text-decoration: none;
+    font-weight: 800;
+    font-size: 24px;
+    color: $main_gray;
+    white-space: nowrap;
+    max-width: 100%;
+    overflow: hidden;
+    padding: 0 5px;
+    text-overflow: ellipsis;
+
+    @include respond-to-min($tablet) {
+      margin: 0 40px 0 0;
+      padding: 0;
+    }
+
+    @include respond-to-min($dt) {
+      margin-right: 50px;
+    }
+  }
+
+  &-right,
+  &-left {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    justify-content: center;
+  }
+
+  @include respond-to-max($tablet) {
+    &-left {
+      justify-content: space-between;
+    }
+
+    &-right {
+      padding-top: 12px;
+      justify-content: flex-end;
+    }
+  }
+
+}

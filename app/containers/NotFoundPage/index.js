@@ -12,10 +12,9 @@ import messages from './messages';
 
 export default function NotFound() {
   return (
-    <article>
-      <H1>
-        <FormattedMessage {...messages.header} />
-      </H1>
+    <article className={'article text-center __lg'}>
+      <h1 className={'article-title'}>404!</h1>
+      <p>Такой страницы нет. Воспользуйтесь навигацией или поиском.</p>
     </article>
   );
 }

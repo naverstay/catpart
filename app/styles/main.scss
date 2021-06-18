@@ -1,0 +1,67 @@
+.main {
+  position: relative;
+  display: flex;
+  flex-flow: column nowrap;
+  flex: 1 0 auto;
+  padding-top: 15px;
+
+  @include respond-to-min($tablet) {
+    padding-top: 30px;
+  }
+
+  @include respond-to-min($wide) {
+    padding-top: 50px;
+  }
+
+  .main-content {
+    will-change: transform;
+    padding-top: 0;
+    order: 1;
+    transition: padding ($form_transition - $form_transition_delay) $form_transition_delay, opacity ($form_transition - $form_transition_delay) $form_transition_delay;
+    opacity: 0;
+
+    &:not(:empty) {
+      padding-top: 25px;
+      flex: 1 0 auto;
+      opacity: 1;
+
+      @include respond-to-min($dt) {
+        padding-top: 35px;
+      }
+    }
+  }
+
+  .main-content:empty +,
+  &.__center {
+    .form-search {
+      padding-top: 120px;
+      padding-bottom: 60px;
+      top: 47%;
+      transform: translateY(-47%);
+      //transition-delay: .2s;
+
+      .form-content {
+        //margin-bottom: 60px;
+
+        @include respond-to-min($tablet) {
+          //margin-bottom: 115px;
+        }
+      }
+
+      .form-search__title {
+        transform: scale(1);
+        opacity: 1;
+      }
+
+      @include respond-to-min($tablet) {
+        padding-top: 130px;
+        padding-bottom: 115px;
+
+        .form-content {
+          //margin-bottom: 115px;
+        }
+      }
+    }
+
+  }
+}
