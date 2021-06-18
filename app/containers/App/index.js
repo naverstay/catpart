@@ -6,27 +6,28 @@
  * contain code that should be seen on all pages. (e.g. navigation bar)
  */
 
-import React, {useEffect, useState} from 'react';
-import {Helmet} from 'react-helmet';
-import {Switch, Route, useHistory} from 'react-router-dom';
-import ReactNotification, {store} from 'react-notifications-component';
-import SearchForm from 'containers/SearchForm/Loadable';
-import FilterForm from 'containers/FilterForm/Loadable';
-import FeaturePage from 'containers/FeaturePage/Loadable';
-import NotFoundPage from 'containers/NotFoundPage/Loadable';
-import Header from 'components/Header';
-import Footer from 'components/Footer';
+import React, { useEffect, useState } from "react";
+import { Helmet } from "react-helmet";
+import { Switch, Route, useHistory } from "react-router-dom";
+import ReactNotification, { store } from "react-notifications-component";
+import SearchForm from "containers/SearchForm/Loadable";
+import FilterForm from "containers/FilterForm/Loadable";
+import FeaturePage from "containers/FeaturePage/Loadable";
+import NotFoundPage from "containers/NotFoundPage/Loadable";
+import Header from "components/Header";
+import Footer from "components/Footer";
 import Form from "../SearchForm/Form";
-import {readFile} from "../../utils/fileReader";
+import { readFile } from "../../utils/fileReader";
 import Input from "../SearchForm/Input";
 import LoadingIndicator from "../../components/LoadingIndicator";
 
 export default function App() {
   const history = useHistory();
+
   const [orderSent, setOrderSent] = useState(false);
   const [searchResult, setSearchResult] = useState(false);
   const [appDrag, setAppDrag] = useState(false);
-  const [dragText, setDragText] = useState('');
+  const [dragText, setDragText] = useState("");
 
   const [centeredForm, setCenteredForm] = useState(true);
   const [formBusy, setFormBusy] = useState(true);
@@ -38,13 +39,13 @@ export default function App() {
   let formFile = React.createRef();
 
   let createNotification = (type, title, text) => {
-    console.log('createNotification', type, text);
+    console.log("createNotification", type, text);
 
     switch (type) {
-      case 'info':
+      case "info":
 
         break;
-      case 'success':
+      case "success":
         store.addNotification({
           title: title,
           message: text,
@@ -61,15 +62,15 @@ export default function App() {
           }
         });
         break;
-      case 'warning':
+      case "warning":
 
         break;
-      case 'error':
+      case "error":
 
         break;
     }
 
-  }
+  };
 
   let onSubmitSearchForm = evt => {
     if (evt !== undefined && evt.preventDefault) evt.preventDefault();
@@ -77,20 +78,20 @@ export default function App() {
     let form = evt.currentTarget;
 
     if (form) {
-      let art = form.querySelector('#art-number');
-      let quantity = form.querySelector('#quantity');
+      let art = form.querySelector("#art-number");
+      let quantity = form.querySelector("#quantity");
 
       setSearchResult(true);
 
-      createNotification('success', 'Номер компонента: ' + art.value, 'Количество: ' + quantity.value);
+      createNotification("success", "Номер компонента: " + art.value, "Количество: " + quantity.value);
 
-      history.push("/search/?art=" + (art.value || '') + "&q=" + (quantity.value || 1));
+      history.push("/search/?art=" + (art.value || "") + "&q=" + (quantity.value || 1));
 
     }
 
-    console.log('onSubmitForm', evt);
+    console.log("onSubmitForm", evt);
 
-    return false
+    return false;
 
     //setFormBusy(true);
     //
@@ -104,7 +105,7 @@ export default function App() {
 
     setTimeout(() => {
       setFormBusy(false);
-    }, 200)
+    }, 200);
   };
 
   let onReset = () => {
@@ -113,28 +114,37 @@ export default function App() {
 
   let onFill = () => {
     formRef.current.setFieldsValue({
-      note: 'Hello world!',
-      gender: 'male'
+      note: "Hello world!",
+      gender: "male"
     });
   };
 
-  useEffect(() => {
-    let dropContainer = document.getElementById('app');
+  const appHeight = () => {
+    const doc = document.documentElement;
+    const sab = parseInt(getComputedStyle(document.documentElement).getPropertyValue("--sab")) || 0;
+    doc.style.setProperty("--app-height", `${window.innerHeight - sab}px`);
+  };
 
-    dropContainer.ondragover = dropContainer.ondragenter = function (evt) {
+  useEffect(() => {
+    let dropContainer = document.getElementById("app");
+
+    window.addEventListener("resize", appHeight);
+    appHeight();
+
+    dropContainer.ondragover = dropContainer.ondragenter = function(evt) {
       evt.preventDefault();
       setAppDrag(true);
     };
 
-    dropContainer.ondragleave = function (evt) {
+    dropContainer.ondragleave = function(evt) {
       evt.preventDefault();
       setAppDrag(false);
     };
 
-    dropContainer.ondrop = function (evt) {
+    dropContainer.ondrop = function(evt) {
       evt.preventDefault();
 
-      let fileInput = document.getElementById('file');
+      let fileInput = document.getElementById("file");
 
       setAppDrag(false);
 
@@ -144,21 +154,21 @@ export default function App() {
 
       fileInput.files = dT.files;
 
-      fileInput.dispatchEvent(new Event('change', {bubbles: true}));
+      fileInput.dispatchEvent(new Event("change", { bubbles: true }));
     };
 
   }, []);
 
   return (
     <>
-      <div className={'app-wrapper' + (appDrag ? ' __over' : '')}>
-        <Header/>
+      <div className={"app-wrapper" + (appDrag ? " __over" : "")}>
+        <Header />
 
-        <main className={'main' + (centeredForm ? ' __center_' : '')}>
+        <main className={"main" + (centeredForm ? " __center_" : "")}>
           <div className="main-content">
             {orderSent ?
-              <article className={'article text-center __lg'}>
-                <h1 className={'article-title'}>Готово! Заказ отправлен!</h1>
+              <article className={"article text-center __lg"}>
+                <h1 className={"article-title"}>Готово! Заказ отправлен!</h1>
                 <p>Спасибо за заказ. В течение 5 минут счет будет на вашей почте.</p>
               </article>
               :
@@ -169,21 +179,21 @@ export default function App() {
                     name="description"
                     content="A catpart.ru application SearchForm"
                   />
-                </Helmet>}/>
-                <Route path="/about" component={FeaturePage}/>
-                <Route path="/search" component={FilterForm}/>
-                <Route path="" component={NotFoundPage}/>
+                </Helmet>} />
+                <Route path="/about" component={FeaturePage} />
+                <Route path="/search" component={FilterForm} />
+                <Route path="" component={NotFoundPage} />
               </Switch>
             }
           </div>
 
-          <SearchForm onSubmitForm={onSubmitSearchForm} notificationFunc={createNotification}/>
+          <SearchForm onSubmitForm={onSubmitSearchForm} notificationFunc={createNotification} />
 
         </main>
-        <Footer/>
+        <Footer />
       </div>
 
-      <ReactNotification/>
+      <ReactNotification />
     </>
   );
 }

@@ -30,6 +30,11 @@
 
   &-cell {
     position: relative;
+    pointer-events: none;
+
+    > * {
+      pointer-events: all;
+    }
 
     &__search {
       @include respond-to-max($tablet) {

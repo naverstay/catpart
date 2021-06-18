@@ -7,12 +7,12 @@
  *
  */
 
-import produce from 'immer';
-import { CHANGE_CURRENCY } from './constants';
+import produce from "immer";
+import { CHANGE_CURRENCY } from "./constants";
 
 // The initial state of the App
 export const initialState = {
-  currency: 'RUB',
+  currency: "RUB"
 };
 
 /* eslint-disable default-case, no-param-reassign */

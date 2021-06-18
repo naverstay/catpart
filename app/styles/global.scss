@@ -1,5 +1,16 @@
 @import '../../node_modules/sanitize.css/sanitize.css';
 
+:root {
+  --app-height: 100%;
+  --sat: env(safe-area-inset-top);
+  --sar: env(safe-area-inset-right);
+  --sab: env(safe-area-inset-bottom);
+  --sal: env(safe-area-inset-left);
+  --animate-duration: 1s;
+  --animate-delay: 1s;
+  --animate-repeat: 1;
+}
+
 html,
 body {
   height: 100%;

@@ -6,17 +6,17 @@
  * otherwise it'll render a link with an onclick
  */
 
-import React, {Children} from 'react';
-import PropTypes from 'prop-types';
+import React, { Children } from "react";
+import PropTypes from "prop-types";
 
-import A from './A';
+import A from "./A";
 
-import Wrapper from './Wrapper';
+import Wrapper from "./Wrapper";
 
 function Button(props) {
   // Render an anchor tag
   let button = (
-    <a className={'btn'} href={props.href} onClick={props.onClick}>
+    <a className={"btn"} href={props.href} onClick={props.onClick}>
       {Children.toArray(props.children)}
     </a>
   );
@@ -24,13 +24,13 @@ function Button(props) {
   // If the Button has a handleRoute prop, we want to render a button
   if (props.handleRoute) {
     button = (
-      <Button className={'btn'} onClick={props.handleRoute}>
+      <Button className={"btn"} onClick={props.handleRoute}>
         {Children.toArray(props.children)}
       </Button>
     );
   }
 
-  return {button};
+  return { button };
 }
 
 Button.propTypes = {

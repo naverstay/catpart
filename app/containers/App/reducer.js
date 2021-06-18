@@ -7,8 +7,8 @@
  *
  */
 
-import produce from 'immer';
-import { LOAD_REPOS_SUCCESS, LOAD_REPOS, LOAD_REPOS_ERROR } from './constants';
+import produce from "immer";
+import { LOAD_REPOS_SUCCESS, LOAD_REPOS, LOAD_REPOS_ERROR } from "./constants";
 
 // The initial state of the App
 export const initialState = {
@@ -16,8 +16,8 @@ export const initialState = {
   error: false,
   currentUser: false,
   userData: {
-    repositories: false,
-  },
+    repositories: false
+  }
 };
 
 /* eslint-disable default-case, no-param-reassign */

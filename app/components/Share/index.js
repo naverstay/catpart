@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 import {
   FacebookShareCount,
@@ -50,11 +50,11 @@ import {
   InstapaperIcon,
   WeiboIcon,
   HatenaIcon
-} from 'react-share';
+} from "react-share";
 
 function Share() {
-  const shareUrl = 'http://github.com';
-  const title = 'GitHub';
+  const shareUrl = "http://github.com";
+  const title = "GitHub";
 
   return (
     <div className="share-container">
@@ -64,7 +64,7 @@ function Share() {
           quote={title}
           className="share-some-network__share-button"
         >
-          <FacebookIcon size={32} round/>
+          <FacebookIcon size={32} round />
         </FacebookShareButton>
 
         <div>
@@ -80,7 +80,7 @@ function Share() {
           appId="521270401588372"
           className="share-some-network__share-button"
         >
-          <FacebookMessengerIcon size={32} round/>
+          <FacebookMessengerIcon size={32} round />
         </FacebookMessengerShareButton>
       </div>
 
@@ -90,7 +90,7 @@ function Share() {
           title={title}
           className="share-some-network__share-button"
         >
-          <TwitterIcon size={32} round/>
+          <TwitterIcon size={32} round />
         </TwitterShareButton>
 
         <div className="share-some-network__share-count">&nbsp;</div>
@@ -102,7 +102,7 @@ function Share() {
           title={title}
           className="share-some-network__share-button"
         >
-          <TelegramIcon size={32} round/>
+          <TelegramIcon size={32} round />
         </TelegramShareButton>
 
         <div className="share-some-network__share-count">&nbsp;</div>
@@ -115,7 +115,7 @@ function Share() {
           separator=":: "
           className="share-some-network__share-button"
         >
-          <WhatsappIcon size={32} round/>
+          <WhatsappIcon size={32} round />
         </WhatsappShareButton>
 
         <div className="share-some-network__share-count">&nbsp;</div>
@@ -123,7 +123,7 @@ function Share() {
 
       <div className="share-some-network">
         <LinkedinShareButton url={shareUrl} className="share-some-network__share-button">
-          <LinkedinIcon size={32} round/>
+          <LinkedinIcon size={32} round />
         </LinkedinShareButton>
       </div>
 
@@ -133,11 +133,11 @@ function Share() {
           media={`${String(window.location)}/${exampleImage}`}
           className="share-some-network__share-button"
         >
-          <PinterestIcon size={32} round/>
+          <PinterestIcon size={32} round />
         </PinterestShareButton>
 
         <div>
-          <PinterestShareCount url={shareUrl} className="share-some-network__share-count"/>
+          <PinterestShareCount url={shareUrl} className="share-some-network__share-count" />
         </div>
       </div>
 
@@ -147,11 +147,11 @@ function Share() {
           image={`${String(window.location)}/${exampleImage}`}
           className="share-some-network__share-button"
         >
-          <VKIcon size={32} round/>
+          <VKIcon size={32} round />
         </VKShareButton>
 
         <div>
-          <VKShareCount url={shareUrl} className="share-some-network__share-count"/>
+          <VKShareCount url={shareUrl} className="share-some-network__share-count" />
         </div>
       </div>
 
@@ -161,11 +161,11 @@ function Share() {
           image={`${String(window.location)}/${exampleImage}`}
           className="share-some-network__share-button"
         >
-          <OKIcon size={32} round/>
+          <OKIcon size={32} round />
         </OKShareButton>
 
         <div>
-          <OKShareCount url={shareUrl} className="share-some-network__share-count"/>
+          <OKShareCount url={shareUrl} className="share-some-network__share-count" />
         </div>
       </div>
 
@@ -177,11 +177,11 @@ function Share() {
           windowHeight={460}
           className="share-some-network__share-button"
         >
-          <RedditIcon size={32} round/>
+          <RedditIcon size={32} round />
         </RedditShareButton>
 
         <div>
-          <RedditShareCount url={shareUrl} className="share-some-network__share-count"/>
+          <RedditShareCount url={shareUrl} className="share-some-network__share-count" />
         </div>
       </div>
 
@@ -191,11 +191,11 @@ function Share() {
           title={title}
           className="share-some-network__share-button"
         >
-          <TumblrIcon size={32} round/>
+          <TumblrIcon size={32} round />
         </TumblrShareButton>
 
         <div>
-          <TumblrShareCount url={shareUrl} className="share-some-network__share-count"/>
+          <TumblrShareCount url={shareUrl} className="share-some-network__share-count" />
         </div>
       </div>
 
@@ -206,7 +206,7 @@ function Share() {
           description={shareUrl}
           className="share-some-network__share-button"
         >
-          <LivejournalIcon size={32} round/>
+          <LivejournalIcon size={32} round />
         </LivejournalShareButton>
       </div>
 
@@ -216,7 +216,7 @@ function Share() {
           title={title}
           className="share-some-network__share-button"
         >
-          <MailruIcon size={32} round/>
+          <MailruIcon size={32} round />
         </MailruShareButton>
       </div>
 
@@ -227,7 +227,7 @@ function Share() {
           body="body"
           className="share-some-network__share-button"
         >
-          <EmailIcon size={32} round/>
+          <EmailIcon size={32} round />
         </EmailShareButton>
       </div>
       <div className="share-some-network">
@@ -236,7 +236,7 @@ function Share() {
           title={title}
           className="share-some-network__share-button"
         >
-          <ViberIcon size={32} round/>
+          <ViberIcon size={32} round />
         </ViberShareButton>
       </div>
 
@@ -246,7 +246,7 @@ function Share() {
           quote={title}
           className="share-some-network__share-button"
         >
-          <WorkplaceIcon size={32} round/>
+          <WorkplaceIcon size={32} round />
         </WorkplaceShareButton>
       </div>
 
@@ -256,7 +256,7 @@ function Share() {
           title={title}
           className="share-some-network__share-button"
         >
-          <LineIcon size={32} round/>
+          <LineIcon size={32} round />
         </LineShareButton>
       </div>
 
@@ -267,7 +267,7 @@ function Share() {
           image={`${String(window.location)}/${exampleImage}`}
           className="share-some-network__share-button"
         >
-          <WeiboIcon size={32} round/>
+          <WeiboIcon size={32} round />
         </WeiboShareButton>
       </div>
 
@@ -277,7 +277,7 @@ function Share() {
           title={title}
           className="share-some-network__share-button"
         >
-          <PocketIcon size={32} round/>
+          <PocketIcon size={32} round />
         </PocketShareButton>
       </div>
 
@@ -287,7 +287,7 @@ function Share() {
           title={title}
           className="share-some-network__share-button"
         >
-          <InstapaperIcon size={32} round/>
+          <InstapaperIcon size={32} round />
         </InstapaperShareButton>
       </div>
 
@@ -299,11 +299,11 @@ function Share() {
           windowHeight={460}
           className="share-some-network__share-button"
         >
-          <HatenaIcon size={32} round/>
+          <HatenaIcon size={32} round />
         </HatenaShareButton>
 
         <div>
-          <HatenaShareCount url={shareUrl} className="share-some-network__share-count"/>
+          <HatenaShareCount url={shareUrl} className="share-some-network__share-count" />
         </div>
       </div>
     </div>

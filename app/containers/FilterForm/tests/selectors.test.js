@@ -1,25 +1,25 @@
-import { selectHome, makeSelectCurrency } from '../selectors';
+import { selectHome, makeSelectCurrency } from "../selectors";
 
-describe('selectHome', () => {
-  it('should select the home state', () => {
+describe("selectHome", () => {
+  it("should select the home state", () => {
     const homeState = {
-      userData: {},
+      userData: {}
     };
     const mockedState = {
-      home: homeState,
+      home: homeState
     };
     expect(selectHome(mockedState)).toEqual(homeState);
   });
 });
 
-describe('makeSelectCurrency', () => {
+describe("makeSelectCurrency", () => {
   const usernameSelector = makeSelectCurrency();
-  it('should select the username', () => {
-    const username = 'mxstbr';
+  it("should select the username", () => {
+    const username = "mxstbr";
     const mockedState = {
       home: {
-        username,
-      },
+        username
+      }
     };
     expect(usernameSelector(mockedState)).toEqual(username);
   });

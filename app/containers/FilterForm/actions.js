@@ -15,7 +15,7 @@
  *    }
  */
 
-import {CHANGE_CURRENCY} from './constants';
+import { CHANGE_CURRENCY } from "./constants";
 
 /**
  * Changes the input field of the form
@@ -27,7 +27,7 @@ import {CHANGE_CURRENCY} from './constants';
  */
 
 export function changeCurrency(exchangeRate, currency) {
-  console.log('changeCurrency', exchangeRate, currency);
+  console.log("changeCurrency", exchangeRate, currency);
 
   return {
     type: CHANGE_CURRENCY,

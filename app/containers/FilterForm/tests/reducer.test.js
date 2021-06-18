@@ -1,24 +1,24 @@
-import produce from 'immer';
+import produce from "immer";
 
-import filterReducer from '../reducer';
-import { changeUsername } from '../actions';
+import filterReducer from "../reducer";
+import { changeUsername } from "../actions";
 
 /* eslint-disable default-case, no-param-reassign */
-describe('filterReducer', () => {
+describe("filterReducer", () => {
   let state;
   beforeEach(() => {
     state = {
-      username: '',
+      username: ""
     };
   });
 
-  it('should return the initial state', () => {
+  it("should return the initial state", () => {
     const expectedResult = state;
     expect(filterReducer(undefined, {})).toEqual(expectedResult);
   });
 
-  it('should handle the changeUsername action correctly', () => {
-    const fixture = 'mxstbr';
+  it("should handle the changeUsername action correctly", () => {
+    const fixture = "mxstbr";
     const expectedResult = produce(state, draft => {
       draft.username = fixture;
     });
