@@ -15,8 +15,8 @@ import ListItemTitle from './ListItemTitle';
 
 export default function FeaturePage(props) {
   useEffect(() => {
-    console.log('props', props);
-  });
+    props.setOpenMobMenu(false);
+  }, []);
 
   return (
     <div className="row">

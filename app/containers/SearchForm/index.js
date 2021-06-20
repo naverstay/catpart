@@ -35,19 +35,9 @@ import saga from './saga';
 
 const key = 'home';
 
-export function SearchForm({ dndFile, notificationFunc, location, onSubmitForm, artNumber, loading, error, repos, onChangeUsername }) {
+export function SearchForm({ dndFile, notificationFunc, busy, location, onSubmitForm, artNumber, loading, error, repos, onChangeUsername }) {
   useInjectReducer({ key, reducer });
   useInjectSaga({ key, saga });
-
-  console.log('location', location);
-
-  // let { artNumber, searchQuantity } = useParams();
-
-  // console.log('searchQuantity', searchQuantity, artNumber);
-
-  const [centeredForm, setCenteredForm] = useState(true);
-  const [formBusy, setFormBusy] = useState(true);
-  const [formDrag, setFormDrag] = useState(false);
 
   const formRef = React.createRef();
   const formArtNumber = React.createRef();
@@ -63,25 +53,6 @@ export function SearchForm({ dndFile, notificationFunc, location, onSubmitForm, 
       return /^\d*\.?\d*$/.test(value); // Allow digits and '.' only, using a RegExp
     });
   }, []);
-
-  const onFinish = values => {
-    setFormBusy(true);
-
-    setTimeout(() => {
-      setFormBusy(false);
-    }, 200);
-  };
-
-  const onReset = () => {
-    formRef.current.resetFields();
-  };
-
-  const onFill = () => {
-    formRef.current.setFieldsValue({
-      note: 'Hello world!',
-      gender: 'male',
-    });
-  };
 
   const reposListProps = {
     loading,
@@ -102,10 +73,19 @@ export function SearchForm({ dndFile, notificationFunc, location, onSubmitForm, 
               Номер компонента
             </label>
             <div className="form-control">
-              <input ref={formArtNumber} defaultValue={query.get('art') || ''} id="art-number" type="text" className="input __lg" />
+              <input
+                //value={artNumber}
+                disabled={busy}
+                onChange={onChangeUsername}
+                ref={formArtNumber}
+                defaultValue={query.get('art') || ''}
+                id="art-number"
+                type="text"
+                className="input __lg"
+              />
             </div>
             <div className="form-tip">
-              Например,{' '}
+              <span>Например, </span>
               <span
                 className="form-tip__example"
                 onClick={() => {
@@ -122,7 +102,15 @@ export function SearchForm({ dndFile, notificationFunc, location, onSubmitForm, 
               Количество
             </label>
             <div className="form-control">
-              <input ref={formQuantity} defaultValue={(query.get('q') || '').replace(/\D/g, '')} id="quantity" type="text" className="input __lg" />
+              <input
+                ref={formQuantity}
+                //value={}
+                disabled={busy}
+                defaultValue={(query.get('q') || '').replace(/\D/g, '')}
+                id="quantity"
+                type="text"
+                className="input __lg"
+              />
             </div>
             <div className="form-tip">
               <span
@@ -203,6 +191,7 @@ export function SearchForm({ dndFile, notificationFunc, location, onSubmitForm, 
 
 SearchForm.propTypes = {
   dndFile: PropTypes.string,
+  busy: PropTypes.bool,
   loading: PropTypes.bool,
   error: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
   repos: PropTypes.oneOfType([PropTypes.array, PropTypes.bool]),
@@ -222,11 +211,11 @@ const mapStateToProps = createStructuredSelector({
 export function mapDispatchToProps(dispatch) {
   return {
     onChangeUsername: evt => dispatch(changeArtNumber(evt.target.value)),
-    // onSubmitForm: evt => {
-    //  console.log('onSubmitForm');
+    //onSubmitForm: evt => {
+    //  console.log('## dispatch onSubmitForm');
     //  if (evt !== undefined && evt.preventDefault) evt.preventDefault();
     //  dispatch(loadRepos());
-    // }
+    //},
   };
 }
 

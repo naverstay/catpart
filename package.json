@@ -66,6 +66,7 @@
   },
   "dependencies": {
     "@babel/polyfill": "7.4.3",
+    "axios": "^0.21.1",
     "chalk": "2.4.2",
     "compression": "1.7.4",
     "connected-react-router": "6.4.0",
@@ -89,6 +90,7 @@
     "react-dom": "16.8.6",
     "react-file-drop": "^3.1.2",
     "react-helmet": "6.0.0-beta",
+    "react-hook-form": "^7.9.0",
     "react-intl": "2.8.0",
     "react-notifications": "^1.7.2",
     "react-notifications-component": "^3.1.0",

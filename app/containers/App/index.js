@@ -20,23 +20,22 @@ import Form from '../SearchForm/Form';
 import { readFile } from '../../utils/fileReader';
 import Input from '../SearchForm/Input';
 import LoadingIndicator from '../../components/LoadingIndicator';
+import searchRequest from '../../utils/search';
 
 export default function App() {
   const history = useHistory();
 
+  const [searchData, setSearchData] = useState([]);
+  const [openMobMenu, setOpenMobMenu] = useState(false);
   const [orderSent, setOrderSent] = useState(false);
+  const [searchCount, setSearchCount] = useState(1);
   const [searchResult, setSearchResult] = useState(false);
   const [appDrag, setAppDrag] = useState(false);
   const [dragText, setDragText] = useState('');
 
   const [centeredForm, setCenteredForm] = useState(true);
-  const [formBusy, setFormBusy] = useState(true);
+  const [formBusy, setFormBusy] = useState(false);
   const [formDrag, setFormDrag] = useState(false);
-
-  const formRef = React.createRef();
-  const formArtNumber = React.createRef();
-  const formQuantity = React.createRef();
-  const formFile = React.createRef();
 
   const createNotification = (type, title, text) => {
     console.log('createNotification', type, text);
@@ -78,42 +77,36 @@ export default function App() {
       const quantity = form.querySelector('#quantity');
 
       if (art.value.length) {
+        const requestURL = `https://dev.catpart.ru/api/search`;
         setSearchResult(true);
+        setFormBusy(true);
 
         createNotification('success', `Номер компонента: ${art.value}`, `Количество: ${quantity.value}`);
 
+        setSearchCount(quantity.value || 1);
+
         history.push(`/search/?art=${art.value || ''}&q=${quantity.value || 1}`);
+
+        let options = {
+          q: art.value,
+          c: quantity.value || 1,
+        };
+
+        console.log('options', options);
+
+        searchRequest(requestURL, options, data => {
+          setFormBusy(false);
+
+          setSearchData(data);
+
+          console.log('searchRequest', data);
+        });
       }
     }
 
     console.log('onSubmitForm', evt);
 
     return false;
-
-    // setFormBusy(true);
-    //
-    // setTimeout(() => {
-    //  setFormBusy(false);
-    // }, 200)
-  };
-
-  const onFinish = values => {
-    setFormBusy(true);
-
-    setTimeout(() => {
-      setFormBusy(false);
-    }, 200);
-  };
-
-  const onReset = () => {
-    formRef.current.resetFields();
-  };
-
-  const onFill = () => {
-    formRef.current.setFieldsValue({
-      note: 'Hello world!',
-      gender: 'male',
-    });
   };
 
   const appHeight = () => {
@@ -158,7 +151,7 @@ export default function App() {
   return (
     <>
       <div className={`app-wrapper${appDrag ? ' __over' : ''}`}>
-        <Header />
+        <Header openMobMenu={openMobMenu} setOpenMobMenu={setOpenMobMenu} />
 
         <main className={`main${centeredForm ? ' __center_' : ''}`}>
           <div className="main-content">
@@ -181,15 +174,16 @@ export default function App() {
                 />
                 {/* <Route path="/about" component={FeaturePage} /> */}
                 {/* <Route path="/search" component={FilterForm} /> */}
-                <Route path="/about" render={routeProps => <FeaturePage {...routeProps} />} />
-                <Route path="/search" render={routeProps => <FilterForm showResults props={{ ...routeProps }} />} />
+                <Route path="/about" render={routeProps => <FeaturePage setOpenMobMenu={setOpenMobMenu} {...routeProps} />} />
+                <Route path="/search" render={routeProps => <FilterForm setOpenMobMenu={setOpenMobMenu} searchData={searchData} showResults cart={false} props={{ ...routeProps }} />} />
+                <Route path="/cart" render={routeProps => <FilterForm setOpenMobMenu={setOpenMobMenu} showResults cart={true} props={{ ...routeProps }} />} />
 
-                <Route path="" component={NotFoundPage} />
+                <Route path="" render={routeProps => <NotFoundPage setOpenMobMenu={setOpenMobMenu} {...routeProps} />} />
               </Switch>
             )}
           </div>
 
-          <SearchForm onSubmitForm={onSubmitSearchForm} notificationFunc={createNotification} />
+          <SearchForm setOpenMobMenu={setOpenMobMenu} busy={formBusy} onSubmitForm={onSubmitSearchForm} notificationFunc={createNotification} />
         </main>
         <Footer />
       </div>

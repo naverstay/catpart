@@ -10,9 +10,7 @@ import HeaderLink from './HeaderLink';
 import Banner from './banner.jpg';
 import messages from './messages';
 
-function Header() {
-  const [openMobMenu, setOpenMobMenu] = useState(false);
-
+function Header({ openMobMenu, setOpenMobMenu }) {
   return (
     <header className={`header${openMobMenu ? ' __open-mob-menu' : ''}`}>
       <div className="header-left">
@@ -76,7 +74,7 @@ function Header() {
         </Link>
         <div className="header-order">
           <Ripples during={1000}>
-            <div className="btn __blue">
+            <Link to={'/cart'} className="btn __blue">
               <span
                 style={{
                   borderRight: '1px solid #97a4f9',
@@ -87,7 +85,7 @@ function Header() {
                 Заказ
               </span>
               <span>12345</span>
-            </div>
+            </Link>
           </Ripples>
         </div>
       </div>

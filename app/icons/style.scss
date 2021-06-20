@@ -2,9 +2,10 @@
 
 @font-face {
   font-family: '#{$icomoon-font-family}';
-  src: url('#{$icomoon-font-path}/#{$icomoon-font-family}.ttf?t5x0ws') format('truetype'),
-  url('#{$icomoon-font-path}/#{$icomoon-font-family}.woff?t5x0ws') format('woff'),
-  url('#{$icomoon-font-path}/#{$icomoon-font-family}.svg?t5x0ws##{$icomoon-font-family}') format('svg');
+  src:
+    url('#{$icomoon-font-path}/#{$icomoon-font-family}.ttf?cwbqn7') format('truetype'),
+    url('#{$icomoon-font-path}/#{$icomoon-font-family}.woff?cwbqn7') format('woff'),
+    url('#{$icomoon-font-path}/#{$icomoon-font-family}.svg?cwbqn7##{$icomoon-font-family}') format('svg');
   font-weight: normal;
   font-style: normal;
   font-display: block;
@@ -25,18 +26,21 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.icon-close {
+  &:before {
+    content: $icon-close;
+  }
+}
 .icon-call {
   &:before {
     content: $icon-call;
   }
 }
-
 .icon-cart {
   &:before {
     content: $icon-cart;
   }
 }
-
 .icon-download {
   &:before {
     content: $icon-download;
