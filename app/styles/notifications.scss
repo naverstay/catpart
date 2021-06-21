@@ -306,8 +306,19 @@
   animation-name: bounceOutRight;
 }
 
+.notifications-component {
+  > * {
+    pointer-events: none;
+  }
+}
+
 .notification {
+  pointer-events: all;
   //height: auto !important;
+
+  &:first-child {
+    margin-top: 50px;
+  }
 }
 
 .notification__item {

@@ -3,6 +3,7 @@ import React from 'react';
 import A from 'components/A';
 import LocaleToggle from 'containers/LocaleToggle';
 import messages from './messages';
+import { Link } from 'react-router-dom';
 
 function Footer() {
   return (
@@ -11,11 +12,10 @@ function Footer() {
         <div className="footer-content">
           <div className="footer-copyright">
             2012-2021 © ООО «Сибэлком-Логистик», ИНН&nbsp;5404462899 <br />
-            Для повышения удобства сайт использует cookies. Оставаясь на сайте,
-            вы соглашаетесь с{' '}
-            <a className="footer-link" href="#">
+            Для повышения удобства сайт использует cookies. Оставаясь на сайте, вы соглашаетесь с{' '}
+            <Link className="footer-link" to="/policy">
               политикой конфиденциальности
-            </a>
+            </Link>
             .
           </div>
 

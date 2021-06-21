@@ -16,29 +16,43 @@
   .main-content {
     will-change: transform;
     padding-top: 0;
-    order: 1;
-    transition: padding ($form_transition - $form_transition_delay) $form_transition_delay, opacity ($form_transition - $form_transition_delay) $form_transition_delay;
-    opacity: 0;
+    transition: padding $form_transition, opacity $form_transition;
+    transition-delay: $form_transition + $title_transition;
+    opacity: 1;
 
-    &:not(:empty) {
-      padding-top: 25px;
-      flex: 1 0 auto;
-      opacity: 1;
+    //&:not(:empty) {
+    //  padding-top: 25px;
+    //  flex: 1 0 auto;
+    //  opacity: 1;
+    //
+    //  @include respond-to-min($dt) {
+    //    padding-top: 35px;
+    //  }
+    //}
+  }
 
-      @include respond-to-min($dt) {
-        padding-top: 35px;
-      }
+  &:not(.__center) .main-content {
+    padding-top: 25px;
+    flex: 1 0 auto;
+    opacity: 1;
+
+    @include respond-to-min($dt) {
+      padding-top: 35px;
     }
   }
 
-  .main-content:empty +,
+  //.main-content:empty +,
   &.__center {
+    .main-content {
+      opacity: 0;
+    }
+
     .form-search {
       padding-top: 120px;
       padding-bottom: 60px;
       top: 47%;
       transform: translateY(-47%);
-      //transition-delay: .2s;
+      transition-delay: 0s;
 
       .form-content {
         //margin-bottom: 60px;
@@ -49,7 +63,7 @@
       }
 
       .form-search__title {
-        transform: scale(1);
+        transition-delay: $form_transition;
         opacity: 1;
       }
 

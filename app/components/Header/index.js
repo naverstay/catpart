@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { FormattedMessage } from 'react-intl';
-
+import { useDetectClickOutside } from 'react-detect-click-outside';
 import { Link } from 'react-router-dom';
 import Ripples from 'react-ripples';
 import A from './A';
@@ -10,9 +10,15 @@ import HeaderLink from './HeaderLink';
 import Banner from './banner.jpg';
 import messages from './messages';
 
-function Header({ openMobMenu, setOpenMobMenu }) {
+function Header({ openMobMenu, cartCount, setOpenMobMenu }) {
+  const headerRef = useDetectClickOutside({
+    onTriggered: () => {
+      setOpenMobMenu(false);
+    },
+  });
+
   return (
-    <header className={`header${openMobMenu ? ' __open-mob-menu' : ''}`}>
+    <header ref={headerRef} className={`header${openMobMenu ? ' __open-mob-menu' : ''}`}>
       <div className="header-left">
         <div
           onClick={() => {
@@ -40,51 +46,43 @@ function Header({ openMobMenu, setOpenMobMenu }) {
               О сервисе
             </Link>
           </li>
-          <li>
-            <Link className="header-navbar__link" to="/distributors">
-              Поставщики
-            </Link>
-          </li>
+          {/*<li>*/}
+          {/*  <Link className="header-navbar__link" to="/distributors">*/}
+          {/*    Поставщики*/}
+          {/*  </Link>*/}
+          {/*</li>*/}
           <li>
             <Link className="header-navbar__link" to="/delivery">
               Доставка
             </Link>
           </li>
-          <li>
-            <Link className="header-navbar__link" to="/conditions">
-              Условия
-            </Link>
-          </li>
-          <li>
-            <Link className="header-navbar__link" to="/requisites">
-              Реквизиты
-            </Link>
-          </li>
-          <li>
-            <Link className="header-navbar__link" to="/vacancies ">
-              Вакансии
-            </Link>
-          </li>
+          {/*<li>*/}
+          {/*  <Link className="header-navbar__link" to="/conditions">*/}
+          {/*    Условия*/}
+          {/*  </Link>*/}
+          {/*</li>*/}
+          {/*<li>*/}
+          {/*  <Link className="header-navbar__link" to="/requisites">*/}
+          {/*    Реквизиты*/}
+          {/*  </Link>*/}
+          {/*</li>*/}
+          {/*<li>*/}
+          {/*  <Link className="header-navbar__link" to="/vacancies ">*/}
+          {/*    Вакансии*/}
+          {/*  </Link>*/}
+          {/*</li>*/}
         </div>
       </div>
 
       <div className="header-right">
-        <Link className="header-navbar__link" to="/cabinet ">
-          Личный кабинет
-        </Link>
+        {/*<Link className="header-navbar__link" to="/cabinet ">*/}
+        {/*  Личный кабинет*/}
+        {/*</Link>*/}
         <div className="header-order">
-          <Ripples during={1000}>
-            <Link to={'/cart'} className="btn __blue">
-              <span
-                style={{
-                  borderRight: '1px solid #97a4f9',
-                  paddingRight: '6px',
-                  marginRight: '8px',
-                }}
-              >
-                Заказ
-              </span>
-              <span>12345</span>
+          <Ripples during={1000} className={'btn __blue' + (cartCount ? '' : ' __disabled')}>
+            <Link to={'/cart'} className="btn-inner">
+              <span className={'header-order__label'}>Заказ</span>
+              <span className={'header-order__count'}>12345</span>
             </Link>
           </Ripples>
         </div>

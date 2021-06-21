@@ -1,7 +1,37 @@
-.share {
+.dropdown {
   &-container {
     position: absolute;
     top: 100%;
     left: 0;
+    z-index: 11;
+    background-color: #fff;
+    box-shadow: 0 0 20px rgba(71, 93, 244, 0.1);
+
   }
+
+  &-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    max-height: 300px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    font-size: 12px;
+  }
+
+  &-link {
+    text-decoration: none;
+    display: flex;
+    padding: 0 20px;
+    align-items: center;
+    color: $main_gray;
+    height: 30px;
+    cursor: pointer;
+    transition: background .3s;
+
+    &:hover {
+      background: $main_gray_light;
+    }
+  }
+
 }

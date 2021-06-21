@@ -24,22 +24,43 @@ import saga from './saga';
 import Share from '../../components/Share';
 import { SearchResults } from '../SearchResults';
 import { CartResults } from '../CartResults';
-import searchRequest from '../../utils/search';
+import apiGET from '../../utils/search';
 import { OrderForm } from '../OrderForm';
+import priceFormatter from '../../utils/priceFormatter';
 
 const key = 'home';
 
-export function FilterForm({ props, cart, showResults, notificationFunc, setOpenMobMenu, searchData, loading, error, onChangeCurrency }) {
+export function FilterForm({ props, cart, showResults, notificationFunc, updateCart, setOpenMobMenu, searchData, loading, error, onChangeCurrency }) {
   useInjectReducer({ key, reducer });
   useInjectSaga({ key, saga });
 
   const query = new URLSearchParams(props.location.search);
 
+  const RUB = { name: 'RUB', exChange: 1 };
   const [count, setCount] = useState(0);
-  const [currency, setCurrency] = useState({ name: 'RUR', exChange: 1 });
+  const [openShare, setOpenShare] = useState(false);
+  const [currencyList, setCurrencyList] = useState([RUB]);
+  const [currency, setCurrency] = useState(RUB);
 
   useEffect(() => {
     setOpenMobMenu(false);
+
+    const requestURL = '/currencies';
+
+    apiGET(requestURL, {}, data => {
+      console.log('setCurrencyList', data);
+
+      setCurrencyList(
+        Object.keys(data)
+          .map(c => {
+            return {
+              name: c,
+              exChange: data[c],
+            };
+          })
+          .concat(RUB),
+      );
+    });
   }, []);
 
   const reposListProps = {
@@ -195,101 +216,87 @@ export function FilterForm({ props, cart, showResults, notificationFunc, setOpen
   return (
     <>
       <div className="form-filter">
-        {!cart && <div className="form-filter__stat">{`По запросу «${query.get('art') || ''}» ${searchData.length ? 'найдено ' + plural(searchData.length, 'наименование', 'наименования', 'наименований') + '.' : 'ничего не найдено :('}`}</div>}
+        {!cart && showResults ? (
+          <div className="form-filter__stat">{'По запросу «' + (query.get('art') || '') + '» ' + (searchData.length ? 'найдено ' + plural(searchData.length, 'наименование', 'наименования', 'наименований') + '.' : 'ничего не найдено :(')}</div>
+        ) : (
+          <div className="form-filter__stat">&nbsp;</div>
+        )}
 
         <div className={'form-filter__controls' + (cart ? ' __cart' : '')}>
           {cart ? (
             <div className="form-filter__controls_left">
-              <Ripples className="form-filter__control" during={1000}>
-                <div className="btn __gray">
-                  <span className="btn __blue">
-                    <span className="btn-icon icon icon-download" />
-                  </span>
-                  <span>Скачать список</span>
-                </div>
-              </Ripples>
+              <div className="form-filter__control">
+                <Ripples className="btn __gray" during={1000}>
+                  <div className="btn-inner">
+                    <span className="btn __blue">
+                      <span className="btn-icon icon icon-download" />
+                    </span>
+                    <span>Скачать список</span>
+                  </div>
+                </Ripples>
+              </div>
             </div>
           ) : (
             <div className="form-filter__controls_left">
-              <Ripples className="form-filter__control" during={1000}>
-                <div className="btn __gray">
-                  <span className="btn __blue">
-                    <span className="btn-icon icon icon-download" />
+              <div className="form-filter__control">
+                <Ripples className="btn __gray" during={1000}>
+                  <span className="btn-inner">
+                    <span className="btn __blue">
+                      <span className="btn-icon icon icon-download" />
+                    </span>
+                    <span>Скачать результат поиска</span>
                   </span>
-                  <span>Скачать результат поиска</span>
-                </div>
-              </Ripples>
-              <Ripples className="form-filter__control" during={1000}>
-                <div className="btn __gray">Поделиться</div>
-              </Ripples>
-
-              {/* <Share /> */}
+                </Ripples>
+              </div>
+              <div className="form-filter__control">
+                <Ripples
+                  onClick={() => {
+                    setOpenShare(true);
+                  }}
+                  className="btn __gray"
+                  during={1000}
+                >
+                  <span className="btn-inner">Поделиться</span>
+                </Ripples>
+                {openShare && <Share setOpenFunc={setOpenShare} />}
+              </div>
             </div>
           )}
 
           <div onChange={onChangeSwitch} className="form-filter__controls_right">
-            <Ripples className="form-filter__control" during={1000}>
-              <label className="form-radio__btn">
-                <input
-                  name="currency"
-                  className="hide"
-                  //checked={currency === 'USD'}
-                  data-currency="USD"
-                  type="radio"
-                  value="72.28"
-                />
-                <span className="btn __gray">
-                  <b>USD</b>
-                  <span>72.28</span>
-                </span>
-              </label>
-            </Ripples>
-            <Ripples className="form-filter__control" during={1000}>
-              <label className="form-radio__btn">
-                <input
-                  name="currency"
-                  className="hide"
-                  //checked={currency === 'EUR'}
-                  data-currency="EUR"
-                  type="radio"
-                  value="88.01"
-                />
-                <span className="btn __gray">
-                  <b>EUR</b>
-                  <span>88.01</span>
-                </span>
-              </label>
-            </Ripples>
-            <Ripples className="form-filter__control" during={1000}>
-              <label className="form-radio__btn">
-                <input
-                  name="currency"
-                  className="hide"
-                  defaultChecked
-                  //checked={currency === 'USD'}
-                  data-currency="RUB"
-                  type="radio"
-                  value="1"
-                />
-                <span className="btn __gray">
-                  <b>RUB</b>
-                </span>
-              </label>
-            </Ripples>
+            {currencyList.length > 1 &&
+              currencyList.map((cur, ind) => (
+                <Ripples key={ind} className="form-filter__control" during={1000}>
+                  <label className="form-radio__btn">
+                    <input
+                      name="currency"
+                      className="hide"
+                      //checked={}
+                      defaultChecked={currency.name === cur.name}
+                      data-currency={cur.name}
+                      type="radio"
+                      value={cur.exChange}
+                    />
+                    <span className="btn __gray">
+                      <b>{cur.name}</b>
+                      {cur.name !== 'RUB' && <span>{priceFormatter(cur.exChange)}</span>}
+                    </span>
+                  </label>
+                </Ripples>
+              ))}
           </div>
         </div>
       </div>
 
-      {showResults &&
-        (cart ? (
-          <>
-            <CartResults count={count} currency={currency} list={cartData} />
+      {cart ? (
+        <>
+          <CartResults updateCart={updateCart} notificationFunc={notificationFunc} showResults={showResults} count={count} currency={currency} />
 
-            <OrderForm />
-          </>
-        ) : (
-          <SearchResults count={count} currency={currency} list={searchData} />
-        ))}
+          <OrderForm />
+        </>
+      ) : (
+        <SearchResults updateCart={updateCart} notificationFunc={notificationFunc} highlight={query.get('art') || ''} showResults={showResults} count={query.get('q') || ''} currency={currency} list={searchData} />
+      )}
     </>
   );
 }

@@ -1,6 +1,7 @@
 import axios from 'axios';
 
 const CancelToken = axios.CancelToken;
+const API = 'https://dev.catpart.ru/api';
 let cancel;
 
 /**
@@ -48,19 +49,19 @@ function checkStatus(response) {
  * @return {object}           The response data
  */
 
-export default function searchRequest(url, options, cb) {
-  if (typeof cancel === 'function') {
-    cancel();
-    cancel = null;
+export default function apiGET(url, options, cb) {
+  //if (typeof cancel === 'function' && url.indexOf('search') > -1) {
+  //  cancel();
+  //  cancel = null;
+  //
+  //  if (typeof cb === 'function') {
+  //    cb([]);
+  //  }
+  //
+  //  console.log('canceled', cancel);
+  //}
 
-    if (typeof cb === 'function') {
-      cb([]);
-    }
-
-    console.log('canceled', cancel);
-  }
-
-  return axios(url, {
+  return axios(API + url, {
     headers: {
       'Content-Type': 'application/json',
       Accept: 'application/json',
@@ -75,6 +76,8 @@ export default function searchRequest(url, options, cb) {
     .then(checkStatus)
     .then(parseJSON)
     .then(data => {
+      cancel = null;
+
       if (typeof cb === 'function') {
         cb(data);
       }

@@ -129,8 +129,8 @@ export function OrderForm({ dndFile, notificationFunc, onSubmitForm, loading, er
         <FormInput textarea={true} placeholder={'Комментарий'} name="order-delivery" className="__lg" />
 
         <div className="form-control">
-          <Ripples className="__w-100p" during={1000}>
-            <button disabled={!validForm} className="btn __blue __lg __w-100p">
+          <Ripples className={'__w-100p btn __blue __lg' + (!validForm ? ' __disabled' : '')} during={1000}>
+            <button className="btn-inner">
               <span>Оформить заказ</span>
             </button>
           </Ripples>

@@ -5,6 +5,7 @@
  */
 
 import React, { useEffect, useState } from 'react';
+
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
@@ -13,12 +14,11 @@ import { FormattedNumber } from 'react-intl';
 import { makeSelectCurrentUser } from 'containers/App/selectors';
 import Ripples from 'react-ripples';
 import priceFormatter from '../../utils/priceFormatter';
+import Skeleton from '../Skeleton';
+import SearchRow from '../SearchRow';
 
 export function SearchResults(props) {
-  let { list, cart, currency, count } = props;
-  let prevY = 0;
-
-  //const query = new URLSearchParams(location.search);
+  let { list, cart, currency, count, showResults, highlight, notificationFunc, updateCart } = props;
 
   let defaultCount = count;
 
@@ -64,43 +64,7 @@ export function SearchResults(props) {
           <div className="search-results__cell __cart">&nbsp;</div>
         </div>
 
-        {list.map((row, rowIndex) => (
-          <div key={rowIndex} className={`search-results__row${rowIndex % 2 === 0 ? ' __odd' : ' __even'}`}>
-            {Object.keys(tableHeader).map((cell, ci) => (
-              <div key={ci} className={`search-results__cell __${cell}`}>
-                {cell === 'name' ? null : <span className="search-results__label">{tableHeader[cell]}</span>}
-                <span className={'search-results__value'}>
-                  {cell === 'pricebreaks'
-                    ? row.pricebreaks.map((p, pi) => (
-                        <span key={pi} className="search-results__item">
-                          {priceFormatter(parseFloat(p.price / currency.exChange).toFixed(2))}
-                        </span>
-                      ))
-                    : cell === 'total'
-                    ? row.pricebreaks.map((p, pi) => (
-                        <span key={pi} className="search-results__item">
-                          x{p.quant}={priceFormatter((parseFloat(p.quant) * parseFloat(p.price / currency.exChange)).toFixed(2))}
-                        </span>
-                      ))
-                    : row[cell] || '!' + cell + '!'}
-                </span>
-              </div>
-            ))}
-
-            <div className="search-results__cell __cart">
-              <div className="search-results__cart">
-                <input defaultValue={defaultCount || row.min} type="text" className="input" />
-                <div className="search-results__add">
-                  <Ripples during={1000}>
-                    <div className="btn __blue">
-                      <span className="btn__icon icon icon-cart" />
-                    </div>
-                  </Ripples>
-                </div>
-              </div>
-            </div>
-          </div>
-        ))}
+        {showResults ? list.map((row, ri) => <SearchRow key={ri} updateCart={updateCart} tableHeader={tableHeader} defaultCount={defaultCount} currency={currency} highlight={highlight} row={row} rowIndex={ri} />) : <Skeleton />}
       </div>
     </div>
   );

@@ -44,6 +44,11 @@
       }
     }
 
+    @include respond-to-min($wide) {
+      flex: 1 0 auto;
+      padding-left: 35px;
+    }
+
     @include respond-to-max($wide) {
       transition: transform .3s, box-shadow .3s;
       z-index: 9;
@@ -139,6 +144,21 @@
   &-order {
     white-space: nowrap;
     margin-left: 35px;
+
+    &__label {
+      margin-right: 8px;
+      padding-right: 6px;
+      transition: border .3s;
+      border-right: 1px solid #97a4f9;
+
+      .__disabled & {
+        border-color: #fff;
+      }
+    }
+
+    &__count {
+      min-width: 35px;
+    }
 
     @include respond-to-min($tablet) {
       margin-left: 45px;

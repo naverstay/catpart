@@ -6,9 +6,7 @@
 import React, { useEffect, memo, useState } from 'react';
 import { useParams, useLocation } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import { Helmet } from 'react-helmet';
-// import {FileDrop} from 'react-file-drop';
-import { FormattedMessage } from 'react-intl';
+
 import { connect } from 'react-redux';
 import { compose } from 'redux';
 import { createStructuredSelector } from 'reselect';
@@ -17,16 +15,9 @@ import Ripples from 'react-ripples';
 import { useInjectReducer } from 'utils/injectReducer';
 import { useInjectSaga } from 'utils/injectSaga';
 import { makeSelectRepos, makeSelectLoading, makeSelectError } from 'containers/App/selectors';
-import H2 from 'components/H2';
-import ReposList from 'components/ReposList';
+
 import { readFile } from '../../utils/fileReader';
-import AtPrefix from './AtPrefix';
-import CenteredSection from './CenteredSection';
-import Form from './Form';
-import Input from './Input';
-import Section from './Section';
-import messages from './messages';
-import { loadRepos } from '../App/actions';
+
 import { changeArtNumber } from './actions';
 import { makeSelectArtNumber } from './selectors';
 import { setInputFilter } from '../../utils/inputFilter';
@@ -46,12 +37,14 @@ export function SearchForm({ dndFile, notificationFunc, busy, location, onSubmit
 
   const query = new URLSearchParams(useLocation().search);
 
-  const onSubmitSearchForm = values => {};
+  let searchBtnText = useLocation().pathname === '/' ? 'Искать' : 'Продолжить искать';
 
   useEffect(() => {
     setInputFilter(formQuantity.current, function(value) {
       return /^\d*\.?\d*$/.test(value); // Allow digits and '.' only, using a RegExp
     });
+
+    onSubmitForm({ currentTarget: formRef.current });
   }, []);
 
   const reposListProps = {
@@ -143,9 +136,9 @@ export function SearchForm({ dndFile, notificationFunc, busy, location, onSubmit
           <div className="form-cell form-cell__search column sm-col-12 md-col-4 lg-col-2">
             <span className="form-label">&nbsp;</span>
             <div className="form-control">
-              <Ripples className="__w-100p" during={1000}>
-                <button className="btn __blue __lg __w-100p">
-                  <span>Искать</span>
+              <Ripples className="__w-100p btn __blue __lg" during={1000}>
+                <button className="btn-inner __abs">
+                  <span>{searchBtnText}</span>
                 </button>
               </Ripples>
             </div>
@@ -154,8 +147,8 @@ export function SearchForm({ dndFile, notificationFunc, busy, location, onSubmit
           <div className="form-cell column form-cell__or sm-col-12 md-col-4 lg-col-2">
             <span className="form-label">&nbsp;</span>
             <div data-or="или" className="form-control">
-              <Ripples className="__w-100p" during={1000}>
-                <label className="btn __lg __gray-dash __w-100p">
+              <Ripples className="__w-100p btn __lg __gray-dash" during={1000}>
+                <label className="btn-inner __abs">
                   <span>Загрузить BOM</span>
                   <input
                     className="hide"
