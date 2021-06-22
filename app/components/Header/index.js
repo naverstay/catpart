@@ -40,7 +40,7 @@ function Header({ openMobMenu, cartCount, setOpenMobMenu }) {
       </div>
 
       <div className="header-navbar">
-        <div className="header-navbar__list">
+        <ul className="header-navbar__list">
           <li>
             <Link className="header-navbar__link" to="/about">
               О сервисе
@@ -71,7 +71,7 @@ function Header({ openMobMenu, cartCount, setOpenMobMenu }) {
           {/*    Вакансии*/}
           {/*  </Link>*/}
           {/*</li>*/}
-        </div>
+        </ul>
       </div>
 
       <div className="header-right">
@@ -82,7 +82,7 @@ function Header({ openMobMenu, cartCount, setOpenMobMenu }) {
           <Ripples during={1000} className={'btn __blue' + (cartCount ? '' : ' __disabled')}>
             <Link to={'/cart'} className="btn-inner">
               <span className={'header-order__label'}>Заказ</span>
-              <span className={'header-order__count'}>12345</span>
+              <span className={'header-order__count'}>{cartCount}</span>
             </Link>
           </Ripples>
         </div>

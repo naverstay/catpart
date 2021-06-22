@@ -4,44 +4,41 @@
  * @param el
  * @param {number} startValue
  * @param {number} endValue
- * @param {number} stepCount
  * @param {number} duration
  *
  * @returns {number}
  */
-export const counterEffect = (el, startValue, endValue, stepCount, duration) => {
-  let currentValue = startValue;
-  let stepValue = (endValue - startValue) / stepCount;
+import priceFormatter from './priceFormatter';
 
-  if (stepValue < 1) {
-    stepValue = 1;
+export function counterEffect(el, startValue, endValue, duration) {
+  let timer;
+
+  // assumes integer values for start and end
+
+  let range = endValue - startValue;
+  // no timer shorter than 50ms (not really visible any way)
+  let minTimer = 100;
+  // calc step time to show all interediate values
+  // never go below minTimer
+  let stepTime = Math.max(Math.abs(Math.floor(duration / range)), minTimer);
+
+  // get current time and calculate desired end time
+  let startTime = new Date().getTime();
+  let endTime = startTime + duration;
+
+  function run() {
+    let now = new Date().getTime();
+
+    if (now > endTime) {
+      el.innerHTML = priceFormatter(endValue);
+      clearInterval(timer);
+    } else {
+      let remaining = Math.max((endTime - now) / duration, 0);
+      let value = endValue - remaining * range;
+      el.innerHTML = priceFormatter(value.toFixed(2));
+    }
   }
 
-  if (Math.abs(stepValue * stepCount) < Math.abs(endValue - startValue)) {
-    stepValue = 1;
-  }
-
-  let stepTime = Math.abs(Math.floor(duration / (endValue - startValue)));
-
-  if (stepTime === duration) {
-    stepTime = 0;
-  }
-
-  if (endValue === startValue) {
-    el.innerHTML = new Intl.NumberFormat('ru-RU').format(parseInt(endValue));
-  } else {
-    let timer = setInterval(() => {
-      currentValue += stepValue;
-
-      if (stepValue > 0 && currentValue < endValue) {
-        el.innerHTML = new Intl.NumberFormat('ru-RU').format(parseInt(currentValue));
-      } else if (stepValue < 0 && currentValue > endValue) {
-        el.innerHTML = new Intl.NumberFormat('ru-RU').format(parseInt(currentValue));
-      } else {
-        el.innerHTML = new Intl.NumberFormat('ru-RU').format(parseInt(endValue));
-
-        clearInterval(timer);
-      }
-    }, stepTime);
-  }
-};
+  timer = setInterval(run, stepTime);
+  run();
+}

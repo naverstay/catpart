@@ -3,6 +3,7 @@
   &-results {
     padding: 10px 0;
     font-size: 12px;
+    overflow: hidden;
 
     &__cart {
       position: relative;
@@ -13,6 +14,10 @@
         position: absolute;
         top: 0;
         right: 0;
+
+        > .btn {
+          width: 30px;
+        }
       }
     }
 
@@ -100,6 +105,10 @@
         justify-content: space-between;
         grid-template-areas: unset;
         grid-template-columns: unset;
+      }
+
+      &:not(.__head):hover {
+        background: $main_gray_hover;
       }
     }
 

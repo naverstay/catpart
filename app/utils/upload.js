@@ -42,14 +42,15 @@ function checkStatus(response) {
 /**
  * Requests a URL, returning a promise
  *
- * @param  {string} url         The URL we want to request
- * @param  {object} [options]   The options we want to pass to "fetch"
- * @param  {function} cb        The callback function
+ * @param  {string} url          The URL we want to request
+ * @param  {object} data         The form data
+ * @param  {object} [options]    The options we want to pass to "fetch"
+ * @param  {function} cb         The callback function
  *
- * @return {object}             The response data
+ * @return {object}           The response data
  */
 
-export default function apiGET(url, options, cb) {
+export default function apiPOST(url, data, options, cb) {
   //if (typeof cancel === 'function' && url.indexOf('search') > -1) {
   //  cancel();
   //  cancel = null;
@@ -61,18 +62,19 @@ export default function apiGET(url, options, cb) {
   //  console.log('canceled', cancel);
   //}
 
-  return axios(API + url, {
-    headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-    },
-    data: {},
-    params: options,
-    cancelToken: new CancelToken(function executor(c) {
-      // An executor function receives a cancel function as a parameter
-      cancel = c;
-    }),
-  })
+  return axios
+    .post(API + url, data, {
+      headers: {
+        //'Content-Type': 'application/json',
+        'Content-Type': 'multipart/form-data',
+      },
+      data: data,
+      params: options,
+      cancelToken: new CancelToken(function executor(c) {
+        // An executor function receives a cancel function as a parameter
+        cancel = c;
+      }),
+    })
     .then(checkStatus)
     .then(parseJSON)
     .then(data => {

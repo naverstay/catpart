@@ -33,104 +33,159 @@ import { setInputFilter } from '../../utils/inputFilter';
 import reducer from './reducer';
 import saga from './saga';
 import FormInput from '../../components/FormInput';
+import priceFormatter from '../../utils/priceFormatter';
+import { counterEffect } from '../../utils/counterEffect';
 
 const key = 'home';
 
-export function OrderForm({ dndFile, notificationFunc, onSubmitForm, loading, error, repos, onChangeUsername }) {
+export function OrderForm({ dndFile, delivery, notificationFunc, currency, totalCart, onSubmitForm, loading, error, repos, onChangeUsername }) {
   useInjectReducer({ key, reducer });
   useInjectSaga({ key, saga });
 
-  const [fields, setFields] = useState({});
-  const [errors, setErrors] = useState({});
+  const innInput = React.createRef();
+  const phoneInput = React.createRef();
+  const totalPriceRef = React.createRef();
+  const [fields, setFields] = useState({
+    'order-email': '',
+    'order-name': '',
+    'order-phone': '',
+    'order-inn': '',
+    'order-delivery': '',
+  });
+  const [justRedraw, setJustRedraw] = useState(0);
+  const [totalPrice, setTotalPrice] = useState(0);
+  const [errors, setErrors] = useState({
+    'order-email': null,
+    'order-name': null,
+    'order-phone': null,
+    'order-inn': null,
+    'order-delivery': null,
+  });
   const [validForm, setValidForm] = useState(false);
 
   const formRef = React.createRef();
 
   const requiredFields = ['order-email', 'order-name', 'order-phone', 'order-inn', 'order-delivery'];
 
-  const handleValidation = () => {
-    let formIsValid = true;
-
-    //Name
-    if (!fields['name']) {
-      formIsValid = false;
-      errors['name'] = 'Cannot be empty';
-    }
-
-    if (typeof fields['name'] !== 'undefined') {
-      if (!fields['name'].match(/^[a-zA-Z]+$/)) {
-        formIsValid = false;
-        errors['name'] = 'Only letters';
-      }
-    }
-
-    //Email
-    if (!fields['email']) {
-      formIsValid = false;
-      errors['email'] = 'Cannot be empty';
-    }
-
-    if (typeof fields['email'] !== 'undefined') {
-      let lastAtPos = fields['email'].lastIndexOf('@');
-      let lastDotPos = fields['email'].lastIndexOf('.');
-
-      if (!(lastAtPos < lastDotPos && lastAtPos > 0 && fields['email'].indexOf('@@') == -1 && lastDotPos > 2 && fields['email'].length - lastDotPos > 2)) {
-        formIsValid = false;
-        errors['email'] = 'Email is not valid';
-      }
-    }
-
-    setErrors(errors);
-
-    return formIsValid;
+  const validateEmail = email => {
+    const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(String(email).toLowerCase());
   };
 
   const handleChange = (field, e) => {
     fields[field] = e.target.value;
     setFields(fields);
 
-    let v = requiredFields.filter(f => {
-      return !(fields.hasOwnProperty(f) && fields[f].length);
-    });
+    switch (field) {
+      case 'order-name':
+      case 'order-inn':
+      case 'order-delivery':
+        errors[field] = e.target.value.length ? '' : 'Не может быть пустым';
+        break;
+      case 'order-phone':
+        errors[field] = e.target.value.length > 8 ? '' : 'Минимум 8 символов';
+        break;
+      case 'order-email':
+        errors[field] = e.target.value.length && validateEmail(e.target.value) ? '' : 'Проверьте формат e-mail';
+        break;
+    }
 
-    setValidForm(!v.length);
+    setErrors(errors);
+
+    setValidForm(!Object.values(errors).filter(er => er === null || er.length).length);
+
+    setJustRedraw(justRedraw + 1);
   };
 
   const contactSubmit = e => {
     e.preventDefault();
 
-    if (handleValidation()) {
-      alert('Form submitted');
-    } else {
-      alert('Form has errors.');
-    }
+    console.log('submit');
   };
 
+  useEffect(() => {
+    if (totalPrice !== totalCart) {
+      counterEffect(totalPriceRef.current, totalPrice * currency.exChange, totalCart * currency.exChange, 800);
+      setTotalPrice(totalCart);
+    }
+  }, [totalCart]);
+
+  useEffect(() => {
+    setInputFilter(phoneInput.current, function(value) {
+      return /^\+?\d*$/.test(value); // Allow digits and '+' on beginning only, using a RegExp
+    });
+
+    return () => {
+      phoneInput.current = false;
+    };
+  }, []);
+
   return (
-    <div className="form-order">
+    <div className={'form-order' + (delivery ? ' __delivery' : '')}>
       <form ref={formRef} className="form-content" onSubmit={contactSubmit}>
-        <div className="form-order__text">Максимальный срок доставки:</div>
-        <div className="form-order__text">3-4 недели</div>
-        <div className="form-order__text">Итого:</div>
-        <div className="form-order__text">
-          <span className="form-order__price">61 116 268,08 </span> RUB
-        </div>
+        {delivery && (
+          <>
+            <div className="form-order__text">Максимальный срок доставки:</div>
+            <div className="form-order__text">3-4 недели</div>
+            <div className="form-order__text">Итого:</div>
+            <div className="form-order__text">
+              <span ref={totalPriceRef} className="form-order__price" /> {currency.name}
+            </div>
+          </>
+        )}
 
-        <FormInput onChange={handleChange.bind(this, 'order-email')} value={fields['order-email']} placeholder={'Ваш email'} name="order-email" className="__lg" />
+        <FormInput
+          onChange={handleChange.bind(this, 'order-email')}
+          placeholder={'Ваш email'}
+          name="order-email"
+          //
+          error={errors['order-email']}
+          className={'__lg'}
+        />
 
-        <FormInput onChange={handleChange.bind(this, 'order-name')} value={fields['order-name']} placeholder={'ФИО'} name="order-name" className="__lg" />
+        <FormInput
+          onChange={handleChange.bind(this, 'order-name')}
+          placeholder={'ФИО'}
+          name="order-name"
+          //
+          error={errors['order-name']}
+          className={'__lg'}
+        />
 
-        <FormInput onChange={handleChange.bind(this, 'order-phone')} value={fields['order-phone']} placeholder={'Телефон'} name="order-phone" className="__lg" />
+        <FormInput
+          onChange={handleChange.bind(this, 'order-phone')}
+          placeholder={'Телефон'}
+          name="order-phone"
+          //
+          error={errors['order-phone']}
+          className={'__lg'}
+          inputRef={phoneInput}
+        />
 
-        <FormInput onChange={handleChange.bind(this, 'order-inn')} value={fields['order-inn']} placeholder={'ИНН'} name="order-inn" className="__lg" />
+        <FormInput
+          onChange={handleChange.bind(this, 'order-inn')}
+          placeholder={'ИНН'}
+          name="order-inn"
+          //
+          error={errors['order-inn']}
+          className={'__lg'}
+          inputRef={innInput}
+        />
 
-        <FormInput onChange={handleChange.bind(this, 'order-delivery')} value={fields['order-delivery']} placeholder={'Доставка'} name="order-delivery" className="__lg" />
+        <FormInput
+          onChange={handleChange.bind(this, 'order-delivery')}
+          placeholder={'Доставка'}
+          name="order-delivery"
+          //
+          error={errors['order-delivery']}
+          className={'__lg'}
+        />
 
-        <FormInput textarea={true} placeholder={'Комментарий'} name="order-delivery" className="__lg" />
+        <FormInput textarea={true} placeholder={'Комментарий'} name="order-delivery" error={null} className="__lg" />
 
         <div className="form-control">
           <Ripples className={'__w-100p btn __blue __lg' + (!validForm ? ' __disabled' : '')} during={1000}>
-            <button className="btn-inner">
+            <button name={'order-submit'} className="btn-inner">
               <span>Оформить заказ</span>
             </button>
           </Ripples>

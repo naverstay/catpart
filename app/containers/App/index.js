@@ -22,6 +22,7 @@ import Input from '../SearchForm/Input';
 import LoadingIndicator from '../../components/LoadingIndicator';
 import apiGET from '../../utils/search';
 import PolicyPage from '../PolicyPage';
+import { closestIndex } from '../../utils/closestIndex';
 
 export default function App() {
   const history = useHistory();
@@ -31,6 +32,8 @@ export default function App() {
   const [orderSent, setOrderSent] = useState(false);
   const [searchCount, setSearchCount] = useState(1);
   const [cartCount, setCartCount] = useState(0);
+  const [totalCart, setTotalCart] = useState(0);
+
   const [searchResult, setSearchResult] = useState(false);
   const [appDrag, setAppDrag] = useState(false);
   const [dragText, setDragText] = useState('');
@@ -89,20 +92,24 @@ export default function App() {
 
       if (count === 0) {
         if (storeItem) {
-          createNotification('success', `Удален: ${storeItem.name}`, `Количество: ${storeItem.count}`);
+          createNotification('success', `Удален: ${storeItem.name}`, `Количество: ${storeItem.cart}`);
 
           store = [...store.filter(f => f.id !== id)];
         }
       } else {
-        let item = searchData.find(f => f.id === id);
-
-        if (item) {
-          createNotification('success', `Добавлен: ${item.name}`, `Количество: ${count}`);
-
-          if (storeItem) {
+        if (storeItem) {
+          if (storeItem.cart !== count) {
             storeItem.cart = count;
             storeItem.cur = cur;
-          } else {
+
+            createNotification('success', `Обновлен: ${storeItem.name}`, `Количество: ${count}`);
+          }
+        } else {
+          let item = searchData.find(f => f.id === id);
+
+          if (item) {
+            createNotification('success', `Добавлен: ${item.name}`, `Количество: ${count}`);
+
             item.cart = count;
             item.cur = cur;
             store.push(item);
@@ -114,6 +121,12 @@ export default function App() {
     }
 
     setCartCount(store.length);
+
+    if (store.length) {
+      setTotalCart(store.reduce((total, c) => total + c.cart * c.pricebreaks[closestIndex(c.pricebreaks, c.cart)].price, 0));
+    } else {
+      history.push('/');
+    }
   };
 
   const onSubmitSearchForm = evt => {
@@ -219,7 +232,7 @@ export default function App() {
 
         setSearchCount(quantity.value || 1);
 
-        history.push(`/search/?art=${art.value || ''}&q=${quantity.value || 1}`);
+        history.push(`/search/?art=${encodeURIComponent(art.value) || ''}&q=${encodeURIComponent(quantity.value || 1)}`);
 
         let options = {
           q: art.value,
@@ -303,7 +316,7 @@ export default function App() {
         <Header cartCount={cartCount} openMobMenu={openMobMenu} setOpenMobMenu={setOpenMobMenu} />
 
         <main className={`main${centeredForm ? ' __center' : ''}`}>
-          <SearchForm setOpenMobMenu={setOpenMobMenu} busy={formBusy} onSubmitForm={onSubmitSearchForm} notificationFunc={createNotification} />
+          <SearchForm setFormBusy={setFormBusy} history={history} setSearchData={setSearchData} setOpenMobMenu={setOpenMobMenu} busy={formBusy} onSubmitForm={onSubmitSearchForm} notificationFunc={createNotification} />
 
           <div className="main-content">
             {orderSent ? (
@@ -327,8 +340,11 @@ export default function App() {
                 {/* <Route path="/search" component={FilterForm} /> */}
                 <Route path="/about" render={routeProps => <FeaturePage setOpenMobMenu={setOpenMobMenu} {...routeProps} />} />
                 <Route path="/policy" render={routeProps => <PolicyPage setOpenMobMenu={setOpenMobMenu} {...routeProps} />} />
-                <Route path="/search" render={routeProps => <FilterForm updateCart={updateCart} notificationFunc={createNotification} setOpenMobMenu={setOpenMobMenu} searchData={searchData} showResults={!formBusy} cart={false} props={{ ...routeProps }} />} />
-                <Route path="/cart" render={routeProps => <FilterForm updateCart={updateCart} notificationFunc={createNotification} setOpenMobMenu={setOpenMobMenu} showResults={!formBusy} cart={true} props={{ ...routeProps }} />} />
+                <Route
+                  path="/search"
+                  render={routeProps => <FilterForm totalCart={totalCart} updateCart={updateCart} notificationFunc={createNotification} setOpenMobMenu={setOpenMobMenu} searchData={searchData} showResults={!formBusy} cart={false} props={{ ...routeProps }} />}
+                />
+                <Route path="/cart" render={routeProps => <FilterForm totalCart={totalCart} updateCart={updateCart} notificationFunc={createNotification} setOpenMobMenu={setOpenMobMenu} showResults={!formBusy} cart={true} props={{ ...routeProps }} />} />
 
                 <Route path="" render={routeProps => <NotFoundPage setOpenMobMenu={setOpenMobMenu} {...routeProps} />} />
               </Switch>

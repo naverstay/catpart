@@ -27,10 +27,11 @@ import { CartResults } from '../CartResults';
 import apiGET from '../../utils/search';
 import { OrderForm } from '../OrderForm';
 import priceFormatter from '../../utils/priceFormatter';
+import { closestIndex } from '../../utils/closestIndex';
 
 const key = 'home';
 
-export function FilterForm({ props, cart, showResults, notificationFunc, updateCart, setOpenMobMenu, searchData, loading, error, onChangeCurrency }) {
+export function FilterForm({ props, cart, showResults, totalCart, notificationFunc, updateCart, setOpenMobMenu, searchData, loading, error, onChangeCurrency }) {
   useInjectReducer({ key, reducer });
   useInjectSaga({ key, saga });
 
@@ -38,6 +39,7 @@ export function FilterForm({ props, cart, showResults, notificationFunc, updateC
 
   const RUB = { name: 'RUB', exChange: 1 };
   const [count, setCount] = useState(0);
+  const [cartData, setCartData] = useState([]);
   const [openShare, setOpenShare] = useState(false);
   const [currencyList, setCurrencyList] = useState([RUB]);
   const [currency, setCurrency] = useState(RUB);
@@ -61,49 +63,17 @@ export function FilterForm({ props, cart, showResults, notificationFunc, updateC
           .concat(RUB),
       );
     });
+
+    let store = localStorage.getItem('catpart');
+    if (store) {
+      setCartData([...JSON.parse(store)]);
+    }
   }, []);
 
   const reposListProps = {
     loading,
     error,
   };
-
-  let cartData = [
-    {
-      manufacturer: 'Rochester (возможен старый DC)',
-      name: 'SMBJ40AHE3/52 (DC:1851)',
-      brand: 'Yangjie Electronic Technology',
-      quantity: 705000,
-      price_unit: 24000,
-      moq: 24000,
-      pack_quant: 24000,
-      delivery_period: '3-4 недели',
-      pricebreaks: [
-        {
-          price: 175.43,
-          quant: 100500,
-          pureprice: 182.35,
-        },
-      ],
-    },
-    {
-      manufacturer: 'Digi-Key Electronics',
-      name: 'SMBJ40A-E3/52',
-      brand: 'Yangjie Electronic Technology',
-      quantity: 284,
-      price_unit: 1,
-      moq: 1,
-      pack_quant: 1,
-      delivery_period: '3-4 недели',
-      pricebreaks: [
-        {
-          price: 226.29,
-          quant: 1,
-          pureprice: 248.94,
-        },
-      ],
-    },
-  ];
 
   /*  searchData = [
     {
@@ -192,6 +162,44 @@ export function FilterForm({ props, cart, showResults, notificationFunc, updateC
     .concat(searchData)
     .concat(searchData);*/
 
+  /*
+  let cartData = [
+    {
+      manufacturer: 'Rochester (возможен старый DC)',
+      name: 'SMBJ40AHE3/52 (DC:1851)',
+      brand: 'Yangjie Electronic Technology',
+      quantity: 705000,
+      price_unit: 24000,
+      moq: 24000,
+      pack_quant: 24000,
+      delivery_period: '3-4 недели',
+      pricebreaks: [
+        {
+          price: 175.43,
+          quant: 100500,
+          pureprice: 182.35,
+        },
+      ],
+    },
+    {
+      manufacturer: 'Digi-Key Electronics',
+      name: 'SMBJ40A-E3/52',
+      brand: 'Yangjie Electronic Technology',
+      quantity: 284,
+      price_unit: 1,
+      moq: 1,
+      pack_quant: 1,
+      delivery_period: '3-4 недели',
+      pricebreaks: [
+        {
+          price: 226.29,
+          quant: 1,
+          pureprice: 248.94,
+        },
+      ],
+    },
+  ];
+
   cartData = cartData
     .concat(cartData)
     .concat(cartData)
@@ -202,6 +210,7 @@ export function FilterForm({ props, cart, showResults, notificationFunc, updateC
     .concat(cartData)
     .concat(cartData)
     .concat(cartData);
+  */
 
   const onChangeSwitch = evt => {
     console.log('onChangeSwitch', currency, evt.target);
@@ -290,12 +299,12 @@ export function FilterForm({ props, cart, showResults, notificationFunc, updateC
 
       {cart ? (
         <>
-          <CartResults updateCart={updateCart} notificationFunc={notificationFunc} showResults={showResults} count={count} currency={currency} />
+          <CartResults updateCart={updateCart} list={cartData} notificationFunc={notificationFunc} showResults={showResults} count={count} currency={currency} />
 
-          <OrderForm />
+          <OrderForm totalCart={totalCart} currency={currency} delivery={true} />
         </>
       ) : (
-        <SearchResults updateCart={updateCart} notificationFunc={notificationFunc} highlight={query.get('art') || ''} showResults={showResults} count={query.get('q') || ''} currency={currency} list={searchData} />
+        <SearchResults updateCart={updateCart} notificationFunc={notificationFunc} highlight={decodeURIComponent(query.get('art')) || ''} showResults={showResults} count={query.get('q') || ''} currency={currency} list={searchData} />
       )}
     </>
   );

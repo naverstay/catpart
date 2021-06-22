@@ -50,9 +50,21 @@
     .form-search {
       padding-top: 120px;
       padding-bottom: 60px;
-      top: 47%;
+      top: 35.3vh;
       transform: translateY(-47%);
       transition-delay: 0s;
+
+      @include respond-to-min($tablet) {
+        top: 45.5vh;
+      }
+
+      @include respond-to-min($dt) {
+        top: 42.2vh;
+      }
+
+      @include respond-to-min($wide) {
+        top: 42.75vh;
+      }
 
       .form-content {
         //margin-bottom: 60px;

@@ -23,10 +23,12 @@ import { makeSelectArtNumber } from './selectors';
 import { setInputFilter } from '../../utils/inputFilter';
 import reducer from './reducer';
 import saga from './saga';
+import apiPOST from '../../utils/upload';
+import FormInput from '../../components/FormInput';
 
 const key = 'home';
 
-export function SearchForm({ dndFile, notificationFunc, busy, location, onSubmitForm, artNumber, loading, error, repos, onChangeUsername }) {
+export function SearchForm({ dndFile, notificationFunc, busy, setFormBusy, history, setSearchData, location, onSubmitForm, artNumber, loading, error, repos, onChangeUsername }) {
   useInjectReducer({ key, reducer });
   useInjectSaga({ key, saga });
 
@@ -37,20 +39,57 @@ export function SearchForm({ dndFile, notificationFunc, busy, location, onSubmit
 
   const query = new URLSearchParams(useLocation().search);
 
+  const [fields, setFields] = useState({
+    quantity: '',
+    'art-number': '',
+  });
+  const [justRedraw, setJustRedraw] = useState(0);
+  const [totalPrice, setTotalPrice] = useState(0);
+  const [errors, setErrors] = useState({
+    quantity: null,
+    'art-number': null,
+  });
+  const [validForm, setValidForm] = useState(false);
+
   let searchBtnText = useLocation().pathname === '/' ? 'Искать' : 'Продолжить искать';
 
   useEffect(() => {
     setInputFilter(formQuantity.current, function(value) {
-      return /^\d*\.?\d*$/.test(value); // Allow digits and '.' only, using a RegExp
+      return !value.length || /^[1-9]\d*$/.test(value); // Allow digits and '.' only, using a RegExp
     });
 
     onSubmitForm({ currentTarget: formRef.current });
+
+    return () => {
+      formRef.current = false;
+      formArtNumber.current = false;
+      formQuantity.current = false;
+      formFile.current = false;
+    };
   }, []);
 
   const reposListProps = {
     loading,
     error,
     repos,
+  };
+
+  const handleChange = (field, e) => {
+    fields[field] = e.target.value;
+    setFields(fields);
+
+    switch (field) {
+      case 'art-number':
+      case 'quantity':
+        errors[field] = e.target.value.length ? '' : 'Не может быть пустым';
+        break;
+    }
+
+    setErrors(errors);
+
+    setValidForm(!errors['art-number']);
+
+    setJustRedraw(justRedraw + 1);
   };
 
   return (
@@ -65,24 +104,26 @@ export function SearchForm({ dndFile, notificationFunc, busy, location, onSubmit
             <label className="form-label" htmlFor="art-number">
               Номер компонента
             </label>
-            <div className="form-control">
-              <input
-                //value={artNumber}
-                disabled={busy}
-                onChange={onChangeUsername}
-                ref={formArtNumber}
-                defaultValue={query.get('art') || ''}
-                id="art-number"
-                type="text"
-                className="input __lg"
-              />
-            </div>
+
+            <FormInput
+              onChange={handleChange.bind(this, 'art-number')}
+              name="art-number"
+              //
+              disabled={busy}
+              defaultValue={decodeURIComponent(query.get('art')) || ''}
+              className={'__lg'}
+              error={errors['art-number']}
+              id="art-number"
+              inputRef={formArtNumber}
+            />
+
             <div className="form-tip">
               <span>Например, </span>
               <span
                 className="form-tip__example"
                 onClick={() => {
                   formArtNumber.current.value = 'MAX34';
+                  handleChange('art-number', { target: formArtNumber.current });
                 }}
               >
                 MAX34
@@ -94,22 +135,31 @@ export function SearchForm({ dndFile, notificationFunc, busy, location, onSubmit
             <label className="form-label" htmlFor="quantity">
               Количество
             </label>
-            <div className="form-control">
-              <input
-                ref={formQuantity}
-                //value={}
-                disabled={busy}
-                defaultValue={(query.get('q') || '').replace(/\D/g, '')}
-                id="quantity"
-                type="text"
-                className="input __lg"
-              />
-            </div>
+
+            <FormInput
+              onChange={handleChange.bind(this, 'quantity')}
+              onBlur={e => {
+                if (!e.target.value.length) {
+                  e.target.value = '1';
+                  handleChange('quantity', e);
+                }
+              }}
+              name="quantity"
+              //
+              disabled={busy}
+              defaultValue={(decodeURIComponent(query.get('q')) || '').replace(/\D/g, '')}
+              className={'__lg'}
+              error={errors['quantity']}
+              id="quantity"
+              inputRef={formQuantity}
+            />
+
             <div className="form-tip">
               <span
                 className="form-tip__example"
                 onClick={() => {
                   formQuantity.current.value = '100';
+                  handleChange('quantity', { target: formQuantity.current });
                 }}
               >
                 100
@@ -118,6 +168,7 @@ export function SearchForm({ dndFile, notificationFunc, busy, location, onSubmit
                 className="form-tip__example"
                 onClick={() => {
                   formQuantity.current.value = '250';
+                  handleChange('quantity', { target: formQuantity.current });
                 }}
               >
                 250
@@ -126,6 +177,7 @@ export function SearchForm({ dndFile, notificationFunc, busy, location, onSubmit
                 className="form-tip__example"
                 onClick={() => {
                   formQuantity.current.value = '500';
+                  handleChange('quantity', { target: formQuantity.current });
                 }}
               >
                 500
@@ -136,8 +188,8 @@ export function SearchForm({ dndFile, notificationFunc, busy, location, onSubmit
           <div className="form-cell form-cell__search column sm-col-12 md-col-4 lg-col-2">
             <span className="form-label">&nbsp;</span>
             <div className="form-control">
-              <Ripples className="__w-100p btn __blue __lg" during={1000}>
-                <button className="btn-inner __abs">
+              <Ripples className={'__w-100p btn __blue __lg' + (!validForm ? ' __disabled' : '')} during={1000}>
+                <button name={'search-submit'} className="btn-inner __abs">
                   <span>{searchBtnText}</span>
                 </button>
               </Ripples>
@@ -156,15 +208,36 @@ export function SearchForm({ dndFile, notificationFunc, busy, location, onSubmit
                     id="file"
                     type="file"
                     onChange={() => {
-                      readFile(formFile.current.files[0], ret => {
-                        console.log('readFile', ret);
+                      const requestURL = '/search/bom';
+                      let file = formFile.current.files[0];
 
-                        if (ret.success) {
-                          notificationFunc('success', `Файл: ${ret.name}`, `Размер: ${ret.size}`);
-                        } else {
-                          notificationFunc('success', `Файл: ${ret.name}`, `Ошибка: ${ret.text}`);
-                        }
-                      });
+                      if (file && file.name.match(/\.([c|t]sv|txt|xls[x]?)$/)) {
+                        let formData = new FormData();
+                        let options = {};
+
+                        formData.append('file', file);
+
+                        history.push('/search');
+
+                        apiPOST(requestURL, formData, options, res => {
+                          setFormBusy(false);
+                          setSearchData(res);
+                        });
+
+                        notificationFunc('success', `Файл: ${file.name}`, 'отправлен');
+                      } else {
+                        notificationFunc('success', `Файл: ${file.name}`, 'не соответствует формату .txt, .csv, .tsv, .xls, . xlsx');
+                      }
+
+                      //readFile(formFile.current.files[0], ret => {
+                      //  console.log('readFile', ret);
+                      //
+                      //  if (ret.success) {
+                      //    notificationFunc('success', `Файл: ${ret.name}`, `Размер: ${ret.size}`);
+                      //  } else {
+                      //    notificationFunc('success', `Файл: ${ret.name}`, `Ошибка: ${ret.text}`);
+                      //  }
+                      //});
                     }}
                   />
                 </label>

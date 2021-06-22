@@ -1,19 +1,29 @@
 import React, { createRef, useEffect, useState } from 'react';
 import priceFormatter from '../../utils/priceFormatter';
 import Ripples from 'react-ripples';
+
 import { setInputFilter } from '../../utils/inputFilter';
+import { closestIndex } from '../../utils/closestIndex';
+
+function escapeRegExp(string) {
+  console.log('escapeRegExp', string, string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
+}
 
 const SearchRow = props => {
   let { rowIndex, tableHeader, currency, row, highlight, defaultCount, updateCart } = props;
+  defaultCount = +defaultCount;
 
   const inputRef = createRef();
   const [disableAddBtn, setDisableAddBtn] = useState(false);
+  let priceMatch = defaultCount ? row.pricebreaks.length - 1 : -1;
 
   let textHighlighter = txt => {
     let ret = <>{txt}</>;
 
     if (highlight.length) {
-      let rx = new RegExp(highlight, 'i');
+      let rx = new RegExp(escapeRegExp(highlight), 'i');
+
       ret = (
         <>
           <b>{highlight}</b>
@@ -25,11 +35,23 @@ const SearchRow = props => {
     return ret;
   };
 
+  let priceHighlighter = (ind, price) => {
+    return ind === priceMatch ? <b>{price}</b> : <>{price}</>;
+  };
+
   useEffect(() => {
     setInputFilter(inputRef.current, function(value) {
-      return /^\d*\.?\d*$/.test(value); // Allow digits and '.' only, using a RegExp
+      return /^\d*$/.test(value); // Allow digits and '.' only, using a RegExp
     });
+
+    return () => {
+      inputRef.current = false;
+    };
   }, []);
+
+  if (defaultCount) {
+    priceMatch = closestIndex(row.pricebreaks, defaultCount);
+  }
 
   return (
     <div className={`search-results__row${rowIndex % 2 === 0 ? ' __odd' : ' __even'}`}>
@@ -40,13 +62,13 @@ const SearchRow = props => {
             {cell === 'pricebreaks'
               ? row.pricebreaks.map((p, pi) => (
                   <span key={pi} className="search-results__item">
-                    {priceFormatter(parseFloat(p.price / currency.exChange).toFixed(2))}
+                    {priceHighlighter(pi, priceFormatter(parseFloat(p.price / currency.exChange).toFixed(2)))}
                   </span>
                 ))
               : cell === 'total'
               ? row.pricebreaks.map((p, pi) => (
                   <span key={pi} className="search-results__item">
-                    x{p.quant}={priceFormatter((parseFloat(p.quant) * parseFloat(p.price / currency.exChange)).toFixed(2))}
+                    {priceHighlighter(pi, `x${pi === priceMatch ? defaultCount : p.quant}=${priceFormatter((parseFloat(p.quant) * parseFloat(p.price / currency.exChange)).toFixed(2))}`)}
                   </span>
                 ))
               : row[cell]
@@ -62,24 +84,32 @@ const SearchRow = props => {
         <div className="search-results__cart">
           <input
             ref={inputRef}
+            //onChange={e => {
+            //  setDisableAddBtn(!e.target.value.length || +e.target.value < 1);
+            //}}
             onChange={e => {
-              setDisableAddBtn(!e.target.value.length || +e.target.value < 1);
+              let val = +e.target.value;
+              if (val > 0) {
+                //updateCart(row.id, val, row.cur);
+              } else {
+                //e.target.value = '1';
+              }
             }}
-            defaultValue={defaultCount || row.min}
+            placeholder={defaultCount || row.min}
             type="text"
             className="input"
           />
           <div className="search-results__add">
             <Ripples
               onClick={() => {
-                updateCart(row.id, +inputRef.current.value, currency);
+                updateCart(row.id, +inputRef.current.value || defaultCount || row.min, currency);
               }}
               during={1000}
               className={'btn __blue' + (disableAddBtn ? ' __disabled' : '')}
             >
-              <btn disabled={disableAddBtn} className="btn-inner">
+              <button name={'search-add-' + row.id} disabled={disableAddBtn} className="btn-inner">
                 <span className="btn__icon icon icon-cart" />
-              </btn>
+              </button>
             </Ripples>
           </div>
         </div>

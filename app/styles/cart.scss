@@ -3,9 +3,10 @@
   &-results {
     padding: 10px 0;
     font-size: 12px;
+    overflow: hidden;
 
     @include respond-to-min($tablet) {
-      width: calc(100% - 300px);
+      width: calc(100% - 299px);
       float: left;
     }
 
@@ -13,8 +14,10 @@
       width: 82px;
     }
 
-    &__item {
-
+    &__remove {
+      .btn {
+        width: 30px;
+      }
     }
 
     &__table {
@@ -80,6 +83,10 @@
         justify-content: space-between;
         grid-template-areas: unset;
         grid-template-columns: unset;
+      }
+
+      &:not(.__head):hover {
+        background: $main_gray_hover;
       }
     }
 
@@ -315,6 +322,13 @@
 
         &.__cart {
           flex: 1 0 40px;
+          opacity: 0;
+          pointer-events: none;
+
+          .cart-results__row:hover & {
+            opacity: 1;
+            pointer-events: all;
+          }
         }
       }
     }

@@ -157,7 +157,10 @@
 
     @include respond-to-min($tablet) {
       max-width: 269px;
-      margin-left: auto;
+
+      &.__delivery {
+        margin-left: auto;
+      }
     }
   }
 
@@ -203,7 +206,7 @@
       will-change: transform;
       //display: none;
       position: absolute;
-      left: 0;
+      left: -3px;
       bottom: 100%;
       margin-bottom: 10px;
       font-weight: bold;
@@ -330,8 +333,21 @@
 
     @at-root #{textarea}#{&} {
       height: 150px;
+      max-height: 600px;
       min-height: 50px;
     }
   }
 
+  &.__error {
+    border-color: #f00 !important;
+
+    &:focus,
+    &:hover {
+      box-shadow: 0 0 20px rgba(255, 0, 0, 0.3);
+    }
+  }
+
+  &.__success {
+    border-color: $main_blue !important;
+  }
 }

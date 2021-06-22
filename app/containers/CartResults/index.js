@@ -25,8 +25,6 @@ export function CartResults(props) {
     list = [...JSON.parse(store)];
   }
 
-  console.log('store', list);
-
   let tableHeader = {
     name: 'Компонент',
     manufacturer: 'Поставщик',
