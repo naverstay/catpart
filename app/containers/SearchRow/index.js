@@ -14,6 +14,10 @@ const SearchRow = props => {
   let { rowIndex, tableHeader, currency, row, highlight, defaultCount, updateCart } = props;
   defaultCount = +defaultCount;
 
+  if (!defaultCount) {
+    defaultCount = row.moq;
+  }
+
   const inputRef = createRef();
   const [disableAddBtn, setDisableAddBtn] = useState(false);
   let priceMatch = defaultCount ? row.pricebreaks.length - 1 : -1;
@@ -21,7 +25,7 @@ const SearchRow = props => {
   let textHighlighter = txt => {
     let ret = <>{txt}</>;
 
-    if (highlight.length) {
+    if (highlight && highlight.length) {
       let rx = new RegExp(escapeRegExp(highlight), 'i');
 
       ret = (
@@ -95,14 +99,14 @@ const SearchRow = props => {
                 //e.target.value = '1';
               }
             }}
-            placeholder={defaultCount || row.min}
+            placeholder={defaultCount}
             type="text"
             className="input"
           />
           <div className="search-results__add">
             <Ripples
               onClick={() => {
-                updateCart(row.id, +inputRef.current.value || defaultCount || row.min, currency);
+                updateCart(row.id, +inputRef.current.value || defaultCount, currency);
               }}
               during={1000}
               className={'btn __blue' + (disableAddBtn ? ' __disabled' : '')}

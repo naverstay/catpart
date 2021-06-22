@@ -304,7 +304,7 @@ export function FilterForm({ props, cart, showResults, totalCart, notificationFu
           <OrderForm totalCart={totalCart} currency={currency} delivery={true} />
         </>
       ) : (
-        <SearchResults updateCart={updateCart} notificationFunc={notificationFunc} highlight={decodeURIComponent(query.get('art')) || ''} showResults={showResults} count={query.get('q') || ''} currency={currency} list={searchData} />
+        <SearchResults updateCart={updateCart} notificationFunc={notificationFunc} highlight={decodeURIComponent(query.get('art') || '')} showResults={showResults} count={query.get('q') || ''} currency={currency} list={searchData} />
       )}
     </>
   );

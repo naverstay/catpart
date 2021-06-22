@@ -87,7 +87,7 @@ export function SearchForm({ dndFile, notificationFunc, busy, setFormBusy, histo
 
     setErrors(errors);
 
-    setValidForm(!errors['art-number']);
+    setValidForm(errors['art-number'] !== null && !errors['art-number']);
 
     setJustRedraw(justRedraw + 1);
   };
@@ -110,7 +110,7 @@ export function SearchForm({ dndFile, notificationFunc, busy, setFormBusy, histo
               name="art-number"
               //
               disabled={busy}
-              defaultValue={decodeURIComponent(query.get('art')) || ''}
+              defaultValue={decodeURIComponent(query.get('art') || '')}
               className={'__lg'}
               error={errors['art-number']}
               id="art-number"
@@ -147,7 +147,7 @@ export function SearchForm({ dndFile, notificationFunc, busy, setFormBusy, histo
               name="quantity"
               //
               disabled={busy}
-              defaultValue={(decodeURIComponent(query.get('q')) || '').replace(/\D/g, '')}
+              defaultValue={(decodeURIComponent(query.get('q')) || '1').replace(/\D/g, '')}
               className={'__lg'}
               error={errors['quantity']}
               id="quantity"
