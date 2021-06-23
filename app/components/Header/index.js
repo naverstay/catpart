@@ -8,7 +8,7 @@ import Img from './Img';
 import NavBar from './NavBar';
 import HeaderLink from './HeaderLink';
 import Banner from './banner.jpg';
-import messages from './messages';
+// import messages from './messages';
 
 function Header({ openMobMenu, cartCount, setOpenMobMenu }) {
   const headerRef = useDetectClickOutside({

@@ -25,7 +25,7 @@ import CenteredSection from './CenteredSection';
 import Form from './Form';
 import Input from './Input';
 import Section from './Section';
-import messages from './messages';
+// import messages from './messages';
 import { loadRepos } from '../App/actions';
 import { changeArtNumber } from './actions';
 import { makeSelectArtNumber } from './selectors';

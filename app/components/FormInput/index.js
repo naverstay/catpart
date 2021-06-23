@@ -6,7 +6,6 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { injectIntl, intlShape } from 'react-intl';
 
 const FormInput = ({ id, value, defaultValue, disabled, error, onChange, onBlur, inputRef, placeholder, name, textarea, className, intl }) => {
   return (
@@ -56,7 +55,6 @@ FormInput.propTypes = {
   className: PropTypes.string,
   name: PropTypes.string,
   placeholder: PropTypes.string,
-  intl: intlShape.isRequired,
 };
 
-export default injectIntl(FormInput);
+export default FormInput;

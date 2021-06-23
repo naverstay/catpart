@@ -4,6 +4,7 @@
   flex-flow: column nowrap;
   flex: 1 0 auto;
   padding-top: 15px;
+  min-height: 450px;
 
   @include respond-to-min($tablet) {
     padding-top: 30px;
@@ -50,20 +51,20 @@
     .form-search {
       padding-top: 120px;
       padding-bottom: 60px;
-      top: 35.3vh;
+      top: Max(220px, 35.3vh);
       transform: translateY(-47%);
       transition-delay: 0s;
 
       @include respond-to-min($tablet) {
-        top: 45.5vh;
+        top: Max(220px, 45.5vh);
       }
 
       @include respond-to-min($dt) {
-        top: 42.2vh;
+        top: Max(220px, 42.2vh);
       }
 
       @include respond-to-min($wide) {
-        top: 42.75vh;
+        top: Max(220px, 42.75vh);
       }
 
       .form-content {

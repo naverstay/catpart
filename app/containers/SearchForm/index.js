@@ -111,8 +111,8 @@ export function SearchForm({ dndFile, notificationFunc, busy, setFormBusy, histo
               //
               disabled={busy}
               defaultValue={decodeURIComponent(query.get('art') || '')}
-              className={'__lg'}
-              error={errors['art-number']}
+              className={'__lg' + (errors['art-number'] === null ? '' : errors['art-number'] ? ' __error' : '')}
+              error={null}
               id="art-number"
               inputRef={formArtNumber}
             />
@@ -148,8 +148,8 @@ export function SearchForm({ dndFile, notificationFunc, busy, setFormBusy, histo
               //
               disabled={busy}
               defaultValue={(decodeURIComponent(query.get('q')) || '1').replace(/\D/g, '')}
-              className={'__lg'}
-              error={errors['quantity']}
+              className={'__lg' + (errors['quantity'] === null ? '' : errors['quantity'] ? ' __error' : '')}
+              error={null}
               id="quantity"
               inputRef={formQuantity}
             />

@@ -21,16 +21,33 @@ import './styles/app.scss';
 import App from 'containers/App';
 
 // Import Language Provider
-import LanguageProvider from 'containers/LanguageProvider';
+//import LanguageProvider from 'containers/LanguageProvider';
 
 // Load the favicon and the .htaccess file
-import '!file-loader?name=[name].[ext]!./images/favicon.ico';
+import '!file-loader?name=[name].[ext]!./favicon.ico';
+import '!file-loader?name=[name].[ext]!./browserconfig.xml';
+import '!file-loader?name=[name].[ext]!./favicon-16x16.png';
+import '!file-loader?name=[name].[ext]!./favicon-32x32.png';
+import '!file-loader?name=[name].[ext]!./safari-pinned-tab.svg';
+import '!file-loader?name=[name].[ext]!./site.webmanifest';
+import '!file-loader?name=[name].[ext]!./mstile-150x150.png';
+import '!file-loader?name=[name].[ext]!./browserconfig.xml';
+import '!file-loader?name=[name].[ext]!./apple-touch-icon-152x152.png';
+import '!file-loader?name=[name].[ext]!./android-chrome-192x192.png';
+import '!file-loader?name=[name].[ext]!./apple-touch-icon-60x60.png';
+import '!file-loader?name=[name].[ext]!./apple-touch-icon-144x144.png';
+import '!file-loader?name=[name].[ext]!./apple-touch-icon-120x120.png';
+import '!file-loader?name=[name].[ext]!./apple-touch-icon.png';
+import '!file-loader?name=[name].[ext]!./apple-touch-icon-76x76.png';
+import '!file-loader?name=[name].[ext]!./apple-touch-icon-72x72.png';
+import '!file-loader?name=[name].[ext]!./android-chrome-256x256.png';
+import '!file-loader?name=[name].[ext]!./apple-touch-icon-57x57.png';
+import '!file-loader?name=[name].[ext]!./apple-touch-icon-180x180.png';
+import '!file-loader?name=[name].[ext]!./apple-touch-icon-114x114.png';
+
 import 'file-loader?name=.htaccess!./.htaccess'; // eslint-disable-line import/extensions
 
 import configureStore from './configureStore';
-
-// Import i18n messages
-import { translationMessages } from './i18n';
 
 // Observe loading of Open Sans (to remove open sans, remove the <link> tag in
 // the index.html file and this observer)
@@ -49,11 +66,11 @@ const MOUNT_NODE = document.getElementById('app');
 const render = messages => {
   ReactDOM.render(
     <Provider store={store}>
-      <LanguageProvider messages={messages}>
-        <ConnectedRouter history={history}>
-          <App />
-        </ConnectedRouter>
-      </LanguageProvider>
+      {/*<LanguageProvider messages={messages}>*/}
+      <ConnectedRouter history={history}>
+        <App />
+      </ConnectedRouter>
+      {/*</LanguageProvider>*/}
     </Provider>,
     MOUNT_NODE,
   );
@@ -63,30 +80,13 @@ if (module.hot) {
   // Hot reloadable React components and translation json files
   // modules.hot.accept does not accept dynamic dependencies,
   // have to be constants at compile-time
-  module.hot.accept(['./i18n', 'containers/App'], () => {
+  module.hot.accept(['containers/App'], () => {
     ReactDOM.unmountComponentAtNode(MOUNT_NODE);
-    render(translationMessages);
+    render();
   });
 }
 
-// Chunked polyfill for browsers without Intl support
-if (!window.Intl) {
-  new Promise(resolve => {
-    resolve(import('intl'));
-  })
-    .then(() =>
-      Promise.all([
-        import('intl/locale-data/jsonp/en.js'),
-        import('intl/locale-data/jsonp/de.js'),
-      ]),
-    ) // eslint-disable-line prettier/prettier
-    .then(() => render(translationMessages))
-    .catch(err => {
-      throw err;
-    });
-} else {
-  render(translationMessages);
-}
+render();
 
 // Install ServiceWorker and AppCache in the end since
 // it's not most important operation and if main code fails,

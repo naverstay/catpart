@@ -134,93 +134,6 @@ export default function App() {
 
     const form = evt.currentTarget;
 
-    let tempData = [
-      {
-        manufacturer: 'Rochester (возможен старый DC)',
-        name: 'SMBJ40AHE3/52 (DC:1851)',
-        brand: 'Yangjie Electronic Technology',
-        quantity: 705000,
-        price_unit: 24000,
-        moq: 24000,
-        pack_quant: 24000,
-        delivery_period: '3-4 недели',
-        pricebreaks: [
-          {
-            price: 226.29,
-            quant: 1,
-            pureprice: 248.94,
-          },
-          {
-            price: 203.64,
-            quant: 8,
-            pureprice: 226.29,
-          },
-          {
-            price: 190.38,
-            quant: 15,
-            pureprice: 203.64,
-          },
-          {
-            price: 183.06,
-            quant: 29,
-            pureprice: 190.38,
-          },
-          {
-            price: 178.65,
-            quant: 50,
-            pureprice: 183.06,
-          },
-        ],
-      },
-      {
-        manufacturer: 'Digi-Key Electronics',
-        name: 'SMBJ40A-E3/52',
-        brand: 'Yangjie Electronic Technology',
-        quantity: 284,
-        price_unit: 1,
-        moq: 1,
-        pack_quant: 1,
-        delivery_period: '3-4 недели',
-        pricebreaks: [
-          {
-            price: 175.43,
-            quant: 1,
-            pureprice: 182.35,
-          },
-          {
-            price: 166.8,
-            quant: 5,
-            pureprice: 175.43,
-          },
-          {
-            price: 159.99,
-            quant: 10,
-            pureprice: 166.8,
-          },
-          {
-            price: 153.7,
-            quant: 19,
-            pureprice: 159.99,
-          },
-          {
-            price: 147.39,
-            quant: 37,
-            pureprice: 153.7,
-          },
-        ],
-      },
-    ];
-
-    tempData = tempData
-      .concat(tempData)
-      .concat(tempData)
-      .concat(tempData)
-      .concat(tempData)
-      .concat(tempData)
-      .concat(tempData)
-      .concat(tempData)
-      .concat(tempData);
-
     if (form) {
       const art = form.querySelector('#art-number');
       const quantity = form.querySelector('#quantity');
@@ -241,8 +154,6 @@ export default function App() {
 
         apiGET(requestURL, options, data => {
           setFormBusy(false);
-
-          //setSearchData(data.length ? data : tempData);
           setSearchData(data);
         });
       }
@@ -254,7 +165,7 @@ export default function App() {
   const appHeight = () => {
     const doc = document.documentElement;
     const sab = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--sab')) || 0;
-    doc.style.setProperty('--app-height', `${window.innerHeight - sab}px`);
+    doc.style.setProperty('--app-height', `${Math.max(700, window.innerHeight - sab)}px`);
   };
 
   const handleScroll = event => {

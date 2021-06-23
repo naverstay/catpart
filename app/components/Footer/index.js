@@ -1,8 +1,5 @@
 import React from 'react';
 
-import A from 'components/A';
-import LocaleToggle from 'containers/LocaleToggle';
-import messages from './messages';
 import { Link } from 'react-router-dom';
 
 function Footer() {
@@ -32,10 +29,6 @@ function Footer() {
           </div>
         </div>
       </div>
-
-      {/* <section> */}
-      {/*  <LocaleToggle /> */}
-      {/* </section> */}
     </footer>
   );
 }
