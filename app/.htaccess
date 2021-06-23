@@ -1,3 +1,12 @@
+AuthName "Enter login"
+AuthType Basic
+AuthUserFile /var/www/fastuser/data/www/html.catpart.ru/.htpasswd
+require valid-user
+
+<Files .htpasswd>
+   deny from all
+</Files>
+
 <ifModule mod_rewrite.c>
 
 

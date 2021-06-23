@@ -300,19 +300,19 @@
   transition: border .3s, box-shadow .3s;
 
   &::-webkit-input-placeholder {
-    color: $gray_border;
+    color: $gray_placeholder;
   }
 
   &::-moz-placeholder {
-    color: $gray_border;
+    color: $gray_placeholder;
   }
 
   &:-ms-input-placeholder {
-    color: $gray_border;
+    color: $gray_placeholder;
   }
 
   &:-moz-placeholder {
-    color: $gray_border;
+    color: $gray_placeholder;
   }
 
   &:focus,

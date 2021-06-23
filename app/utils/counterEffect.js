@@ -29,13 +29,17 @@ export function counterEffect(el, startValue, endValue, duration) {
   function run() {
     let now = new Date().getTime();
 
-    if (now > endTime) {
-      el.innerHTML = priceFormatter(endValue);
-      clearInterval(timer);
+    if (el) {
+      if (now > endTime) {
+        el.innerHTML = priceFormatter(endValue.toFixed(2));
+        clearInterval(timer);
+      } else {
+        let remaining = Math.max((endTime - now) / duration, 0);
+        let value = endValue - remaining * range;
+        el.innerHTML = priceFormatter(value.toFixed(2));
+      }
     } else {
-      let remaining = Math.max((endTime - now) / duration, 0);
-      let value = endValue - remaining * range;
-      el.innerHTML = priceFormatter(value.toFixed(2));
+      clearInterval(timer);
     }
   }
 

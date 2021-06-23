@@ -104,11 +104,11 @@ export function OrderForm({ dndFile, delivery, notificationFunc, currency, total
   };
 
   useEffect(() => {
-    if (totalPrice !== totalCart) {
-      counterEffect(totalPriceRef.current, totalPrice * currency.exChange, totalCart * currency.exChange, 800);
+    if (totalPriceRef.current && totalPrice !== totalCart) {
+      counterEffect(totalPriceRef.current, totalPrice / currency.exChange, totalCart / currency.exChange, 800);
       setTotalPrice(totalCart);
     }
-  }, [totalCart]);
+  }, [totalCart, currency]);
 
   useEffect(() => {
     setInputFilter(phoneInput.current, function(value) {

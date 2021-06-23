@@ -56,11 +56,14 @@ const CartRow = props => {
                               if (val > 0) {
                                 setCartCount(parseFloat(val));
                                 console.log('row', row);
-                              } else {
-                                e.target.value = '1';
                               }
                             }}
                             onBlur={e => {
+                              let val = +e.target.value;
+                              if (val > 0) {
+                              } else {
+                                e.target.value = '1';
+                              }
                               updateCart(row.id, +e.target.value, row.cur);
                             }}
                             defaultValue={cartCount}

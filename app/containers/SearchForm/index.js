@@ -58,6 +58,8 @@ export function SearchForm({ dndFile, notificationFunc, busy, setFormBusy, histo
       return !value.length || /^[1-9]\d*$/.test(value); // Allow digits and '.' only, using a RegExp
     });
 
+    handleChange('art-number', { target: formArtNumber.current });
+
     onSubmitForm({ currentTarget: formRef.current });
 
     return () => {
@@ -188,8 +190,8 @@ export function SearchForm({ dndFile, notificationFunc, busy, setFormBusy, histo
           <div className="form-cell form-cell__search column sm-col-12 md-col-4 lg-col-2">
             <span className="form-label">&nbsp;</span>
             <div className="form-control">
-              <Ripples className={'__w-100p btn __blue __lg' + (!validForm ? ' __disabled' : '')} during={1000}>
-                <button name={'search-submit'} className="btn-inner __abs">
+              <Ripples className={'__w-100p btn __blue __lg'} during={1000}>
+                <button disabled={!validForm || busy} name={'search-submit'} className="btn-inner __abs">
                   <span>{searchBtnText}</span>
                 </button>
               </Ripples>
@@ -219,9 +221,9 @@ export function SearchForm({ dndFile, notificationFunc, busy, setFormBusy, histo
 
                         history.push('/search');
 
-                        apiPOST(requestURL, formData, options, res => {
+                        apiPOST(requestURL, formData, options, data => {
                           setFormBusy(false);
-                          setSearchData(res);
+                          setSearchData(data);
                         });
 
                         notificationFunc('success', `Файл: ${file.name}`, 'отправлен');

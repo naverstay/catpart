@@ -80,7 +80,7 @@ function Header({ openMobMenu, cartCount, setOpenMobMenu }) {
         {/*</Link>*/}
         <div className="header-order">
           <Ripples during={1000} className={'btn __blue' + (cartCount ? '' : ' __disabled')}>
-            <Link to={'/cart'} className="btn-inner">
+            <Link to={'/order'} className="btn-inner">
               <span className={'header-order__label'}>Заказ</span>
               <span className={'header-order__count'}>{cartCount}</span>
             </Link>

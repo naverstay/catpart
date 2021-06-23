@@ -10,7 +10,7 @@ function Footer() {
           <div className="footer-copyright">
             2012-2021 © ООО «Сибэлком-Логистик», ИНН&nbsp;5404462899 <br />
             Для повышения удобства сайт использует cookies. Оставаясь на сайте, вы соглашаетесь с{' '}
-            <Link className="footer-link" to="/policy">
+            <Link className="footer-link" to="/privacy-policy">
               политикой конфиденциальности
             </Link>
             .

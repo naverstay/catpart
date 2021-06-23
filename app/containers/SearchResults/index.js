@@ -8,12 +8,7 @@ import React, { useEffect, useState } from 'react';
 
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { createStructuredSelector } from 'reselect';
-import { FormattedNumber } from 'react-intl';
 
-import { makeSelectCurrentUser } from 'containers/App/selectors';
-import Ripples from 'react-ripples';
-import priceFormatter from '../../utils/priceFormatter';
 import Skeleton from '../Skeleton';
 import SearchRow from '../SearchRow';
 
@@ -51,7 +46,6 @@ export function SearchResults(props) {
   //  });
   //}, []);
 
-  // Render the content into a list item
   return (
     <div className="search-results">
       <div className="search-results__table">
@@ -64,7 +58,7 @@ export function SearchResults(props) {
           <div className="search-results__cell __cart">&nbsp;</div>
         </div>
 
-        {showResults ? list.map((row, ri) => <SearchRow key={ri} updateCart={updateCart} tableHeader={tableHeader} defaultCount={defaultCount} currency={currency} highlight={highlight} row={row} rowIndex={ri} />) : <Skeleton />}
+        {showResults && list && list.length ? list.map((row, ri) => <SearchRow key={ri} updateCart={updateCart} tableHeader={tableHeader} defaultCount={defaultCount} currency={currency} highlight={highlight} row={row} rowIndex={ri} />) : <Skeleton />}
       </div>
     </div>
   );

@@ -75,143 +75,6 @@ export function FilterForm({ props, cart, showResults, totalCart, notificationFu
     error,
   };
 
-  /*  searchData = [
-    {
-      manufacturer: 'Rochester (возможен старый DC)',
-      name: 'SMBJ40AHE3/52 (DC:1851)',
-      brand: 'Yangjie Electronic Technology',
-      quantity: 705000,
-      price_unit: 24000,
-      moq: 24000,
-      pack_quant: 24000,
-      delivery_period: '3-4 недели',
-      pricebreaks: [
-        {
-          price: 226.29,
-          quant: 1,
-          pureprice: 248.94,
-        },
-        {
-          price: 203.64,
-          quant: 8,
-          pureprice: 226.29,
-        },
-        {
-          price: 190.38,
-          quant: 15,
-          pureprice: 203.64,
-        },
-        {
-          price: 183.06,
-          quant: 29,
-          pureprice: 190.38,
-        },
-        {
-          price: 178.65,
-          quant: 50,
-          pureprice: 183.06,
-        },
-      ],
-    },
-    {
-      manufacturer: 'Digi-Key Electronics',
-      name: 'SMBJ40A-E3/52',
-      brand: 'Yangjie Electronic Technology',
-      quantity: 284,
-      price_unit: 1,
-      moq: 1,
-      pack_quant: 1,
-      delivery_period: '3-4 недели',
-      pricebreaks: [
-        {
-          price: 175.43,
-          quant: 1,
-          pureprice: 182.35,
-        },
-        {
-          price: 166.8,
-          quant: 5,
-          pureprice: 175.43,
-        },
-        {
-          price: 159.99,
-          quant: 10,
-          pureprice: 166.8,
-        },
-        {
-          price: 153.7,
-          quant: 19,
-          pureprice: 159.99,
-        },
-        {
-          price: 147.39,
-          quant: 37,
-          pureprice: 153.7,
-        },
-      ],
-    },
-  ];
-
-  searchData = searchData
-    .concat(searchData)
-    .concat(searchData)
-    .concat(searchData)
-    .concat(searchData)
-    .concat(searchData)
-    .concat(searchData)
-    .concat(searchData)
-    .concat(searchData);*/
-
-  /*
-  let cartData = [
-    {
-      manufacturer: 'Rochester (возможен старый DC)',
-      name: 'SMBJ40AHE3/52 (DC:1851)',
-      brand: 'Yangjie Electronic Technology',
-      quantity: 705000,
-      price_unit: 24000,
-      moq: 24000,
-      pack_quant: 24000,
-      delivery_period: '3-4 недели',
-      pricebreaks: [
-        {
-          price: 175.43,
-          quant: 100500,
-          pureprice: 182.35,
-        },
-      ],
-    },
-    {
-      manufacturer: 'Digi-Key Electronics',
-      name: 'SMBJ40A-E3/52',
-      brand: 'Yangjie Electronic Technology',
-      quantity: 284,
-      price_unit: 1,
-      moq: 1,
-      pack_quant: 1,
-      delivery_period: '3-4 недели',
-      pricebreaks: [
-        {
-          price: 226.29,
-          quant: 1,
-          pureprice: 248.94,
-        },
-      ],
-    },
-  ];
-
-  cartData = cartData
-    .concat(cartData)
-    .concat(cartData)
-    .concat(cartData)
-    .concat(cartData)
-    .concat(cartData)
-    .concat(cartData)
-    .concat(cartData)
-    .concat(cartData)
-    .concat(cartData);
-  */
-
   const onChangeSwitch = evt => {
     console.log('onChangeSwitch', currency, evt.target);
     //onChangeCurrency(evt.target.value, evt.target.dataset.currency);
@@ -222,14 +85,29 @@ export function FilterForm({ props, cart, showResults, totalCart, notificationFu
     return n + ' ' + (n % 10 == 1 && n % 100 != 11 ? str1 : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? str2 : str5);
   };
 
+  let searchInfo =
+    !cart && searchData && searchData.hasOwnProperty('res') ? 'По запросу «' + (query.get('art') || '') + '» ' + (searchData.res.length ? 'найдено ' + plural(searchData.res.length, 'наименование', 'наименования', 'наименований') + '.' : 'ничего не найдено :(') : '';
+
   return (
     <>
+      {cart ? (
+        <Helmet>
+          <title>Оформление заказа - CATPART.RU</title>
+          <meta name="description" content="Оформление заказа - CATPART.RU" />
+          <meta name="keywords" content="Оформление заказа - CATPART.RU" />
+          <link rel="canonical" href="https://catpart.ru/order/" />
+        </Helmet>
+      ) : (
+        <Helmet>
+          <title>{searchInfo}</title>
+          <meta name="description" content={searchInfo} />
+          <meta name="keywords" content={searchInfo} />
+          <link rel="canonical" href="https://catpart.ru/" />
+        </Helmet>
+      )}
+
       <div className="form-filter">
-        {!cart && showResults ? (
-          <div className="form-filter__stat">{'По запросу «' + (query.get('art') || '') + '» ' + (searchData.length ? 'найдено ' + plural(searchData.length, 'наименование', 'наименования', 'наименований') + '.' : 'ничего не найдено :(')}</div>
-        ) : (
-          <div className="form-filter__stat">&nbsp;</div>
-        )}
+        {!cart && showResults ? <div className="form-filter__stat">{searchInfo}</div> : <div className="form-filter__stat">&nbsp;</div>}
 
         <div className={'form-filter__controls' + (cart ? ' __cart' : '')}>
           {cart ? (
@@ -304,7 +182,7 @@ export function FilterForm({ props, cart, showResults, totalCart, notificationFu
           <OrderForm totalCart={totalCart} currency={currency} delivery={true} />
         </>
       ) : (
-        <SearchResults updateCart={updateCart} notificationFunc={notificationFunc} highlight={decodeURIComponent(query.get('art') || '')} showResults={showResults} count={query.get('q') || ''} currency={currency} list={searchData} />
+        <SearchResults updateCart={updateCart} notificationFunc={notificationFunc} highlight={decodeURIComponent(query.get('art') || '')} showResults={showResults} count={query.get('q') || ''} currency={currency} list={searchData.res} />
       )}
     </>
   );
@@ -312,7 +190,7 @@ export function FilterForm({ props, cart, showResults, totalCart, notificationFu
 
 FilterForm.propTypes = {
   showResults: PropTypes.bool,
-  searchData: PropTypes.array,
+  searchData: PropTypes.object,
   cart: PropTypes.bool,
   loading: PropTypes.bool,
   error: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),

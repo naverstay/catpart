@@ -16,8 +16,10 @@ export default function FeaturePage(props) {
     <>
       <div className="row">
         <Helmet>
-          <title>About Page</title>
-          <meta name="description" content="About page of catpart.ru application" />
+          <title>О сервисе - CATPART.RU</title>
+          <meta name="description" content="О сервисе - CATPART.RU" />
+          <meta name="keywords" content="О сервисе - CATPART.RU" />
+          <link rel="canonical" href="https://catpart.ru/about/" />
         </Helmet>
 
         <div className="column sm-col-12 xl-col-9">

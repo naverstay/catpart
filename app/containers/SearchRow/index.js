@@ -6,7 +6,6 @@ import { setInputFilter } from '../../utils/inputFilter';
 import { closestIndex } from '../../utils/closestIndex';
 
 function escapeRegExp(string) {
-  console.log('escapeRegExp', string, string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
   return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
 }
 
@@ -20,6 +19,7 @@ const SearchRow = props => {
 
   const inputRef = createRef();
   const [disableAddBtn, setDisableAddBtn] = useState(false);
+  const [itemCount, setItemCount] = useState(defaultCount || 1);
   let priceMatch = defaultCount ? row.pricebreaks.length - 1 : -1;
 
   let textHighlighter = txt => {
@@ -53,8 +53,8 @@ const SearchRow = props => {
     };
   }, []);
 
-  if (defaultCount) {
-    priceMatch = closestIndex(row.pricebreaks, defaultCount);
+  if (itemCount) {
+    priceMatch = closestIndex(row.pricebreaks, itemCount);
   }
 
   return (
@@ -72,7 +72,7 @@ const SearchRow = props => {
               : cell === 'total'
               ? row.pricebreaks.map((p, pi) => (
                   <span key={pi} className="search-results__item">
-                    {priceHighlighter(pi, `x${pi === priceMatch ? defaultCount : p.quant}=${priceFormatter((parseFloat(p.quant) * parseFloat(p.price / currency.exChange)).toFixed(2))}`)}
+                    {priceHighlighter(pi, `x${pi === priceMatch ? itemCount : p.quant}=${priceFormatter((parseFloat(pi === priceMatch ? itemCount : p.quant) * parseFloat(p.price / currency.exChange)).toFixed(2))}`)}
                   </span>
                 ))
               : row[cell]
@@ -88,25 +88,25 @@ const SearchRow = props => {
         <div className="search-results__cart">
           <input
             ref={inputRef}
-            //onChange={e => {
-            //  setDisableAddBtn(!e.target.value.length || +e.target.value < 1);
-            //}}
             onChange={e => {
-              let val = +e.target.value;
+              //setDisableAddBtn(!e.target.value.length || +e.target.value < 1);
+              //}}
+              //onBlur={e => {
+              let val = +(e.target.value || 1);
               if (val > 0) {
+                setItemCount(val);
+
                 //updateCart(row.id, val, row.cur);
-              } else {
-                //e.target.value = '1';
               }
             }}
-            placeholder={defaultCount}
+            placeholder={itemCount}
             type="text"
             className="input"
           />
           <div className="search-results__add">
             <Ripples
               onClick={() => {
-                updateCart(row.id, +inputRef.current.value || defaultCount, currency);
+                updateCart(row.id, +inputRef.current.value || itemCount, currency);
               }}
               during={1000}
               className={'btn __blue' + (disableAddBtn ? ' __disabled' : '')}

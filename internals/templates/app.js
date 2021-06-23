@@ -24,7 +24,27 @@ import LanguageProvider from 'containers/LanguageProvider';
 
 // Load the favicon and the .htaccess file
 /* eslint-disable import/no-unresolved, import/extensions */
-import '!file-loader?name=[name].[ext]!./images/favicon.ico';
+import '!file-loader?name=[name].[ext]!./favicon.ico';
+import '!file-loader?name=[name].[ext]!./browserconfig.xml';
+import '!file-loader?name=[name].[ext]!./favicon-16x16.png';
+import '!file-loader?name=[name].[ext]!./favicon-32x32.png';
+import '!file-loader?name=[name].[ext]!./safari-pinned-tab.svg';
+import '!file-loader?name=[name].[ext]!./site.webmanifest';
+import '!file-loader?name=[name].[ext]!./mstile-150x150.png';
+import '!file-loader?name=[name].[ext]!./browserconfig.xml';
+import '!file-loader?name=[name].[ext]!./apple-touch-icon-152x152.png';
+import '!file-loader?name=[name].[ext]!./android-chrome-192x192.png';
+import '!file-loader?name=[name].[ext]!./apple-touch-icon-60x60.png';
+import '!file-loader?name=[name].[ext]!./apple-touch-icon-144x144.png';
+import '!file-loader?name=[name].[ext]!./apple-touch-icon-120x120.png';
+import '!file-loader?name=[name].[ext]!./apple-touch-icon.png';
+import '!file-loader?name=[name].[ext]!./apple-touch-icon-precomposed.png';
+import '!file-loader?name=[name].[ext]!./apple-touch-icon-76x76.png';
+import '!file-loader?name=[name].[ext]!./apple-touch-icon-72x72.png';
+import '!file-loader?name=[name].[ext]!./android-chrome-256x256.png';
+import '!file-loader?name=[name].[ext]!./apple-touch-icon-57x57.png';
+import '!file-loader?name=[name].[ext]!./apple-touch-icon-180x180.png';
+import '!file-loader?name=[name].[ext]!./apple-touch-icon-114x114.png';
 import 'file-loader?name=.htaccess!./.htaccess';
 /* eslint-enable import/no-unresolved, import/extensions */
 

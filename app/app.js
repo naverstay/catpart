@@ -38,6 +38,7 @@ import '!file-loader?name=[name].[ext]!./apple-touch-icon-60x60.png';
 import '!file-loader?name=[name].[ext]!./apple-touch-icon-144x144.png';
 import '!file-loader?name=[name].[ext]!./apple-touch-icon-120x120.png';
 import '!file-loader?name=[name].[ext]!./apple-touch-icon.png';
+import '!file-loader?name=[name].[ext]!./apple-touch-icon-precomposed.png';
 import '!file-loader?name=[name].[ext]!./apple-touch-icon-76x76.png';
 import '!file-loader?name=[name].[ext]!./apple-touch-icon-72x72.png';
 import '!file-loader?name=[name].[ext]!./android-chrome-256x256.png';
@@ -45,7 +46,8 @@ import '!file-loader?name=[name].[ext]!./apple-touch-icon-57x57.png';
 import '!file-loader?name=[name].[ext]!./apple-touch-icon-180x180.png';
 import '!file-loader?name=[name].[ext]!./apple-touch-icon-114x114.png';
 
-import 'file-loader?name=.htaccess!./.htaccess'; // eslint-disable-line import/extensions
+import 'file-loader?name=.htaccess!./.htaccess';
+// eslint-disable-line import/extensions
 
 import configureStore from './configureStore';
 

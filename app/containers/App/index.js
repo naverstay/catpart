@@ -16,18 +16,16 @@ import FeaturePage from 'containers/FeaturePage/Loadable';
 import NotFoundPage from 'containers/NotFoundPage/Loadable';
 import Header from 'components/Header';
 import Footer from 'components/Footer';
-import Form from '../SearchForm/Form';
-import { readFile } from '../../utils/fileReader';
-import Input from '../SearchForm/Input';
-import LoadingIndicator from '../../components/LoadingIndicator';
+
 import apiGET from '../../utils/search';
 import PolicyPage from '../PolicyPage';
 import { closestIndex } from '../../utils/closestIndex';
+import DeliveryPage from '../DeliveryPage';
 
 export default function App() {
   const history = useHistory();
 
-  const [searchData, setSearchData] = useState([]);
+  const [searchData, setSearchData] = useState({});
   const [openMobMenu, setOpenMobMenu] = useState(false);
   const [orderSent, setOrderSent] = useState(false);
   const [searchCount, setSearchCount] = useState(1);
@@ -105,7 +103,7 @@ export default function App() {
             createNotification('success', `Обновлен: ${storeItem.name}`, `Количество: ${count}`);
           }
         } else {
-          let item = searchData.find(f => f.id === id);
+          let item = searchData.res.find(f => f.id === id);
 
           if (item) {
             createNotification('success', `Добавлен: ${item.name}`, `Количество: ${count}`);
@@ -242,20 +240,23 @@ export default function App() {
                   path="/"
                   component={() => (
                     <Helmet>
-                      <title>Home Page</title>
-                      <meta name="description" content="A catpart.ru application SearchForm" />
+                      <title>Поиск электронных компонентов - CATPART.RU</title>
+                      <meta name="description" content="Поиск электронных компонентов - CATPART.RU" />
+                      <meta name="keywords" content="Поиск электронных компонентов - CATPART.RU" />
+                      <link rel="canonical" href="https://catpart.ru/" />
                     </Helmet>
                   )}
                 />
                 {/* <Route path="/about" component={FeaturePage} /> */}
                 {/* <Route path="/search" component={FilterForm} /> */}
                 <Route path="/about" render={routeProps => <FeaturePage setOpenMobMenu={setOpenMobMenu} {...routeProps} />} />
-                <Route path="/policy" render={routeProps => <PolicyPage setOpenMobMenu={setOpenMobMenu} {...routeProps} />} />
+                <Route path="/delivery" render={routeProps => <DeliveryPage setOpenMobMenu={setOpenMobMenu} {...routeProps} />} />
+                <Route path="/privacy-policy" render={routeProps => <PolicyPage setOpenMobMenu={setOpenMobMenu} {...routeProps} />} />
                 <Route
                   path="/search"
                   render={routeProps => <FilterForm totalCart={totalCart} updateCart={updateCart} notificationFunc={createNotification} setOpenMobMenu={setOpenMobMenu} searchData={searchData} showResults={!formBusy} cart={false} props={{ ...routeProps }} />}
                 />
-                <Route path="/cart" render={routeProps => <FilterForm totalCart={totalCart} updateCart={updateCart} notificationFunc={createNotification} setOpenMobMenu={setOpenMobMenu} showResults={!formBusy} cart={true} props={{ ...routeProps }} />} />
+                <Route path="/order" render={routeProps => <FilterForm totalCart={totalCart} updateCart={updateCart} notificationFunc={createNotification} setOpenMobMenu={setOpenMobMenu} showResults={!formBusy} cart={true} props={{ ...routeProps }} />} />
 
                 <Route path="" render={routeProps => <NotFoundPage setOpenMobMenu={setOpenMobMenu} {...routeProps} />} />
               </Switch>
