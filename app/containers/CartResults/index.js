@@ -51,7 +51,7 @@ export function CartResults(props) {
           <div className="cart-results__cell __cart">&nbsp;</div>
         </div>
 
-        {list && list.length ? list.map((row, ri) => <CartRow key={ri} updateCart={updateCart} tableHeader={tableHeader} currency={currency} row={row} rowIndex={ri} />) : null}
+        {list && list.length ? list.map((row, ri) => <CartRow key={ri} notificationFunc={notificationFunc} updateCart={updateCart} tableHeader={tableHeader} currency={currency} row={row} rowIndex={ri} />) : null}
       </div>
     </div>
   );

@@ -44,7 +44,6 @@ export function SearchForm({ dndFile, notificationFunc, busy, setFormBusy, histo
     'art-number': '',
   });
   const [justRedraw, setJustRedraw] = useState(0);
-  const [totalPrice, setTotalPrice] = useState(0);
   const [errors, setErrors] = useState({
     quantity: null,
     'art-number': null,
@@ -58,9 +57,10 @@ export function SearchForm({ dndFile, notificationFunc, busy, setFormBusy, histo
       return !value.length || /^[1-9]\d*$/.test(value); // Allow digits and '.' only, using a RegExp
     });
 
-    handleChange('art-number', { target: formArtNumber.current });
-
-    onSubmitForm({ currentTarget: formRef.current });
+    if (formArtNumber.current.value.length) {
+      handleChange('art-number', { target: formArtNumber.current });
+      onSubmitForm({ currentTarget: formRef.current });
+    }
 
     return () => {
       formRef.current = false;
@@ -74,6 +74,12 @@ export function SearchForm({ dndFile, notificationFunc, busy, setFormBusy, histo
     loading,
     error,
     repos,
+  };
+
+  const handleSubmit = evt => {
+    handleChange('art-number', { target: formArtNumber.current });
+
+    onSubmitForm(evt);
   };
 
   const handleChange = (field, e) => {
@@ -96,7 +102,7 @@ export function SearchForm({ dndFile, notificationFunc, busy, setFormBusy, histo
 
   return (
     <div className="form-search">
-      <form ref={formRef} className="form-content" onSubmit={onSubmitForm}>
+      <form ref={formRef} className="form-content" onSubmit={handleSubmit}>
         <div className="form-search__title">
           Поиск электронных <br /> компонентов
         </div>
@@ -191,7 +197,7 @@ export function SearchForm({ dndFile, notificationFunc, busy, setFormBusy, histo
             <span className="form-label">&nbsp;</span>
             <div className="form-control">
               <Ripples className={'__w-100p btn __blue __lg'} during={1000}>
-                <button disabled={!validForm || busy} name={'search-submit'} className="btn-inner __abs">
+                <button name={'search-submit'} className="btn-inner __abs">
                   <span>{searchBtnText}</span>
                 </button>
               </Ripples>
@@ -217,13 +223,21 @@ export function SearchForm({ dndFile, notificationFunc, busy, setFormBusy, histo
                         let formData = new FormData();
                         let options = {};
 
+                        setSearchData({});
+                        setFormBusy(true);
+
                         formData.append('file', file);
 
                         history.push('/search');
 
                         apiPOST(requestURL, formData, options, data => {
-                          setFormBusy(false);
-                          setSearchData(data);
+                          if (data.error) {
+                            setFormBusy(false);
+                            notificationFunc('success', `Файл: ${file.name}`, 'ошибка обработки');
+                          } else {
+                            setFormBusy(false);
+                            setSearchData(data);
+                          }
                         });
 
                         notificationFunc('success', `Файл: ${file.name}`, 'отправлен');

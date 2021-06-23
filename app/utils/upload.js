@@ -83,5 +83,10 @@ export default function apiPOST(url, data, options, cb) {
       if (typeof cb === 'function') {
         cb(data);
       }
+    })
+    .catch(e => {
+      if (typeof cb === 'function') {
+        cb({ error: e });
+      }
     });
 }

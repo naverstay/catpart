@@ -27,11 +27,11 @@ import { CartResults } from '../CartResults';
 import apiGET from '../../utils/search';
 import { OrderForm } from '../OrderForm';
 import priceFormatter from '../../utils/priceFormatter';
-import { closestIndex } from '../../utils/closestIndex';
+import { findPriceIndex } from '../../utils/findPriceIndex';
 
 const key = 'home';
 
-export function FilterForm({ props, cart, showResults, totalCart, notificationFunc, updateCart, setOpenMobMenu, searchData, loading, error, onChangeCurrency }) {
+export function FilterForm({ props, pageY, cart, showResults, totalCart, notificationFunc, updateCart, setOpenMobMenu, searchData, loading, error, onChangeCurrency }) {
   useInjectReducer({ key, reducer });
   useInjectSaga({ key, saga });
 
@@ -50,8 +50,6 @@ export function FilterForm({ props, cart, showResults, totalCart, notificationFu
     const requestURL = '/currencies';
 
     apiGET(requestURL, {}, data => {
-      console.log('setCurrencyList', data);
-
       setCurrencyList(
         Object.keys(data)
           .map(c => {
@@ -177,12 +175,23 @@ export function FilterForm({ props, cart, showResults, totalCart, notificationFu
 
       {cart ? (
         <>
-          <CartResults updateCart={updateCart} list={cartData} notificationFunc={notificationFunc} showResults={showResults} count={count} currency={currency} />
+          <CartResults pageY={pageY} updateCart={updateCart} list={cartData} notificationFunc={notificationFunc} showResults={showResults} count={count} currency={currency} />
 
           <OrderForm totalCart={totalCart} currency={currency} delivery={true} />
         </>
       ) : (
-        <SearchResults updateCart={updateCart} notificationFunc={notificationFunc} highlight={decodeURIComponent(query.get('art') || '')} showResults={showResults} count={query.get('q') || ''} currency={currency} list={searchData.res} />
+        <SearchResults
+          pageY={pageY}
+          updateCart={updateCart}
+          notificationFunc={notificationFunc}
+          highlight={decodeURIComponent(query.get('art') || '')}
+          showResults={showResults}
+          count={query.get('q') || ''}
+          currency={currency}
+          bom={searchData.bom}
+          listTitles={searchData.req}
+          list={searchData.res}
+        />
       )}
     </>
   );

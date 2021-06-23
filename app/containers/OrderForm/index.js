@@ -104,10 +104,8 @@ export function OrderForm({ dndFile, delivery, notificationFunc, currency, total
   };
 
   useEffect(() => {
-    if (totalPriceRef.current && totalPrice !== totalCart) {
-      counterEffect(totalPriceRef.current, totalPrice / currency.exChange, totalCart / currency.exChange, 800);
-      setTotalPrice(totalCart);
-    }
+    counterEffect(totalPriceRef.current, totalPrice, totalCart / currency.exChange, 800);
+    setTotalPrice(totalCart / currency.exChange);
   }, [totalCart, currency]);
 
   useEffect(() => {

@@ -3,17 +3,17 @@ import priceFormatter from '../../utils/priceFormatter';
 import Ripples from 'react-ripples';
 
 import { setInputFilter } from '../../utils/inputFilter';
-import { closestIndex } from '../../utils/closestIndex';
+import { findPriceIndex } from '../../utils/findPriceIndex';
 
 function escapeRegExp(string) {
   return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
 }
 
 const SearchRow = props => {
-  let { rowIndex, tableHeader, currency, row, highlight, defaultCount, updateCart } = props;
+  let { rowIndex, tableHeader, currency, row, highlight, defaultCount, updateCart, notificationFunc } = props;
   defaultCount = +defaultCount;
 
-  if (!defaultCount) {
+  if (!defaultCount || defaultCount < row.moq) {
     defaultCount = row.moq;
   }
 
@@ -54,7 +54,7 @@ const SearchRow = props => {
   }, []);
 
   if (itemCount) {
-    priceMatch = closestIndex(row.pricebreaks, itemCount);
+    priceMatch = findPriceIndex(row.pricebreaks, itemCount);
   }
 
   return (
@@ -90,15 +90,25 @@ const SearchRow = props => {
             ref={inputRef}
             onChange={e => {
               //setDisableAddBtn(!e.target.value.length || +e.target.value < 1);
-              //}}
-              //onBlur={e => {
+
               let val = +(e.target.value || 1);
               if (val > 0) {
-                setItemCount(val);
+                setItemCount(Math.max(row.moq, val));
+                //updateCart(row.id, val, row.cur);
+              }
+            }}
+            onBlur={e => {
+              let val = +(e.target.value || 1);
+              if (e.target.value.length && val < row.moq) {
+                e.target.value = row.moq + '';
+                setItemCount(row.moq);
+
+                notificationFunc('success', `Для ${row.name}`, `минимальное количество: ${row.moq}`);
 
                 //updateCart(row.id, val, row.cur);
               }
             }}
+            //value={itemCount}
             placeholder={itemCount}
             type="text"
             className="input"

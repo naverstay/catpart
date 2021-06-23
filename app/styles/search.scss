@@ -50,6 +50,20 @@
         white-space: nowrap;
         //position: sticky;
         //top: 0;
+
+        &.__sticky {
+          position: fixed;
+          top: 0;
+          transform: translate3d(0px, 0px, 0px);
+          backface-visibility: hidden;
+          display: none;
+
+          &.__show {
+            @include respond-to-min($wide) {
+              display: flex;
+            }
+          }
+        }
       }
 
       &.__even {

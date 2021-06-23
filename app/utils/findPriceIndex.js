@@ -6,21 +6,22 @@
  *
  * @returns {number}
  */
-export const closestIndex = (arr, val) => {
+export const findPriceIndex = (arr, val) => {
   let ret = 0;
-  arr.every((p, pi) => {
-    if (pi) {
-      if (val >= arr[pi - 1].quant && val < p.quant) {
-        ret = pi - 1;
-        return false;
-      }
-    }
-
-    return true;
-  });
 
   if (val >= arr[arr.length - 1].quant) {
     ret = arr.length - 1;
+  } else {
+    arr.every((p, pi) => {
+      if (pi) {
+        if (val >= arr[pi - 1].quant && val < p.quant) {
+          ret = pi - 1;
+          return false;
+        }
+      }
+
+      return true;
+    });
   }
 
   return ret;

@@ -79,5 +79,10 @@ export default function apiGET(url, options, cb) {
       if (typeof cb === 'function') {
         cb(data);
       }
+    })
+    .catch(e => {
+      if (typeof cb === 'function') {
+        cb({ error: e });
+      }
     });
 }

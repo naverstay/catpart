@@ -19,7 +19,7 @@ import Footer from 'components/Footer';
 
 import apiGET from '../../utils/search';
 import PolicyPage from '../PolicyPage';
-import { closestIndex } from '../../utils/closestIndex';
+import { findPriceIndex } from '../../utils/findPriceIndex';
 import DeliveryPage from '../DeliveryPage';
 
 export default function App() {
@@ -36,6 +36,7 @@ export default function App() {
   const [appDrag, setAppDrag] = useState(false);
   const [dragText, setDragText] = useState('');
 
+  const [pageY, setPageY] = useState(0);
   const [centeredForm, setCenteredForm] = useState(true);
   const [formBusy, setFormBusy] = useState(false);
   const [formDrag, setFormDrag] = useState(false);
@@ -121,7 +122,7 @@ export default function App() {
     setCartCount(store.length);
 
     if (store.length) {
-      setTotalCart(store.reduce((total, c) => total + c.cart * c.pricebreaks[closestIndex(c.pricebreaks, c.cart)].price, 0));
+      setTotalCart(store.reduce((total, c) => total + c.cart * c.pricebreaks[findPriceIndex(c.pricebreaks, c.cart)].price, 0));
     } else {
       history.push('/');
     }
@@ -136,10 +137,14 @@ export default function App() {
       const art = form.querySelector('#art-number');
       const quantity = form.querySelector('#quantity');
 
+      console.log('onSubmitSearchForm', art.value);
+
       if (art.value.length) {
         const requestURL = '/search';
         setSearchResult(true);
         setFormBusy(true);
+
+        setSearchData({});
 
         setSearchCount(quantity.value || 1);
 
@@ -168,6 +173,8 @@ export default function App() {
 
   const handleScroll = event => {
     setOpenMobMenu(false);
+
+    setPageY(event.target.scrollTop);
   };
 
   useEffect(() => {
@@ -254,9 +261,9 @@ export default function App() {
                 <Route path="/privacy-policy" render={routeProps => <PolicyPage setOpenMobMenu={setOpenMobMenu} {...routeProps} />} />
                 <Route
                   path="/search"
-                  render={routeProps => <FilterForm totalCart={totalCart} updateCart={updateCart} notificationFunc={createNotification} setOpenMobMenu={setOpenMobMenu} searchData={searchData} showResults={!formBusy} cart={false} props={{ ...routeProps }} />}
+                  render={routeProps => <FilterForm pageY={pageY} totalCart={totalCart} updateCart={updateCart} notificationFunc={createNotification} setOpenMobMenu={setOpenMobMenu} searchData={searchData} showResults={!formBusy} cart={false} props={{ ...routeProps }} />}
                 />
-                <Route path="/order" render={routeProps => <FilterForm totalCart={totalCart} updateCart={updateCart} notificationFunc={createNotification} setOpenMobMenu={setOpenMobMenu} showResults={!formBusy} cart={true} props={{ ...routeProps }} />} />
+                <Route path="/order" render={routeProps => <FilterForm pageY={pageY} totalCart={totalCart} updateCart={updateCart} notificationFunc={createNotification} setOpenMobMenu={setOpenMobMenu} showResults={!formBusy} cart={true} props={{ ...routeProps }} />} />
 
                 <Route path="" render={routeProps => <NotFoundPage setOpenMobMenu={setOpenMobMenu} {...routeProps} />} />
               </Switch>

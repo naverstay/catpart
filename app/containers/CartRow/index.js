@@ -2,13 +2,16 @@ import React, { createRef, useEffect, useState } from 'react';
 import priceFormatter from '../../utils/priceFormatter';
 import Ripples from 'react-ripples';
 import { setInputFilter } from '../../utils/inputFilter';
+import { findPriceIndex } from '../../utils/findPriceIndex';
 
 const CartRow = props => {
-  let { rowIndex, tableHeader, currency, row, highlight, defaultCount, updateCart } = props;
+  let { rowIndex, tableHeader, currency, row, highlight, notificationFunc, defaultCount, updateCart } = props;
 
   const inputRef = createRef();
 
+  const [itemCount, setItemCount] = useState(defaultCount || 1);
   const [cartCount, setCartCount] = useState(parseFloat(row.cart));
+  let priceMatch = defaultCount ? row.pricebreaks.length - 1 : -1;
 
   useEffect(() => {
     setInputFilter(inputRef.current, function(value) {
@@ -19,6 +22,10 @@ const CartRow = props => {
       inputRef.current = false;
     };
   }, []);
+
+  if (cartCount) {
+    priceMatch = findPriceIndex(row.pricebreaks, cartCount);
+  }
 
   return (
     <div className={`cart-results__row${rowIndex % 2 === 0 ? ' __odd' : ' __even'}`}>
@@ -40,45 +47,45 @@ const CartRow = props => {
               <>
                 {cell === 'name' ? null : <span className="cart-results__label">{tableHeader[cell]}</span>}
                 <span className={'cart-results__value'}>
-                  {cell === 'pricebreaks'
-                    ? row.pricebreaks.slice(0, 1).map((p, pi) => (
-                        <span key={pi} className="cart-results__item">
-                          {priceFormatter(parseFloat(p.price / currency.exChange).toFixed(2))}
-                        </span>
-                      ))
-                    : cell === 'quantity'
-                    ? row.pricebreaks.slice(0, 1).map((p, pi) => (
-                        <div key={pi} className="cart-results__count">
-                          <input
-                            ref={inputRef}
-                            onChange={e => {
-                              let val = +e.target.value;
-                              if (val > 0) {
-                                setCartCount(parseFloat(val));
-                                console.log('row', row);
-                              }
-                            }}
-                            onBlur={e => {
-                              let val = +e.target.value;
-                              if (val > 0) {
-                              } else {
-                                e.target.value = '1';
-                              }
-                              updateCart(row.id, +e.target.value, row.cur);
-                            }}
-                            defaultValue={cartCount}
-                            type="text"
-                            className="input"
-                          />
-                        </div>
-                      ))
-                    : cell === 'total'
-                    ? row.pricebreaks.slice(0, 1).map((p, pi) => (
-                        <span key={pi} className="cart-results__item">
-                          {priceFormatter((cartCount * parseFloat(p.price / currency.exChange)).toFixed(2))}
-                        </span>
-                      ))
-                    : row[cell] || '!' + cell + '!'}
+                  {cell === 'pricebreaks' ? (
+                    <span className="cart-results__item">{priceFormatter(parseFloat(row.pricebreaks[priceMatch].price / currency.exChange).toFixed(2))}</span>
+                  ) : cell === 'quantity' ? (
+                    <div className="cart-results__count">
+                      <input
+                        ref={inputRef}
+                        onChange={e => {
+                          let val = +e.target.value;
+                          if (val > 0) {
+                            setCartCount(parseFloat(val));
+                            console.log('row', row);
+                          }
+                        }}
+                        onBlur={e => {
+                          let val = +e.target.value;
+                          if (val > 0) {
+                          } else {
+                            e.target.value = '1';
+                          }
+
+                          if (e.target.value.length && +e.target.value < row.moq) {
+                            e.target.value = row.moq + '';
+                            setItemCount(row.moq);
+
+                            notificationFunc('success', `Для ${row.name}`, `минимальное количество: ${row.moq}`);
+                          }
+
+                          updateCart(row.id, +e.target.value, row.cur);
+                        }}
+                        defaultValue={cartCount}
+                        type="text"
+                        className="input"
+                      />
+                    </div>
+                  ) : cell === 'total' ? (
+                    <span className="cart-results__item">{priceFormatter((cartCount * parseFloat(row.pricebreaks[priceMatch].price / currency.exChange)).toFixed(2))}</span>
+                  ) : (
+                    row[cell] || '!' + cell + '!'
+                  )}
                 </span>
               </>
             )}

@@ -13,7 +13,10 @@ import Skeleton from '../Skeleton';
 import SearchRow from '../SearchRow';
 
 export function SearchResults(props) {
-  let { list, cart, currency, count, showResults, highlight, notificationFunc, updateCart } = props;
+  let { bom, listTitles, list, cart, pageY, currency, count, showResults, highlight, notificationFunc, updateCart } = props;
+
+  const tableHead = React.createRef();
+  const [stickyHead, setStickyHead] = useState(false);
 
   let defaultCount = count;
 
@@ -30,26 +33,30 @@ export function SearchResults(props) {
     delivery_period: 'Срок',
   };
 
-  //list = list.concat(list).concat(list);
+  useEffect(() => {
+    //console.log('tableHead', tableHead.current.getBoundingClientRect().y, pageY);
 
-  //useEffect(() => {
-  //  console.log('useEffect', window);
-  //
-  //  window.addEventListener('scroll', evt => {
-  //    let action = window.scrollY > 50 && window.scrollY - prevY > 0 ? 'add' : 'remove';
-  //
-  //    console.log('scroll-down', action);
-  //
-  //    //document.getElementById('root').classList[action]('scroll-down');
-  //
-  //    prevY = window.scrollY;
-  //  });
-  //}, []);
+    setStickyHead(tableHead.current.getBoundingClientRect().y <= 0);
+
+    return () => {
+      tableHead.current = false;
+    };
+  }, [pageY]);
+
+  console.log('listTitles', listTitles, list);
 
   return (
     <div className="search-results">
+      <div ref={tableHead} className={'search-results__row __even __head __sticky' + (stickyHead ? ' __show' : '')}>
+        {Object.keys(tableHeader).map((head, hi) => (
+          <div key={hi} className={`search-results__cell __${head}`}>
+            {tableHeader[head]}
+          </div>
+        ))}
+        <div className="search-results__cell __cart">&nbsp;</div>
+      </div>
       <div className="search-results__table">
-        <div className="search-results__row __even __head">
+        <div className={'search-results__row __even __head'}>
           {Object.keys(tableHeader).map((head, hi) => (
             <div key={hi} className={`search-results__cell __${head}`}>
               {tableHeader[head]}
@@ -58,7 +65,22 @@ export function SearchResults(props) {
           <div className="search-results__cell __cart">&nbsp;</div>
         </div>
 
-        {showResults && list && list.length ? list.map((row, ri) => <SearchRow key={ri} updateCart={updateCart} tableHeader={tableHeader} defaultCount={defaultCount} currency={currency} highlight={highlight} row={row} rowIndex={ri} />) : <Skeleton />}
+        {list && list.length ? (
+          bom ? (
+            listTitles.map((t, ti) => (
+              <div key={ti}>
+                <div className={'search-results__title'}>{t.q}</div>
+                {list.map((row, ri) => (
+                  <SearchRow key={ri} updateCart={updateCart} tableHeader={tableHeader} defaultCount={defaultCount} currency={currency} highlight={highlight} notificationFunc={notificationFunc} row={row} rowIndex={ri} />
+                ))}
+              </div>
+            ))
+          ) : (
+            list.map((row, ri) => <SearchRow key={ri} updateCart={updateCart} tableHeader={tableHeader} defaultCount={defaultCount} currency={currency} highlight={highlight} notificationFunc={notificationFunc} row={row} rowIndex={ri} />)
+          )
+        ) : showResults ? null : (
+          <Skeleton />
+        )}
       </div>
     </div>
   );
