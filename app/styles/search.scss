@@ -20,7 +20,6 @@
       }
     }
 
-
     &__cart {
       position: relative;
       width: 100%;
@@ -62,6 +61,11 @@
 
         &.__cart {
           width: 871px;
+        }
+
+        .cart-results__row {
+          border-top-left-radius: 0;
+          border-top-right-radius: 0;
         }
 
         @include respond-to-max($wide) {

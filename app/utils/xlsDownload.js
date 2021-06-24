@@ -32,6 +32,8 @@ const prepareJSON = (data, mode, currency) => {
       priceMatch = findPriceIndex(row.pricebreaks, row.cart);
       price = priceFormatter((row.cart * parseFloat(row.pricebreaks[priceMatch].price / currency.exChange)).toFixed(2));
       row.price = priceMatch + '#' + price;
+    } else {
+      delete row.cart;
     }
 
     row.pricebreaks = row.pricebreaks.map(p => `${p.quant} - ${priceFormatter(p.price / currency.exChange)}`).join('\n');
@@ -48,45 +50,47 @@ const prepareJSON = (data, mode, currency) => {
 };
 
 export const xlsDownload = (data, currency, mode) => {
-  let fileName = mode === MODE_CART ? 'cart' : 'search';
+  if (data && data.length) {
+    let fileName = mode === MODE_CART ? 'cart' : 'search';
 
-  let tableHeader = ['manufacturer', 'name', 'brand', 'quantity', 'pack_quant', 'price_unit', 'moq', 'delivery_period'];
+    let tableHeader = ['manufacturer', 'name', 'brand', 'quantity', 'pack_quant', 'price_unit', 'moq', 'delivery_period'];
 
-  if (mode === MODE_CART) {
-    tableHeader.push('cart');
+    if (mode === MODE_CART) {
+      tableHeader.push('cart');
+    }
+
+    tableHeader.push('pricebreaks');
+
+    if (mode === MODE_CART) {
+      tableHeader.push('price');
+    }
+
+    tableHeader.push('currency');
+
+    if (mode === MODE_BOM) {
+      tableHeader = ['query', ...tableHeader];
+    }
+
+    let WS = XLSX.utils.json_to_sheet(prepareJSON(JSON.parse(JSON.stringify(data)), mode, currency), { header: tableHeader });
+
+    if (mode === MODE_CART) {
+      let newJSON = XLSX.utils.sheet_to_json(WS);
+
+      Object.keys(newJSON).map(j => {
+        let row = newJSON[j];
+        let priceMatch = row.price.split('#');
+        let space = '\n'.repeat(+priceMatch[0]);
+        row.currency = space + row.currency;
+        row.cart = space + row.cart;
+        row.price = space + priceMatch[1];
+      });
+
+      WS = XLSX.utils.json_to_sheet(newJSON, { header: tableHeader });
+    }
+
+    let WB = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(WB, WS, fileName);
+
+    XLSX.writeFile(WB, fileName + '.xls');
   }
-
-  tableHeader.push('pricebreaks');
-
-  if (mode === MODE_CART) {
-    tableHeader.push('price');
-  }
-
-  tableHeader.push('currency');
-
-  if (mode === MODE_BOM) {
-    tableHeader = ['query', ...tableHeader];
-  }
-
-  let WS = XLSX.utils.json_to_sheet(prepareJSON(JSON.parse(JSON.stringify(data)), mode, currency), { header: tableHeader });
-
-  if (mode === MODE_CART) {
-    let newJSON = XLSX.utils.sheet_to_json(WS);
-
-    Object.keys(newJSON).map(j => {
-      let row = newJSON[j];
-      let priceMatch = row.price.split('#');
-      let space = '\n'.repeat(+priceMatch[0]);
-      row.currency = space + row.currency;
-      row.cart = space + row.cart;
-      row.price = space + priceMatch[1];
-    });
-
-    WS = XLSX.utils.json_to_sheet(newJSON, { header: tableHeader });
-  }
-
-  let WB = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(WB, WS, fileName);
-
-  XLSX.writeFile(WB, fileName + '.xls');
 };

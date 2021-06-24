@@ -275,13 +275,20 @@
         margin: 0 -5px;
         display: flex;
         flex-flow: row wrap;
+      }
 
-        .form-filter__control {
-          position: relative;
-          white-space: nowrap;
-          height: 30px;
-          margin: 0 5px 10px;
-        }
+      .form-filter__control {
+        position: relative;
+        white-space: nowrap;
+        height: 30px;
+        margin: 0 5px 10px;
+      }
+
+      &.__wide {
+        display: flex;
+        flex-flow: row wrap;
+        justify-content: flex-start;
+        margin: 30px -5px 7px;
       }
     }
   }

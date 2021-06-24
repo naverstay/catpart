@@ -1,5 +1,6 @@
 import React from 'react';
 import { useDetectClickOutside } from 'react-detect-click-outside';
+import Ripples from 'react-ripples';
 
 function Share({ setOpenFunc }) {
   const shareRef = useDetectClickOutside({
@@ -89,18 +90,21 @@ function Share({ setOpenFunc }) {
         {links.map((l, li) => (
           <li key={li}>
             {l.action ? (
-              <span
-                className={'dropdown-link'}
+              <Ripples
                 onClick={() => {
                   dropdownAction(l.action);
                 }}
+                className="dropdown-link"
+                during={1000}
               >
                 {l.name}
-              </span>
+              </Ripples>
             ) : (
-              <a className={'dropdown-link'} href={l.href}>
-                {l.name}
-              </a>
+              <Ripples className="dropdown-link" during={1000}>
+                <a className={'dropdown-link-inner'} href={l.href}>
+                  {l.name}
+                </a>
+              </Ripples>
             )}
           </li>
         ))}

@@ -20,30 +20,6 @@ export function SearchResults(props) {
   const tableHead = React.createRef();
   const [collapseTriggers, setCollapseTriggers] = useState([]);
 
-  let smoothScrollTo = (target, startY, endY, duration) => {
-    let distanceY = endY - startY;
-    let startTime = new Date().getTime();
-
-    function easeInOutQuart(time, from, distance, duration) {
-      if ((time /= duration / 2) < 1) {
-        return (distance / 2) * Math.pow(time, 4) + from;
-      }
-
-      return (-distance / 2) * ((time -= 2) * Math.pow(time, 3) - 2) + from;
-    }
-
-    let timer = window.setInterval(() => {
-      let time = new Date().getTime() - startTime;
-      let newY = easeInOutQuart(time, startY, distanceY, duration);
-
-      if (time >= duration) {
-        window.clearInterval(timer);
-      }
-
-      target.scrollTo(0, newY);
-    }, 1000 / 60);
-  };
-
   let defaultCount = count;
 
   let tableHeader = {
@@ -78,6 +54,10 @@ export function SearchResults(props) {
     };
   }, [pageY]);
 
+  //if (list && list.length && bom) {
+  //  setCollapseTriggers(list.map((query, qi) => <span>{query.q}</span>));
+  //}
+
   return (
     <div className="search-results">
       <div className="search-results__table">
@@ -87,24 +67,6 @@ export function SearchResults(props) {
         {list && list.length ? (
           bom ? (
             list.map((query, qi) => {
-              const triggerRef = React.createRef();
-              const triggerBtn = <span ref={triggerRef}>{query.q}</span>;
-
-              const scrollBtn = (
-                <Ripples
-                  onClick={() => {
-                    console.log('scrollTo', triggerRef.current);
-                  }}
-                  className="btn __gray"
-                  during={1000}
-                >
-                  <span className="btn-inner">{query.q}</span>
-                </Ripples>
-              );
-
-              //setCollapseTriggers([...collapseTriggers, triggerBtn]);
-              //setScrollTriggers([...scrollTriggers, scrollBtn]);
-
               return (
                 <Collapsible
                   key={qi}
@@ -116,7 +78,7 @@ export function SearchResults(props) {
                   triggerClassName={'search-results__trigger __collapsed trigger-' + qi}
                   triggerOpenedClassName={'search-results__trigger __expanded trigger-' + qi}
                   openedClassName={'search-results__expanded'}
-                  trigger={triggerBtn}
+                  trigger={<span>{query.q}</span>}
                 >
                   {query.data.map((row, ri) => (
                     <SearchRow key={ri} updateCart={updateCart} tableHeader={tableHeader} defaultCount={defaultCount} currency={currency} highlight={highlight} notificationFunc={notificationFunc} row={row} rowIndex={ri} />
