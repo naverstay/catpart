@@ -41,6 +41,7 @@ export function FilterForm({ props, pageY, cart, setTableHeadFixed, showResults,
   const RUB = { name: 'RUB', exChange: 1 };
   const [count, setCount] = useState(0);
   const [cartData, setCartData] = useState([]);
+  const [scrollTriggers, setScrollTriggers] = useState([]);
   const [openShare, setOpenShare] = useState(false);
   const [currencyList, setCurrencyList] = useState([RUB]);
   const [currency, setCurrency] = useState(RUB);
@@ -85,7 +86,9 @@ export function FilterForm({ props, pageY, cart, setTableHeadFixed, showResults,
   };
 
   let searchInfo =
-    !cart && searchData && searchData.hasOwnProperty('res') ? 'По запросу «' + (query.get('art') || '') + '» ' + (searchData.res.length ? 'найдено ' + plural(searchData.res.length, 'наименование', 'наименования', 'наименований') + '.' : 'ничего не найдено :(') : '';
+    !cart && searchData && searchData.hasOwnProperty('res')
+      ? (searchData.bom ? 'BOM-поиск. Н' : 'По запросу «' + (query.get('art') || '') + '» н') + (searchData.res.length ? 'айдено ' + plural(searchData.res.length, 'наименование', 'наименования', 'наименований') + '.' : 'ичего не найдено :(')
+      : '';
 
   return (
     <>
@@ -106,6 +109,15 @@ export function FilterForm({ props, pageY, cart, setTableHeadFixed, showResults,
       )}
 
       <div className="form-filter">
+        {!cart &&
+          (scrollTriggers.length ? (
+            <div className={'form-filter__controls'}>
+              {scrollTriggers.map((t, ti) => (
+                <div className={'form-filter__control'}>{t}</div>
+              ))}
+            </div>
+          ) : null)}
+
         {!cart && showResults ? <div className="form-filter__stat">{searchInfo}</div> : <div className="form-filter__stat">&nbsp;</div>}
 
         <div className={'form-filter__controls' + (cart ? ' __cart' : '')}>
@@ -114,7 +126,7 @@ export function FilterForm({ props, pageY, cart, setTableHeadFixed, showResults,
               <div className="form-filter__control">
                 <Ripples
                   onClick={() => {
-                    xlsDownload(cartData, currency, true);
+                    xlsDownload(cartData, currency, 0);
                   }}
                   className="btn __gray"
                   during={1000}
@@ -133,7 +145,7 @@ export function FilterForm({ props, pageY, cart, setTableHeadFixed, showResults,
               <div className="form-filter__control">
                 <Ripples
                   onClick={() => {
-                    xlsDownload(searchData.res, currency, false);
+                    xlsDownload(searchData.res, currency, searchData.bom ? 1 : -1);
                   }}
                   className="btn __gray"
                   during={1000}
@@ -194,6 +206,8 @@ export function FilterForm({ props, pageY, cart, setTableHeadFixed, showResults,
         </>
       ) : (
         <SearchResults
+          scrollTriggers={scrollTriggers}
+          setScrollTriggers={setScrollTriggers}
           setTableHeadFixed={setTableHeadFixed}
           pageY={pageY}
           updateCart={updateCart}
@@ -203,7 +217,6 @@ export function FilterForm({ props, pageY, cart, setTableHeadFixed, showResults,
           count={query.get('q') || ''}
           currency={currency}
           bom={searchData.bom}
-          listTitles={searchData.req}
           list={searchData.res}
         />
       )}

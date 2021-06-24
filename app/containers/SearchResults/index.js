@@ -11,11 +11,38 @@ import { connect } from 'react-redux';
 
 import Skeleton from '../Skeleton';
 import SearchRow from '../SearchRow';
+import Collapsible from 'react-collapsible';
+import Ripples from 'react-ripples';
 
 export function SearchResults(props) {
-  let { bom, listTitles, list, cart, pageY, setTableHeadFixed, currency, count, showResults, highlight, notificationFunc, updateCart } = props;
+  let { bom, list, cart, pageY, scrollTriggers, setScrollTriggers, setTableHeadFixed, currency, count, showResults, highlight, notificationFunc, updateCart } = props;
 
   const tableHead = React.createRef();
+  const [collapseTriggers, setCollapseTriggers] = useState([]);
+
+  let smoothScrollTo = (target, startY, endY, duration) => {
+    let distanceY = endY - startY;
+    let startTime = new Date().getTime();
+
+    function easeInOutQuart(time, from, distance, duration) {
+      if ((time /= duration / 2) < 1) {
+        return (distance / 2) * Math.pow(time, 4) + from;
+      }
+
+      return (-distance / 2) * ((time -= 2) * Math.pow(time, 3) - 2) + from;
+    }
+
+    let timer = window.setInterval(() => {
+      let time = new Date().getTime() - startTime;
+      let newY = easeInOutQuart(time, startY, distanceY, duration);
+
+      if (time >= duration) {
+        window.clearInterval(timer);
+      }
+
+      target.scrollTo(0, newY);
+    }, 1000 / 60);
+  };
 
   let defaultCount = count;
 
@@ -59,16 +86,46 @@ export function SearchResults(props) {
         </div>
         {list && list.length ? (
           bom ? (
-            listTitles.map((t, ti) => (
-              <div key={ti}>
-                <div className={'search-results__title'}>{t.q}</div>
-                {list.map((row, ri) => (
-                  <SearchRow key={ri} updateCart={updateCart} tableHeader={tableHeader} defaultCount={defaultCount} currency={currency} highlight={highlight} notificationFunc={notificationFunc} row={row} rowIndex={ri} />
-                ))}
-              </div>
-            ))
+            list.map((query, qi) => {
+              const triggerRef = React.createRef();
+              const triggerBtn = <span ref={triggerRef}>{query.q}</span>;
+
+              const scrollBtn = (
+                <Ripples
+                  onClick={() => {
+                    console.log('scrollTo', triggerRef.current);
+                  }}
+                  className="btn __gray"
+                  during={1000}
+                >
+                  <span className="btn-inner">{query.q}</span>
+                </Ripples>
+              );
+
+              //setCollapseTriggers([...collapseTriggers, triggerBtn]);
+              //setScrollTriggers([...scrollTriggers, scrollBtn]);
+
+              return (
+                <Collapsible
+                  key={qi}
+                  open={true}
+                  transitionTime={200}
+                  transitionCloseTime={200}
+                  triggerTagName={'div'}
+                  className={'search-results__collapsed'}
+                  triggerClassName={'search-results__trigger __collapsed trigger-' + qi}
+                  triggerOpenedClassName={'search-results__trigger __expanded trigger-' + qi}
+                  openedClassName={'search-results__expanded'}
+                  trigger={triggerBtn}
+                >
+                  {query.data.map((row, ri) => (
+                    <SearchRow key={ri} updateCart={updateCart} tableHeader={tableHeader} defaultCount={defaultCount} currency={currency} highlight={highlight} notificationFunc={notificationFunc} row={row} rowIndex={ri} />
+                  ))}
+                </Collapsible>
+              );
+            })
           ) : (
-            list.map((row, ri) => <SearchRow key={ri} updateCart={updateCart} tableHeader={tableHeader} defaultCount={defaultCount} currency={currency} highlight={highlight} notificationFunc={notificationFunc} row={row} rowIndex={ri} />)
+            list[0].data.map((row, ri) => <SearchRow key={ri} updateCart={updateCart} tableHeader={tableHeader} defaultCount={defaultCount} currency={currency} highlight={highlight} notificationFunc={notificationFunc} row={row} rowIndex={ri} />)
           )
         ) : showResults ? null : (
           <Skeleton />

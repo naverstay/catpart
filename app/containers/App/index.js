@@ -105,19 +105,26 @@ export default function App() {
             createNotification('success', `Обновлен: ${storeItem.name}`, `Количество: ${count}`);
           }
         } else {
-          let item = searchData.res.find(f => f.id === id);
+          searchData.res.every(query => {
+            let item = query.data.find(f => f.id === id);
 
-          if (item) {
-            createNotification('success', `Добавлен: ${item.name}`, `Количество: ${count}`);
+            if (item) {
+              createNotification('success', `Добавлен: ${item.name}`, `Количество: ${count}`);
 
-            item.cart = count;
-            item.cur = cur;
-            store.push(item);
-          }
+              item.cart = count;
+              item.cur = cur;
+              store.push(item);
+
+              return false;
+            }
+
+            return true;
+          });
         }
       }
 
       localStorage.setItem('catpart', JSON.stringify(store));
+    } else {
     }
 
     setCartCount(store.length);

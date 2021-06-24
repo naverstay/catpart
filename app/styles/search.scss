@@ -4,6 +4,23 @@
     padding: 10px 0;
     overflow: hidden;
 
+    &__trigger {
+      padding: 16px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      background: $main_gray;
+      color: #fff;
+      font-weight: bold;
+      margin: 1px 0;
+      font-size: 18px;
+      transition: color .3s, background .3s;
+
+      &.__collapsed {
+        background: $gray_placeholder;
+      }
+    }
+
+
     &__cart {
       position: relative;
       width: 100%;

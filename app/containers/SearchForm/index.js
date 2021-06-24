@@ -242,7 +242,7 @@ export function SearchForm({ dndFile, notificationFunc, busy, setFormBusy, histo
 
                         notificationFunc('success', `Файл: ${file.name}`, 'отправлен');
                       } else {
-                        notificationFunc('success', `Файл: ${file.name}`, 'не соответствует формату .txt, .csv, .tsv, .xls, . xlsx');
+                        file && notificationFunc('success', `Файл: ${file.name}`, 'не соответствует формату .txt, .csv, .tsv, .xls, . xlsx');
                       }
 
                       //readFile(formFile.current.files[0], ret => {

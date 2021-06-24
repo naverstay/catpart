@@ -2,12 +2,33 @@ import XLSX from 'xlsx';
 import priceFormatter from './priceFormatter';
 import { findPriceIndex } from './findPriceIndex';
 
-const prepareJSON = (data, cart, currency) => {
+const MODE_CART = 0;
+const MODE_BOM = 1;
+const MODE_SEARCH = -1;
+
+const transformSearchData = data => {
+  return data.reduce(
+    (arr, c) =>
+      arr.concat(
+        c.data.map(d => {
+          d.query = c.q;
+          return d;
+        }),
+      ),
+    [],
+  );
+};
+
+const prepareJSON = (data, mode, currency) => {
+  if (mode !== MODE_CART) {
+    data = transformSearchData(data);
+  }
+
   return data.map(row => {
     let price = '';
     let priceMatch = -1;
 
-    if (cart) {
+    if (mode === MODE_CART) {
       priceMatch = findPriceIndex(row.pricebreaks, row.cart);
       price = priceFormatter((row.cart * parseFloat(row.pricebreaks[priceMatch].price / currency.exChange)).toFixed(2));
       row.price = priceMatch + '#' + price;
@@ -26,26 +47,30 @@ const prepareJSON = (data, cart, currency) => {
   });
 };
 
-export const xlsDownload = (data, currency, cart) => {
-  let fileName = cart ? 'cart' : 'search';
+export const xlsDownload = (data, currency, mode) => {
+  let fileName = mode === MODE_CART ? 'cart' : 'search';
 
-  const tableHeader = ['manufacturer', 'name', 'brand', 'quantity', 'pack_quant', 'price_unit', 'moq', 'delivery_period'];
+  let tableHeader = ['manufacturer', 'name', 'brand', 'quantity', 'pack_quant', 'price_unit', 'moq', 'delivery_period'];
 
-  if (cart) {
+  if (mode === MODE_CART) {
     tableHeader.push('cart');
   }
 
   tableHeader.push('pricebreaks');
 
-  if (cart) {
+  if (mode === MODE_CART) {
     tableHeader.push('price');
   }
 
   tableHeader.push('currency');
 
-  let WS = XLSX.utils.json_to_sheet(prepareJSON(JSON.parse(JSON.stringify(data)), cart, currency), { header: tableHeader });
+  if (mode === MODE_BOM) {
+    tableHeader = ['query', ...tableHeader];
+  }
 
-  if (cart) {
+  let WS = XLSX.utils.json_to_sheet(prepareJSON(JSON.parse(JSON.stringify(data)), mode, currency), { header: tableHeader });
+
+  if (mode === MODE_CART) {
     let newJSON = XLSX.utils.sheet_to_json(WS);
 
     Object.keys(newJSON).map(j => {
