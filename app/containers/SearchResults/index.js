@@ -13,10 +13,9 @@ import Skeleton from '../Skeleton';
 import SearchRow from '../SearchRow';
 
 export function SearchResults(props) {
-  let { bom, listTitles, list, cart, pageY, currency, count, showResults, highlight, notificationFunc, updateCart } = props;
+  let { bom, listTitles, list, cart, pageY, setTableHeadFixed, currency, count, showResults, highlight, notificationFunc, updateCart } = props;
 
   const tableHead = React.createRef();
-  const [stickyHead, setStickyHead] = useState(false);
 
   let defaultCount = count;
 
@@ -33,38 +32,31 @@ export function SearchResults(props) {
     delivery_period: 'Срок',
   };
 
-  useEffect(() => {
-    //console.log('tableHead', tableHead.current.getBoundingClientRect().y, pageY);
+  let tHead = (
+    <div className={'search-results__row __even __head'}>
+      {Object.keys(tableHeader).map((head, hi) => (
+        <div key={hi} className={`search-results__cell __${head}`}>
+          {tableHeader[head]}
+        </div>
+      ))}
+      <div className="search-results__cell __cart">&nbsp;</div>
+    </div>
+  );
 
-    setStickyHead(tableHead.current.getBoundingClientRect().y <= 0);
+  useEffect(() => {
+    setTableHeadFixed(tableHead.current.getBoundingClientRect().y <= 0 ? <div className={'search-results__table __sticky'}>{tHead}</div> : null);
 
     return () => {
       tableHead.current = false;
     };
   }, [pageY]);
 
-  console.log('listTitles', listTitles, list);
-
   return (
     <div className="search-results">
-      <div ref={tableHead} className={'search-results__row __even __head __sticky' + (stickyHead ? ' __show' : '')}>
-        {Object.keys(tableHeader).map((head, hi) => (
-          <div key={hi} className={`search-results__cell __${head}`}>
-            {tableHeader[head]}
-          </div>
-        ))}
-        <div className="search-results__cell __cart">&nbsp;</div>
-      </div>
       <div className="search-results__table">
-        <div className={'search-results__row __even __head'}>
-          {Object.keys(tableHeader).map((head, hi) => (
-            <div key={hi} className={`search-results__cell __${head}`}>
-              {tableHeader[head]}
-            </div>
-          ))}
-          <div className="search-results__cell __cart">&nbsp;</div>
+        <div ref={tableHead} className={'search-results__head-wrapper'}>
+          {tHead}
         </div>
-
         {list && list.length ? (
           bom ? (
             listTitles.map((t, ti) => (

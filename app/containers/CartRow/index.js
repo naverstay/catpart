@@ -1,8 +1,8 @@
 import React, { createRef, useEffect, useState } from 'react';
-import priceFormatter from '../../utils/priceFormatter';
 import Ripples from 'react-ripples';
-import { setInputFilter } from '../../utils/inputFilter';
+import priceFormatter from '../../utils/priceFormatter';
 import { findPriceIndex } from '../../utils/findPriceIndex';
+import { setInputFilter } from '../../utils/inputFilter';
 
 const CartRow = props => {
   let { rowIndex, tableHeader, currency, row, highlight, notificationFunc, defaultCount, updateCart } = props;

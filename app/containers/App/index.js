@@ -25,6 +25,7 @@ import DeliveryPage from '../DeliveryPage';
 export default function App() {
   const history = useHistory();
 
+  const [tableHeadFixed, setTableHeadFixed] = useState(null);
   const [searchData, setSearchData] = useState({});
   const [openMobMenu, setOpenMobMenu] = useState(false);
   const [orderSent, setOrderSent] = useState(false);
@@ -261,14 +262,34 @@ export default function App() {
                 <Route path="/privacy-policy" render={routeProps => <PolicyPage setOpenMobMenu={setOpenMobMenu} {...routeProps} />} />
                 <Route
                   path="/search"
-                  render={routeProps => <FilterForm pageY={pageY} totalCart={totalCart} updateCart={updateCart} notificationFunc={createNotification} setOpenMobMenu={setOpenMobMenu} searchData={searchData} showResults={!formBusy} cart={false} props={{ ...routeProps }} />}
+                  render={routeProps => (
+                    <FilterForm
+                      setTableHeadFixed={setTableHeadFixed}
+                      pageY={pageY}
+                      totalCart={totalCart}
+                      updateCart={updateCart}
+                      notificationFunc={createNotification}
+                      setOpenMobMenu={setOpenMobMenu}
+                      searchData={searchData}
+                      showResults={!formBusy}
+                      cart={false}
+                      props={{ ...routeProps }}
+                    />
+                  )}
                 />
-                <Route path="/order" render={routeProps => <FilterForm pageY={pageY} totalCart={totalCart} updateCart={updateCart} notificationFunc={createNotification} setOpenMobMenu={setOpenMobMenu} showResults={!formBusy} cart={true} props={{ ...routeProps }} />} />
+                <Route
+                  path="/order"
+                  render={routeProps => (
+                    <FilterForm setTableHeadFixed={setTableHeadFixed} pageY={pageY} totalCart={totalCart} updateCart={updateCart} notificationFunc={createNotification} setOpenMobMenu={setOpenMobMenu} showResults={!formBusy} cart={true} props={{ ...routeProps }} />
+                  )}
+                />
 
                 <Route path="" render={routeProps => <NotFoundPage setOpenMobMenu={setOpenMobMenu} {...routeProps} />} />
               </Switch>
             )}
           </div>
+
+          {tableHeadFixed}
         </main>
         <Footer />
       </div>

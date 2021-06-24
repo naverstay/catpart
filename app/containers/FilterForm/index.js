@@ -28,10 +28,11 @@ import apiGET from '../../utils/search';
 import { OrderForm } from '../OrderForm';
 import priceFormatter from '../../utils/priceFormatter';
 import { findPriceIndex } from '../../utils/findPriceIndex';
+import { xlsDownload } from '../../utils/xlsDownload';
 
 const key = 'home';
 
-export function FilterForm({ props, pageY, cart, showResults, totalCart, notificationFunc, updateCart, setOpenMobMenu, searchData, loading, error, onChangeCurrency }) {
+export function FilterForm({ props, pageY, cart, setTableHeadFixed, showResults, totalCart, notificationFunc, updateCart, setOpenMobMenu, searchData, loading, error, onChangeCurrency }) {
   useInjectReducer({ key, reducer });
   useInjectSaga({ key, saga });
 
@@ -111,7 +112,13 @@ export function FilterForm({ props, pageY, cart, showResults, totalCart, notific
           {cart ? (
             <div className="form-filter__controls_left">
               <div className="form-filter__control">
-                <Ripples className="btn __gray" during={1000}>
+                <Ripples
+                  onClick={() => {
+                    xlsDownload(cartData, currency, true);
+                  }}
+                  className="btn __gray"
+                  during={1000}
+                >
                   <div className="btn-inner">
                     <span className="btn __blue">
                       <span className="btn-icon icon icon-download" />
@@ -124,7 +131,13 @@ export function FilterForm({ props, pageY, cart, showResults, totalCart, notific
           ) : (
             <div className="form-filter__controls_left">
               <div className="form-filter__control">
-                <Ripples className="btn __gray" during={1000}>
+                <Ripples
+                  onClick={() => {
+                    xlsDownload(searchData.res, currency, false);
+                  }}
+                  className="btn __gray"
+                  during={1000}
+                >
                   <span className="btn-inner">
                     <span className="btn __blue">
                       <span className="btn-icon icon icon-download" />
@@ -175,12 +188,13 @@ export function FilterForm({ props, pageY, cart, showResults, totalCart, notific
 
       {cart ? (
         <>
-          <CartResults pageY={pageY} updateCart={updateCart} list={cartData} notificationFunc={notificationFunc} showResults={showResults} count={count} currency={currency} />
+          <CartResults setTableHeadFixed={setTableHeadFixed} pageY={pageY} updateCart={updateCart} list={cartData} notificationFunc={notificationFunc} showResults={showResults} count={count} currency={currency} />
 
           <OrderForm totalCart={totalCart} currency={currency} delivery={true} />
         </>
       ) : (
         <SearchResults
+          setTableHeadFixed={setTableHeadFixed}
           pageY={pageY}
           updateCart={updateCart}
           notificationFunc={notificationFunc}

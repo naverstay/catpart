@@ -2,7 +2,6 @@
 
   &-results {
     padding: 10px 0;
-    font-size: 12px;
     overflow: hidden;
 
     &__cart {
@@ -31,8 +30,27 @@
     }
 
     &__table {
+      font-size: 12px;
       display: flex;
       flex-flow: column nowrap;
+
+      &.__sticky {
+        z-index: 9;
+        position: fixed;
+        top: 0;
+        width: 1170px;
+        transform: translate3d(0px, 0px, 0px);
+        backface-visibility: hidden;
+        box-shadow: 0 0 20px rgba(71, 93, 244, 0.25);
+
+        &.__cart {
+          width: 871px;
+        }
+
+        @include respond-to-max($wide) {
+          display: none;
+        }
+      }
     }
 
     &__row {
@@ -51,19 +69,6 @@
         //position: sticky;
         //top: 0;
 
-        &.__sticky {
-          position: fixed;
-          top: 0;
-          transform: translate3d(0px, 0px, 0px);
-          backface-visibility: hidden;
-          display: none;
-
-          &.__show {
-            @include respond-to-min($wide) {
-              display: flex;
-            }
-          }
-        }
       }
 
       &.__even {
