@@ -267,7 +267,7 @@ export function FilterForm({ props, pageY, cart, setTableHeadFixed, showResults,
                 >
                   <span className="btn-inner">Поделиться</span>
                 </Ripples>
-                {openShare && <Share setOpenFunc={setOpenShare} />}
+                {openShare && <Share notificationFunc={notificationFunc} setOpenFunc={setOpenShare} />}
               </div>
             </div>
           )}

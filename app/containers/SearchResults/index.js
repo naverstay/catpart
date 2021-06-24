@@ -54,10 +54,6 @@ export function SearchResults(props) {
     };
   }, [pageY]);
 
-  //if (list && list.length && bom) {
-  //  setCollapseTriggers(list.map((query, qi) => <span>{query.q}</span>));
-  //}
-
   return (
     <div className="search-results">
       <div className="search-results__table">

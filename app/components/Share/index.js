@@ -2,12 +2,20 @@ import React from 'react';
 import { useDetectClickOutside } from 'react-detect-click-outside';
 import Ripples from 'react-ripples';
 
-function Share({ setOpenFunc }) {
+function Share({ setOpenFunc, notificationFunc }) {
   const shareRef = useDetectClickOutside({
     onTriggered: () => {
       setOpenFunc(false);
     },
   });
+
+  let successCopy = text => {
+    notificationFunc('success', `URL страницы скопирован в буфер обмена`, text);
+  };
+
+  let failCopy = () => {
+    notificationFunc('success', `Ошибка копирования в буфер обмена`, ':(');
+  };
 
   let fallbackCopyTextToClipboard = text => {
     let textArea = document.createElement('textarea');
@@ -24,10 +32,14 @@ function Share({ setOpenFunc }) {
 
     try {
       let successful = document.execCommand('copy');
-      let msg = successful ? 'successful' : 'unsuccessful';
-      console.log('Fallback: Copying text command was ' + msg);
+
+      if (successful) {
+        successCopy(text);
+      } else {
+        failCopy();
+      }
     } catch (err) {
-      console.error('Fallback: Oops, unable to copy', err);
+      failCopy();
     }
 
     document.body.removeChild(textArea);
@@ -48,10 +60,10 @@ function Share({ setOpenFunc }) {
     }
     navigator.clipboard.writeText(text).then(
       function() {
-        console.log('Async: Copying to clipboard was successful!');
+        successCopy(text);
       },
       function(err) {
-        console.error('Async: Could not copy text: ', err);
+        failCopy();
       },
     );
   };
