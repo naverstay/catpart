@@ -4,7 +4,7 @@
  * Lists the name and the issue count of a repository
  */
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
@@ -17,9 +17,9 @@ import SearchRow from '../SearchRow';
 import CartRow from '../CartRow';
 
 export function CartResults(props) {
-  let { cart, currency, count, pageY, setTableHeadFixed, updateCart, notificationFunc } = props;
+  let { cart, currency, count, pageY, setShowTableHeadFixed, setTableHeadFixed, updateCart, notificationFunc } = props;
 
-  const tableHead = React.createRef();
+  const tableHead = useRef();
 
   let list = [];
   let store = localStorage.getItem('catpart');
@@ -51,13 +51,19 @@ export function CartResults(props) {
     </div>
   );
 
+  const handleScroll = event => {
+    tableHead.current.closest('.main').classList[tableHead.current.getBoundingClientRect().y <= 0 ? 'add' : 'remove']('__stick');
+  };
+
   useEffect(() => {
-    setTableHeadFixed(tableHead.current.getBoundingClientRect().y <= 0 ? <div className={'search-results__table __sticky __cart'}>{tHead}</div> : null);
+    setTableHeadFixed(<div className={'search-results__table __sticky __cart'}>{tHead}</div>);
+
+    document.body.addEventListener('scroll', handleScroll);
 
     return () => {
-      tableHead.current = false;
+      document.body.removeEventListener('scroll', handleScroll);
     };
-  }, [pageY]);
+  }, []);
 
   // Render the content into a list item
   return (

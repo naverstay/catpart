@@ -32,7 +32,7 @@ import { useDetectClickOutside } from 'react-detect-click-outside';
 const key = 'home';
 const TRIGGER_DROPDOWN_LIMIT = 11;
 
-export function FilterForm({ props, pageY, cart, setTableHeadFixed, showResults, totalCart, notificationFunc, updateCart, setOpenMobMenu, searchData, loading, error, onChangeCurrency }) {
+export function FilterForm({ props, pageY, cart, setShowTableHeadFixed, setTableHeadFixed, showResults, totalCart, notificationFunc, updateCart, setOpenMobMenu, searchData, loading, error, onChangeCurrency }) {
   useInjectReducer({ key, reducer });
   useInjectSaga({ key, saga });
 
@@ -299,7 +299,7 @@ export function FilterForm({ props, pageY, cart, setTableHeadFixed, showResults,
 
       {cart ? (
         <>
-          <CartResults setTableHeadFixed={setTableHeadFixed} pageY={pageY} updateCart={updateCart} list={cartData} notificationFunc={notificationFunc} showResults={showResults} count={count} currency={currency} />
+          <CartResults setTableHeadFixed={setTableHeadFixed} setShowTableHeadFixed={setShowTableHeadFixed} pageY={pageY} updateCart={updateCart} list={cartData} notificationFunc={notificationFunc} showResults={showResults} count={count} currency={currency} />
 
           <OrderForm totalCart={totalCart} currency={currency} delivery={true} />
         </>
@@ -308,6 +308,7 @@ export function FilterForm({ props, pageY, cart, setTableHeadFixed, showResults,
           scrollTriggers={scrollTriggers}
           setScrollTriggers={setScrollTriggers}
           setTableHeadFixed={setTableHeadFixed}
+          setShowTableHeadFixed={setShowTableHeadFixed}
           pageY={pageY}
           updateCart={updateCart}
           notificationFunc={notificationFunc}

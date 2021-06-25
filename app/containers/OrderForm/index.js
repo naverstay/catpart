@@ -4,11 +4,9 @@
  */
 
 import React, { useEffect, memo, useState } from 'react';
-import { useParams, useLocation } from 'react-router-dom';
+
 import PropTypes from 'prop-types';
-import { Helmet } from 'react-helmet';
-// import {FileDrop} from 'react-file-drop';
-import { FormattedMessage } from 'react-intl';
+
 import { connect } from 'react-redux';
 import { compose } from 'redux';
 import { createStructuredSelector } from 'reselect';
@@ -17,16 +15,7 @@ import Ripples from 'react-ripples';
 import { useInjectReducer } from 'utils/injectReducer';
 import { useInjectSaga } from 'utils/injectSaga';
 import { makeSelectRepos, makeSelectLoading, makeSelectError } from 'containers/App/selectors';
-import H2 from 'components/H2';
-import ReposList from 'components/ReposList';
-import { readFile } from '../../utils/fileReader';
-import AtPrefix from './AtPrefix';
-import CenteredSection from './CenteredSection';
-import Form from './Form';
-import Input from './Input';
-import Section from './Section';
-// import messages from './messages';
-import { loadRepos } from '../App/actions';
+
 import { changeArtNumber } from './actions';
 import { makeSelectArtNumber } from './selectors';
 import { setInputFilter } from '../../utils/inputFilter';
@@ -35,6 +24,8 @@ import saga from './saga';
 import FormInput from '../../components/FormInput';
 import priceFormatter from '../../utils/priceFormatter';
 import { counterEffect } from '../../utils/counterEffect';
+import apiORDER from '../../utils/order';
+import { findPriceIndex } from '../../utils/findPriceIndex';
 
 const key = 'home';
 
@@ -42,7 +33,11 @@ export function OrderForm({ dndFile, delivery, notificationFunc, currency, total
   useInjectReducer({ key, reducer });
   useInjectSaga({ key, saga });
 
+  const emailInput = React.createRef();
+  const nameInput = React.createRef();
   const innInput = React.createRef();
+  const commentInput = React.createRef();
+  const deliveryInput = React.createRef();
   const phoneInput = React.createRef();
   const totalPriceRef = React.createRef();
   const [fields, setFields] = useState({
@@ -90,6 +85,8 @@ export function OrderForm({ dndFile, delivery, notificationFunc, currency, total
         break;
     }
 
+    localStorage.setItem('catpart-user', JSON.stringify(fields));
+
     setErrors(errors);
 
     setValidForm(!Object.values(errors).filter(er => er === null || er.length).length);
@@ -100,18 +97,133 @@ export function OrderForm({ dndFile, delivery, notificationFunc, currency, total
   const contactSubmit = e => {
     e.preventDefault();
 
-    console.log('submit');
+    const url = '/set/deal';
+
+    let store = localStorage.getItem('catpart');
+
+    if (store) {
+      store = JSON.parse(store);
+    } else {
+      store = {};
+    }
+
+    if (!store.hasOwnProperty('order')) {
+      store.order = [];
+      localStorage.setItem('catpart', JSON.stringify(store));
+    }
+
+    function join(t, a, s) {
+      function format(m) {
+        let f = new Intl.DateTimeFormat('en', m);
+        return f.format(t);
+      }
+
+      return a.map(format).join(s);
+    }
+
+    let products = store.map(s => {
+      let price = s.pricebreaks[findPriceIndex(s.pricebreaks, s.cart)].price;
+
+      let now = join(new Date(), [{ day: 'numeric' }, { month: 'numeric' }, { year: 'numeric' }], '.');
+      let time = join(new Date(), [{ hour: '2-digit' }, { minute: '2-digit' }], ':');
+
+      return {
+        partNo: s.name,
+        supllier: s.manufacturer,
+        manufacturer: s.brand,
+        packingRate: s.pack_quant,
+        amount: s.cart,
+        price: price + ' ' + currency.name,
+        priceSumm: s.cart * (price / currency.exChange) + ' RUB на ' + now + ' ' + time,
+        deliveryTime: s.delivery_period,
+      };
+    });
+
+    apiORDER(
+      url,
+      {
+        authCode: '123456',
+        catpartCompanyId: 213,
+        catpartDealId: 133,
+        catpartINN: fields['order-inn'],
+        name: fields['order-name'],
+        email: fields['order-email'],
+        phone: fields['order-phone'],
+        delivery: fields['order-delivery'],
+        comment: commentInput.value,
+        maxDeliveryTime: 'Максимальный срок',
+        summ: totalCart / currency.exChange + ' ' + currency.name,
+        products: products,
+      },
+      {},
+      data => {
+        console.log('data', data);
+      },
+    );
+
+    console.log(
+      'submit',
+      {
+        authCode: '123456',
+        catpartCompanyId: 213,
+        catpartDealId: 133,
+        catpartINN: fields['order-inn'],
+        name: fields['order-name'],
+        email: fields['order-email'],
+        phone: fields['order-phone'],
+        delivery: fields['order-delivery'],
+        comment: commentInput.current.value,
+        maxDeliveryTime: 'Максимальный срок',
+        summ: totalCart / currency.exChange + ' ' + currency.name,
+        products: products,
+      },
+      products,
+    );
   };
 
   useEffect(() => {
-    counterEffect(totalPriceRef.current, totalPrice, totalCart / currency.exChange, 800);
-    setTotalPrice(totalCart / currency.exChange);
+    if (delivery) {
+      counterEffect(totalPriceRef.current, totalPrice, totalCart / currency.exChange, 800);
+      setTotalPrice(totalCart / currency.exChange);
+    }
   }, [totalCart, currency]);
 
   useEffect(() => {
     setInputFilter(phoneInput.current, function(value) {
       return /^\+?\d*$/.test(value); // Allow digits and '+' on beginning only, using a RegExp
     });
+
+    let user = localStorage.getItem('catpart-user');
+
+    if (user) {
+      let userFields = JSON.parse(user);
+      setFields(userFields);
+
+      if (userFields['order-email']) {
+        emailInput.current.value = userFields['order-email'];
+        handleChange('order-email', { target: emailInput.current });
+      }
+
+      if (userFields['order-name']) {
+        nameInput.current.value = userFields['order-name'];
+        handleChange('order-name', { target: nameInput.current });
+      }
+
+      if (userFields['order-phone']) {
+        phoneInput.current.value = userFields['order-phone'];
+        handleChange('order-phone', { target: phoneInput.current });
+      }
+
+      if (userFields['order-inn']) {
+        innInput.current.value = userFields['order-inn'];
+        handleChange('order-inn', { target: innInput.current });
+      }
+
+      if (userFields['order-delivery']) {
+        deliveryInput.current.value = userFields['order-delivery'];
+        handleChange('order-delivery', { target: deliveryInput.current });
+      }
+    }
 
     return () => {
       phoneInput.current = false;
@@ -139,6 +251,7 @@ export function OrderForm({ dndFile, delivery, notificationFunc, currency, total
           //
           error={errors['order-email']}
           className={'__lg'}
+          inputRef={emailInput}
         />
 
         <FormInput
@@ -148,6 +261,7 @@ export function OrderForm({ dndFile, delivery, notificationFunc, currency, total
           //
           error={errors['order-name']}
           className={'__lg'}
+          inputRef={nameInput}
         />
 
         <FormInput
@@ -177,9 +291,10 @@ export function OrderForm({ dndFile, delivery, notificationFunc, currency, total
           //
           error={errors['order-delivery']}
           className={'__lg'}
+          inputRef={deliveryInput}
         />
 
-        <FormInput textarea={true} placeholder={'Комментарий'} name="order-delivery" error={null} className="__lg" />
+        <FormInput textarea={true} placeholder={'Комментарий'} name="order-delivery" error={null} className="__lg" inputRef={commentInput} />
 
         <div className="form-control">
           <Ripples className={'__w-100p btn __blue __lg' + (!validForm ? ' __disabled' : '')} during={1000}>

@@ -26,6 +26,7 @@ export default function App() {
   const history = useHistory();
 
   const [tableHeadFixed, setTableHeadFixed] = useState(null);
+  const [showTableHeadFixed, setShowTableHeadFixed] = useState(false);
   const [searchData, setSearchData] = useState({});
   const [openMobMenu, setOpenMobMenu] = useState(false);
   const [orderSent, setOrderSent] = useState(false);
@@ -182,7 +183,7 @@ export default function App() {
   const handleScroll = event => {
     setOpenMobMenu(false);
 
-    setPageY(event.target.scrollTop);
+    //setPageY(event.target.scrollTop);
   };
 
   useEffect(() => {
@@ -272,6 +273,7 @@ export default function App() {
                   render={routeProps => (
                     <FilterForm
                       setTableHeadFixed={setTableHeadFixed}
+                      setShowTableHeadFixed={setShowTableHeadFixed}
                       pageY={pageY}
                       totalCart={totalCart}
                       updateCart={updateCart}
@@ -287,7 +289,18 @@ export default function App() {
                 <Route
                   path="/order"
                   render={routeProps => (
-                    <FilterForm setTableHeadFixed={setTableHeadFixed} pageY={pageY} totalCart={totalCart} updateCart={updateCart} notificationFunc={createNotification} setOpenMobMenu={setOpenMobMenu} showResults={!formBusy} cart={true} props={{ ...routeProps }} />
+                    <FilterForm
+                      setShowTableHeadFixed={setShowTableHeadFixed}
+                      setTableHeadFixed={setTableHeadFixed}
+                      pageY={pageY}
+                      totalCart={totalCart}
+                      updateCart={updateCart}
+                      notificationFunc={createNotification}
+                      setOpenMobMenu={setOpenMobMenu}
+                      showResults={!formBusy}
+                      cart={true}
+                      props={{ ...routeProps }}
+                    />
                   )}
                 />
 

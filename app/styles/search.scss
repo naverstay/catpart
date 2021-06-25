@@ -52,17 +52,21 @@
 
       &.__sticky {
         z-index: 9;
+        display: none;
         position: fixed;
         top: 0;
         width: 1170px;
-        transform: translate3d(0px, 0px, 0px);
-        backface-visibility: hidden;
         box-shadow: 0 0 20px rgba(71, 93, 244, 0.25);
+
+        .__stick & {
+          display: flex;
+        }
 
         &.__cart {
           width: 871px;
         }
 
+        .search-results__row,
         .cart-results__row {
           border-top-left-radius: 0;
           border-top-right-radius: 0;

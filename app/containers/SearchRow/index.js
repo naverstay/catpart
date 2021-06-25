@@ -121,7 +121,7 @@ const SearchRow = props => {
               during={1000}
               className={'btn __blue' + (disableAddBtn ? ' __disabled' : '')}
             >
-              <button name={'search-add-' + row.id} disabled={disableAddBtn} className="btn-inner">
+              <button aria-label={row.name} name={'search-add-' + row.id} disabled={disableAddBtn} className="btn-inner">
                 <span className="btn__icon icon icon-cart" />
               </button>
             </Ripples>

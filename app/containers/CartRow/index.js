@@ -102,7 +102,7 @@ const CartRow = props => {
             during={1000}
             className="btn __blue"
           >
-            <button name={'cart-row-rm-' + row.id} className="btn-inner">
+            <button aria-label={row.name} name={'cart-row-rm-' + row.id} className="btn-inner">
               <span className="btn__icon icon icon-close" />
             </button>
           </Ripples>

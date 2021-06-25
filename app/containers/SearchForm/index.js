@@ -219,7 +219,7 @@ export function SearchForm({ dndFile, notificationFunc, busy, setFormBusy, histo
                       const requestURL = '/search/bom';
                       let file = formFile.current.files[0];
 
-                      if (file && file.name.match(/\.([c|t]sv|txt|xls[x]?)$/)) {
+                      if (file && file.name.match(/\.(xls[x]?)$/)) {
                         let formData = new FormData();
                         let options = {};
 
@@ -242,7 +242,7 @@ export function SearchForm({ dndFile, notificationFunc, busy, setFormBusy, histo
 
                         notificationFunc('success', `Файл: ${file.name}`, 'отправлен');
                       } else {
-                        file && notificationFunc('success', `Файл: ${file.name}`, 'не соответствует формату .txt, .csv, .tsv, .xls, . xlsx');
+                        file && notificationFunc('success', `Файл: ${file.name}`, 'не соответствует формату .xls, . xlsx');
                       }
 
                       //readFile(formFile.current.files[0], ret => {
