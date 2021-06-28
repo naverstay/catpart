@@ -21,16 +21,16 @@ import { readFile } from '../../utils/fileReader';
 import { changeArtNumber } from './actions';
 import { makeSelectArtNumber } from './selectors';
 import { setInputFilter } from '../../utils/inputFilter';
-import reducer from './reducer';
-import saga from './saga';
+//import reducer from './reducer';
+//import saga from './saga';
 import apiPOST from '../../utils/upload';
 import FormInput from '../../components/FormInput';
 
-const key = 'home';
+//const key = 'home';
 
 export function SearchForm({ dndFile, notificationFunc, busy, setFormBusy, history, setSearchData, location, onSubmitForm, artNumber, loading, error, repos, onChangeUsername }) {
-  useInjectReducer({ key, reducer });
-  useInjectSaga({ key, saga });
+  //useInjectReducer({ key, reducer });
+  //useInjectSaga({ key, saga });
 
   const formRef = React.createRef();
   const formArtNumber = React.createRef();

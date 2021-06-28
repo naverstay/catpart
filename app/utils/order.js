@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const CancelToken = axios.CancelToken;
-const API = 'https://sibelcom54.beget.tech/apiv2';
+const API = 'https://dev.sibelcom.tech/apiv2';
 let cancel;
 
 /**
@@ -62,18 +62,21 @@ export default function apiORDER(url, data, options, cb) {
   //  console.log('canceled', cancel);
   //}
 
-  return axios
-    .post(API + url, data, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      data: data,
-      params: options,
-      cancelToken: new CancelToken(function executor(c) {
-        // An executor function receives a cancel function as a parameter
-        cancel = c;
-      }),
-    })
+  console.log('apiORDER', data);
+
+  return axios({
+    method: 'post',
+    url: API + url,
+    data: data,
+    headers: {
+      'Content-type': 'application/json; charset=UTF-8',
+    },
+    params: options,
+    cancelToken: new CancelToken(function executor(c) {
+      // An executor function receives a cancel function as a parameter
+      cancel = c;
+    }),
+  })
     .then(checkStatus)
     .then(parseJSON)
     .then(data => {

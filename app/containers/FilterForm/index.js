@@ -13,13 +13,13 @@ import { compose } from 'redux';
 import { createStructuredSelector } from 'reselect';
 import Ripples from 'react-ripples';
 
-import { useInjectReducer } from 'utils/injectReducer';
-import { useInjectSaga } from 'utils/injectSaga';
+//import { useInjectReducer } from 'utils/injectReducer';
+//import { useInjectSaga } from 'utils/injectSaga';
 import { makeSelectRepos, makeSelectLoading, makeSelectError } from 'containers/App/selectors';
 
 import { changeCurrency } from './actions';
-import reducer from './reducer';
-import saga from './saga';
+//import reducer from './reducer';
+//import saga from './saga';
 import Share from '../../components/Share';
 import { SearchResults } from '../SearchResults';
 import { CartResults } from '../CartResults';
@@ -29,23 +29,21 @@ import priceFormatter from '../../utils/priceFormatter';
 import { xlsDownload } from '../../utils/xlsDownload';
 import { useDetectClickOutside } from 'react-detect-click-outside';
 
-const key = 'home';
+//const key = 'home';
 const TRIGGER_DROPDOWN_LIMIT = 11;
 
-export function FilterForm({ props, pageY, cart, setShowTableHeadFixed, setTableHeadFixed, showResults, totalCart, notificationFunc, updateCart, setOpenMobMenu, searchData, loading, error, onChangeCurrency }) {
-  useInjectReducer({ key, reducer });
-  useInjectSaga({ key, saga });
+export function FilterForm({ props, cart, RUB, currency, setCurrency, setOrderSent, setShowTableHeadFixed, setTableHeadFixed, showResults, totalCart, notificationFunc, updateCart, setOpenMobMenu, searchData, loading, error, onChangeCurrency }) {
+  //useInjectReducer({ key, reducer });
+  //useInjectSaga({ key, saga });
 
   const query = new URLSearchParams(props.location.search);
 
-  const RUB = { name: 'RUB', exChange: 1 };
   const [count, setCount] = useState(0);
   const [cartData, setCartData] = useState([]);
   const [scrollTriggers, setScrollTriggers] = useState([]);
   const [openShare, setOpenShare] = useState(false);
   const [openMoreTriggers, setOpenMoreTriggers] = useState(false);
   const [currencyList, setCurrencyList] = useState([RUB]);
-  const [currency, setCurrency] = useState(RUB);
 
   const moreTriggersRef = useDetectClickOutside({
     onTriggered: () => {
@@ -64,6 +62,7 @@ export function FilterForm({ props, pageY, cart, setShowTableHeadFixed, setTable
           .map(c => {
             return {
               name: c,
+              precision: 4,
               exChange: data[c],
             };
           })
@@ -151,9 +150,9 @@ export function FilterForm({ props, pageY, cart, setShowTableHeadFixed, setTable
   };
 
   const onChangeSwitch = evt => {
-    console.log('onChangeSwitch', currency, evt.target);
+    //console.log('onChangeSwitch', currency, evt.target);
     //onChangeCurrency(evt.target.value, evt.target.dataset.currency);
-    setCurrency({ exChange: parseFloat(evt.target.value), name: evt.target.dataset.currency });
+    setCurrency({ exChange: parseFloat(evt.target.value), name: evt.target.dataset.currency, precision: evt.target.dataset.currency === 'RUB' ? 2 : 4 });
   };
 
   const plural = (n, str1, str2, str5) => {
@@ -299,9 +298,9 @@ export function FilterForm({ props, pageY, cart, setShowTableHeadFixed, setTable
 
       {cart ? (
         <>
-          <CartResults setTableHeadFixed={setTableHeadFixed} setShowTableHeadFixed={setShowTableHeadFixed} pageY={pageY} updateCart={updateCart} list={cartData} notificationFunc={notificationFunc} showResults={showResults} count={count} currency={currency} />
+          <CartResults setTableHeadFixed={setTableHeadFixed} setShowTableHeadFixed={setShowTableHeadFixed} updateCart={updateCart} list={cartData} notificationFunc={notificationFunc} showResults={showResults} count={count} currency={currency} />
 
-          <OrderForm totalCart={totalCart} currency={currency} delivery={true} />
+          <OrderForm updateCart={updateCart} notificationFunc={notificationFunc} setOrderSent={setOrderSent} totalCart={totalCart} currency={currency} delivery={true} />
         </>
       ) : (
         <SearchResults
@@ -309,7 +308,6 @@ export function FilterForm({ props, pageY, cart, setShowTableHeadFixed, setTable
           setScrollTriggers={setScrollTriggers}
           setTableHeadFixed={setTableHeadFixed}
           setShowTableHeadFixed={setShowTableHeadFixed}
-          pageY={pageY}
           updateCart={updateCart}
           notificationFunc={notificationFunc}
           highlight={decodeURIComponent(query.get('art') || '')}

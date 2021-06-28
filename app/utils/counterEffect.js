@@ -10,9 +10,10 @@
  */
 import priceFormatter from './priceFormatter';
 
-export function counterEffect(el, startValue, endValue, duration) {
-  let timer;
+let timer;
 
+export function counterEffect(el, startValue, endValue, duration, precision) {
+  clearInterval(timer);
   // assumes integer values for start and end
 
   let range = endValue - startValue;
@@ -31,12 +32,12 @@ export function counterEffect(el, startValue, endValue, duration) {
 
     if (el) {
       if (now > endTime) {
-        el.innerHTML = priceFormatter(endValue.toFixed(2));
+        el.innerHTML = priceFormatter(endValue.toFixed(precision), precision);
         clearInterval(timer);
       } else {
         let remaining = Math.max((endTime - now) / duration, 0);
         let value = endValue - remaining * range;
-        el.innerHTML = priceFormatter(value.toFixed(2));
+        el.innerHTML = priceFormatter(value.toFixed(precision), precision);
       }
     } else {
       clearInterval(timer);

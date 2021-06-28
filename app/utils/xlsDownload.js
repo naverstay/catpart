@@ -30,13 +30,13 @@ const prepareJSON = (data, mode, currency) => {
 
     if (mode === MODE_CART) {
       priceMatch = findPriceIndex(row.pricebreaks, row.cart);
-      price = priceFormatter((row.cart * parseFloat(row.pricebreaks[priceMatch].price / currency.exChange)).toFixed(2));
+      price = priceFormatter((row.cart * parseFloat(row.pricebreaks[priceMatch].price / currency.exChange)).toFixed(currency.precision), currency.precision);
       row.price = priceMatch + '#' + price;
     } else {
       delete row.cart;
     }
 
-    row.pricebreaks = row.pricebreaks.map(p => `${p.quant} - ${priceFormatter(p.price / currency.exChange)}`).join('\n');
+    row.pricebreaks = row.pricebreaks.map(p => `${p.quant} - ${priceFormatter(p.price / currency.exChange, currency.precision)}`).join('\n');
 
     row.currency = currency.name;
 

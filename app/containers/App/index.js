@@ -25,6 +25,8 @@ import DeliveryPage from '../DeliveryPage';
 export default function App() {
   const history = useHistory();
 
+  const RUB = { name: 'RUB', exChange: 1, precision: 2 };
+  const [currency, setCurrency] = useState(RUB);
   const [tableHeadFixed, setTableHeadFixed] = useState(null);
   const [showTableHeadFixed, setShowTableHeadFixed] = useState(false);
   const [searchData, setSearchData] = useState({});
@@ -45,6 +47,7 @@ export default function App() {
 
   history.listen(function(loc) {
     setCenteredForm(loc.pathname === '/');
+    setOrderSent(false);
   });
 
   const createNotification = (type, title, text) => {
@@ -77,7 +80,7 @@ export default function App() {
     }
   };
 
-  const updateCart = (id = null, count = 0, cur = {}) => {
+  const updateCart = (id = null, count = 0, cur = {}, clear = false) => {
     console.log('updateCart', id, count);
 
     let store = localStorage.getItem('catpart');
@@ -88,7 +91,9 @@ export default function App() {
       store = [];
     }
 
-    if (id) {
+    if (clear) {
+      store = [];
+    } else if (id) {
       let storeItem = store.find(f => f.id === id);
 
       if (count === 0) {
@@ -123,17 +128,17 @@ export default function App() {
           });
         }
       }
-
-      localStorage.setItem('catpart', JSON.stringify(store));
-    } else {
     }
 
+    localStorage.setItem('catpart', JSON.stringify(store));
     setCartCount(store.length);
 
     if (store.length) {
       setTotalCart(store.reduce((total, c) => total + c.cart * c.pricebreaks[findPriceIndex(c.pricebreaks, c.cart)].price, 0));
     } else {
-      history.push('/');
+      if (!clear) {
+        history.push('/');
+      }
     }
   };
 
@@ -263,18 +268,20 @@ export default function App() {
                     </Helmet>
                   )}
                 />
-                {/* <Route path="/about" component={FeaturePage} /> */}
-                {/* <Route path="/search" component={FilterForm} /> */}
-                <Route path="/about" render={routeProps => <FeaturePage setOpenMobMenu={setOpenMobMenu} {...routeProps} />} />
+
+                <Route path="/about" render={routeProps => <FeaturePage updateCart={updateCart} notificationFunc={createNotification} setOrderSent={setOrderSent} totalCart={totalCart} currency={currency} setOpenMobMenu={setOpenMobMenu} {...routeProps} />} />
                 <Route path="/delivery" render={routeProps => <DeliveryPage setOpenMobMenu={setOpenMobMenu} {...routeProps} />} />
                 <Route path="/privacy-policy" render={routeProps => <PolicyPage setOpenMobMenu={setOpenMobMenu} {...routeProps} />} />
                 <Route
                   path="/search"
                   render={routeProps => (
                     <FilterForm
+                      currency={currency}
+                      setCurrency={setCurrency}
+                      RUB={RUB}
                       setTableHeadFixed={setTableHeadFixed}
                       setShowTableHeadFixed={setShowTableHeadFixed}
-                      pageY={pageY}
+                      setOrderSent={setOrderSent}
                       totalCart={totalCart}
                       updateCart={updateCart}
                       notificationFunc={createNotification}
@@ -290,9 +297,12 @@ export default function App() {
                   path="/order"
                   render={routeProps => (
                     <FilterForm
+                      currency={currency}
+                      setCurrency={setCurrency}
+                      RUB={RUB}
                       setShowTableHeadFixed={setShowTableHeadFixed}
                       setTableHeadFixed={setTableHeadFixed}
-                      pageY={pageY}
+                      setOrderSent={setOrderSent}
                       totalCart={totalCart}
                       updateCart={updateCart}
                       notificationFunc={createNotification}

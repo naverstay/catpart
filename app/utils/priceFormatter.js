@@ -10,6 +10,10 @@ let formatter = new Intl.NumberFormat('ru', {
   minimumFractionDigits: 2,
 });
 
-export default function priceFormatter(val) {
-  return formatter.format(val);
+let formatter4 = new Intl.NumberFormat('ru', {
+  minimumFractionDigits: 4,
+});
+
+export default function priceFormatter(val, precision) {
+  return precision === 4 ? formatter4.format(val) : formatter.format(val);
 }

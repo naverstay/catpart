@@ -29,7 +29,7 @@ import { findPriceIndex } from '../../utils/findPriceIndex';
 
 const key = 'home';
 
-export function OrderForm({ dndFile, delivery, notificationFunc, currency, totalCart, onSubmitForm, loading, error, repos, onChangeUsername }) {
+export function OrderForm({ dndFile, delivery, updateCart, notificationFunc, setOrderSent, currency, totalCart, onSubmitForm, loading, error, repos, onChangeUsername }) {
   useInjectReducer({ key, reducer });
   useInjectSaga({ key, saga });
 
@@ -65,6 +65,10 @@ export function OrderForm({ dndFile, delivery, notificationFunc, currency, total
   const validateEmail = email => {
     const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     return re.test(String(email).toLowerCase());
+  };
+
+  const leadingZero = val => {
+    return ('0' + val).slice(-2);
   };
 
   const handleChange = (field, e) => {
@@ -124,8 +128,8 @@ export function OrderForm({ dndFile, delivery, notificationFunc, currency, total
     let products = store.map(s => {
       let price = s.pricebreaks[findPriceIndex(s.pricebreaks, s.cart)].price;
 
-      let now = join(new Date(), [{ day: 'numeric' }, { month: 'numeric' }, { year: 'numeric' }], '.');
-      let time = join(new Date(), [{ hour: '2-digit' }, { minute: '2-digit' }], ':');
+      let time = new Date();
+      let now = join(time, [{ day: '2-digit' }, { month: '2-digit' }, { year: 'numeric' }], '.');
 
       return {
         partNo: s.name,
@@ -133,57 +137,48 @@ export function OrderForm({ dndFile, delivery, notificationFunc, currency, total
         manufacturer: s.brand,
         packingRate: s.pack_quant,
         amount: s.cart,
-        price: price + ' ' + currency.name,
-        priceSumm: s.cart * (price / currency.exChange) + ' RUB на ' + now + ' ' + time,
+        price: price,
+        priceSumm: priceFormatter(s.cart * (price / currency.exChange), currency.precision) + ' RUB на ' + now + ' ' + leadingZero(time.getHours()) + ':' + leadingZero(time.getMinutes()),
         deliveryTime: s.delivery_period,
       };
     });
 
-    apiORDER(
-      url,
-      {
+    if (products.length) {
+      let order = {
         authCode: '123456',
         catpartCompanyId: 213,
         catpartDealId: 133,
-        catpartINN: fields['order-inn'],
+        INN: parseInt(fields['order-inn']),
         name: fields['order-name'],
         email: fields['order-email'],
         phone: fields['order-phone'],
         delivery: fields['order-delivery'],
-        comment: commentInput.value,
+        comment: commentInput.current.value || '',
         maxDeliveryTime: 'Максимальный срок',
-        summ: totalCart / currency.exChange + ' ' + currency.name,
+        summ: (totalCart / currency.exChange).toFixed(2),
         products: products,
-      },
-      {},
-      data => {
-        console.log('data', data);
-      },
-    );
+      };
 
-    console.log(
-      'submit',
-      {
-        authCode: '123456',
-        catpartCompanyId: 213,
-        catpartDealId: 133,
-        catpartINN: fields['order-inn'],
-        name: fields['order-name'],
-        email: fields['order-email'],
-        phone: fields['order-phone'],
-        delivery: fields['order-delivery'],
-        comment: commentInput.current.value,
-        maxDeliveryTime: 'Максимальный срок',
-        summ: totalCart / currency.exChange + ' ' + currency.name,
-        products: products,
-      },
-      products,
-    );
+      apiORDER(url, order, {}, respData => {
+        console.log('respData', respData);
+        setOrderSent(true);
+
+        if (respData && respData.hasOwnProperty('status') && respData.status === 'ok') {
+          notificationFunc('success', 'Заказ доставлен!', 'И уже обрабатывается ;)');
+          updateCart(null, 0, {}, true);
+        } else {
+          notificationFunc('success', 'Ошибка обработки заказа.', 'Повторите позже.');
+        }
+      });
+    } else {
+      notificationFunc('success', 'В заказе не товаров.', `Заказ не отправлен.`);
+    }
   };
 
   useEffect(() => {
     if (delivery) {
-      counterEffect(totalPriceRef.current, totalPrice, totalCart / currency.exChange, 800);
+      counterEffect(totalPriceRef.current, totalPrice, totalCart / currency.exChange, 800, currency.precision);
+
       setTotalPrice(totalCart / currency.exChange);
     }
   }, [totalCart, currency]);

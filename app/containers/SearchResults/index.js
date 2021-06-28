@@ -13,14 +13,23 @@ import Skeleton from '../Skeleton';
 import SearchRow from '../SearchRow';
 import Collapsible from 'react-collapsible';
 import Ripples from 'react-ripples';
+import InfiniteScroll from 'react-infinite-scroll-component';
 
 export function SearchResults(props) {
   let { bom, list, cart, pageY, scrollTriggers, setScrollTriggers, setShowTableHeadFixed, setTableHeadFixed, currency, count, showResults, highlight, notificationFunc, updateCart } = props;
 
   const tableHead = useRef();
-  const [collapseTriggers, setCollapseTriggers] = useState([]);
 
   let defaultCount = count;
+
+  let loaderInterval;
+  let stepCounter = 0;
+  let listCounter = 0;
+  let rowCounter = 0;
+  const INF_STEP = 30;
+
+  const [rowCount, setRowCount] = useState([]);
+  const [hasMore, setHasMore] = useState(true);
 
   let tableHeader = {
     manufacturer: 'Поставщик',
@@ -48,6 +57,8 @@ export function SearchResults(props) {
 
   const handleScroll = event => {
     tableHead.current.closest('.main').classList[tableHead.current.getBoundingClientRect().y <= 0 ? 'add' : 'remove']('__stick');
+
+    //console.log('handleScroll', list, listCounter);
   };
 
   useEffect(() => {
@@ -59,6 +70,57 @@ export function SearchResults(props) {
       document.body.removeEventListener('scroll', handleScroll);
     };
   }, []);
+
+  const getMoreData = (newList, step) => {
+    console.log('newList', newList);
+
+    setRowCount(prevState => {
+      if (!newList) {
+        return prevState;
+      }
+
+      let newRows = newList[listCounter].data.slice(0, step * INF_STEP);
+
+      let rowCounter = newRows.length;
+
+      console.log('prevState', prevState, rowCounter, newList, newRows);
+
+      if (rowCounter === newList[listCounter].data.length) {
+        listCounter++;
+
+        if (listCounter < newList.length) {
+          rowCounter = 0;
+          step = 0;
+          newRows = newRows.concat(newList[listCounter].data.slice(rowCounter, INF_STEP));
+        } else {
+          clearTimeout(loaderInterval);
+        }
+      }
+
+      return [...newRows];
+    });
+
+    loaderInterval = setTimeout(() => {
+      getMoreData(newList, step + 1);
+    }, 200);
+  };
+
+  //useEffect(() => {
+  //  clearInterval(loaderInterval);
+  //
+  //  if (list && list[listCounter].data.length) {
+  //setRowCount(list[listCounter].data.slice(0, INF_STEP));
+
+  //console.log('setRowCount', list);
+  //getMoreData(list, 0);
+
+  //return () => {
+  //  loaderInterval = setInterval(() => {
+  //
+  //  }, 1000);
+  //};
+  //  }
+  //}, [list]);
 
   return (
     <div className="search-results">
@@ -89,6 +151,13 @@ export function SearchResults(props) {
               );
             })
           ) : (
+            //  (
+            //  rowCount.map((row, ri) => {
+            //    //console.log('InfiniteScroll', ri);
+            //    return <SearchRow key={ri} updateCart={updateCart} tableHeader={tableHeader} defaultCount={defaultCount} currency={currency} highlight={highlight} notificationFunc={notificationFunc} row={row} rowIndex={ri} />;
+            //  })
+            //)
+
             list[0].data.map((row, ri) => <SearchRow key={ri} updateCart={updateCart} tableHeader={tableHeader} defaultCount={defaultCount} currency={currency} highlight={highlight} notificationFunc={notificationFunc} row={row} rowIndex={ri} />)
           )
         ) : showResults ? null : (
