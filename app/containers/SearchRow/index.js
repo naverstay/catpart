@@ -102,10 +102,12 @@ const SearchRow = props => {
               if (e.target.value.length && val < row.moq) {
                 e.target.value = row.moq + '';
                 setItemCount(row.moq);
-
                 notificationFunc('success', `Для ${row.name}`, `минимальное количество: ${row.moq}`);
-
-                //updateCart(row.id, val, row.cur);
+              }
+              if (e.target.value.length && val > row.quantity) {
+                e.target.value = row.quantity + '';
+                setItemCount(row.quantity);
+                notificationFunc('success', `Для ${row.name}`, `максимальное количество: ${row.quantity}`);
               }
             }}
             //value={itemCount}

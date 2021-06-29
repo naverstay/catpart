@@ -126,7 +126,9 @@ export function OrderForm({ dndFile, delivery, updateCart, notificationFunc, set
     }
 
     let products = store.map(s => {
-      let price = s.pricebreaks[findPriceIndex(s.pricebreaks, s.cart)].price;
+      let priceIndex = findPriceIndex(s.pricebreaks, s.cart);
+      let price = s.pricebreaks[priceIndex].price;
+      let pureprice = s.pricebreaks[priceIndex].pureprice;
 
       let time = new Date();
       let now = join(time, [{ day: '2-digit' }, { month: '2-digit' }, { year: 'numeric' }], '.');
@@ -137,6 +139,7 @@ export function OrderForm({ dndFile, delivery, updateCart, notificationFunc, set
         manufacturer: s.brand,
         packingRate: s.pack_quant,
         amount: s.cart,
+        pureprice: price,
         price: price,
         priceSumm: priceFormatter(s.cart * (price / currency.exChange), currency.precision) + ' RUB на ' + now + ' ' + leadingZero(time.getHours()) + ':' + leadingZero(time.getMinutes()),
         deliveryTime: s.delivery_period,

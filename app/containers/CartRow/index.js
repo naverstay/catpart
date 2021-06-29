@@ -74,6 +74,13 @@ const CartRow = props => {
                             notificationFunc('success', `Для ${row.name}`, `минимальное количество: ${row.moq}`);
                           }
 
+                          if (e.target.value.length && +e.target.value > row.quantity) {
+                            e.target.value = row.quantity + '';
+                            setItemCount(row.quantity);
+
+                            notificationFunc('success', `Для ${row.name}`, `максимальное количество: ${row.quantity}`);
+                          }
+
                           updateCart(row.id, +e.target.value, row.cur);
                         }}
                         defaultValue={cartCount}

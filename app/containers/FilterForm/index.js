@@ -28,6 +28,7 @@ import { OrderForm } from '../OrderForm';
 import priceFormatter from '../../utils/priceFormatter';
 import { xlsDownload } from '../../utils/xlsDownload';
 import { useDetectClickOutside } from 'react-detect-click-outside';
+import { findPriceIndex } from '../../utils/findPriceIndex';
 
 //const key = 'home';
 const TRIGGER_DROPDOWN_LIMIT = 11;
@@ -152,7 +153,11 @@ export function FilterForm({ props, cart, RUB, currency, setCurrency, setOrderSe
   const onChangeSwitch = evt => {
     //console.log('onChangeSwitch', currency, evt.target);
     //onChangeCurrency(evt.target.value, evt.target.dataset.currency);
-    setCurrency({ exChange: parseFloat(evt.target.value), name: evt.target.dataset.currency, precision: evt.target.dataset.currency === 'RUB' ? 2 : 4 });
+    setCurrency({
+      exChange: parseFloat(evt.target.value),
+      name: evt.target.dataset.currency,
+      precision: evt.target.dataset.currency === 'RUB' ? 2 : 4,
+    });
   };
 
   const plural = (n, str1, str2, str5) => {
@@ -161,7 +166,8 @@ export function FilterForm({ props, cart, RUB, currency, setCurrency, setOrderSe
 
   let searchInfo =
     !cart && searchData && searchData.hasOwnProperty('res')
-      ? (searchData.bom ? 'BOM-поиск. Н' : 'По запросу «' + (query.get('art') || '') + '» н') + (searchData.res.length ? 'айдено ' + plural(searchData.res.length, 'наименование', 'наименования', 'наименований') + '.' : 'ичего не найдено :(')
+      ? (searchData.bom ? 'BOM-поиск. Н' : 'По запросу «' + (query.get('art') || '') + '» н') +
+        (searchData.res.length ? 'айдено ' + plural(searchData.res.reduce((total, c) => total + c.data.length, 0), 'наименование', 'наименования', 'наименований') + '.' : 'ичего не найдено :(')
       : '';
 
   return (

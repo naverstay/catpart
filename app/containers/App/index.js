@@ -136,7 +136,7 @@ export default function App() {
     if (store.length) {
       setTotalCart(store.reduce((total, c) => total + c.cart * c.pricebreaks[findPriceIndex(c.pricebreaks, c.cart)].price, 0));
     } else {
-      if (!clear) {
+      if (window.location.pathname === '/order') {
         history.push('/');
       }
     }
@@ -237,6 +237,12 @@ export default function App() {
     return () => {
       document.body.removeEventListener('scroll', handleScroll);
       window.removeEventListener('resize', appHeight);
+
+      dropContainer.ondragover = null;
+
+      dropContainer.ondragleave = null;
+
+      dropContainer.ondrop = null;
     };
   }, []);
 

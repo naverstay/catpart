@@ -41,7 +41,7 @@ export default function FeaturePage(props) {
         </div>
       </div>
 
-      <OrderForm updateCart={props.updateCart} notificationFunc={props.notificationFunc} setOrderSent={props.setOrderSent} totalCart={props.totalCart} currency={props.currency} />
+      {/*<OrderForm updateCart={props.updateCart} notificationFunc={props.notificationFunc} setOrderSent={props.setOrderSent} totalCart={props.totalCart} currency={props.currency} />*/}
     </>
   );
 }
