@@ -26,6 +26,7 @@ import priceFormatter from '../../utils/priceFormatter';
 import { counterEffect } from '../../utils/counterEffect';
 import apiORDER from '../../utils/order';
 import { findPriceIndex } from '../../utils/findPriceIndex';
+import FormSelect from '../../components/FormSelect';
 
 const key = 'home';
 
@@ -57,6 +58,8 @@ export function OrderForm({ dndFile, delivery, updateCart, notificationFunc, set
     'order-delivery': null,
   });
   const [validForm, setValidForm] = useState(false);
+  const [deliveryOptions, setDeliveryOptions] = useState([]);
+  const [preSelectedDelivery, setPreSelectedDelivery] = useState(-1);
 
   const formRef = React.createRef();
 
@@ -72,6 +75,7 @@ export function OrderForm({ dndFile, delivery, updateCart, notificationFunc, set
   };
 
   const handleChange = (field, e) => {
+    console.log('handleChange', field, e);
     fields[field] = e.target.value;
     setFields(fields);
 
@@ -191,6 +195,14 @@ export function OrderForm({ dndFile, delivery, updateCart, notificationFunc, set
       return /^\+?\d*$/.test(value); // Allow digits and '+' on beginning only, using a RegExp
     });
 
+    let deliveryList = [
+      {
+        value: 'Самовывоз со склада в Новосибирске',
+        label: 'Самовывоз со склада в Новосибирске',
+      },
+      { value: 'Доставка курьерской службой', label: 'Доставка курьерской службой' },
+    ];
+
     let user = localStorage.getItem('catpart-user');
 
     if (user) {
@@ -220,8 +232,18 @@ export function OrderForm({ dndFile, delivery, updateCart, notificationFunc, set
       if (userFields['order-delivery']) {
         deliveryInput.current.value = userFields['order-delivery'];
         handleChange('order-delivery', { target: deliveryInput.current });
+
+        setPreSelectedDelivery(deliveryList.findIndex(d => d.value === userFields['order-delivery']));
+
+        deliveryList.forEach(d => {
+          if (d.value === userFields['order-delivery']) {
+            d.selected = true;
+          }
+        });
       }
     }
+
+    setDeliveryOptions([...deliveryList]);
 
     return () => {
       phoneInput.current = false;
@@ -233,8 +255,8 @@ export function OrderForm({ dndFile, delivery, updateCart, notificationFunc, set
       <form ref={formRef} className="form-content" onSubmit={contactSubmit}>
         {delivery && (
           <>
-            <div className="form-order__text">Максимальный срок доставки:</div>
-            <div className="form-order__text">3-4 недели</div>
+            {/*<div className="form-order__text">Максимальный срок доставки:</div>*/}
+            {/*<div className="form-order__text">3-4 недели</div>*/}
             <div className="form-order__text">Итого:</div>
             <div className="form-order__text">
               <span ref={totalPriceRef} className="form-order__price" /> {currency.name}
@@ -282,15 +304,23 @@ export function OrderForm({ dndFile, delivery, updateCart, notificationFunc, set
           inputRef={innInput}
         />
 
-        <FormInput
-          onChange={handleChange.bind(this, 'order-delivery')}
-          placeholder={'Доставка'}
-          name="order-delivery"
+        {/*<FormInput*/}
+        {/*  onChange={handleChange.bind(this, 'order-delivery')}*/}
+        {/*  placeholder={'Доставка'}*/}
+        {/*  name="order-delivery"*/}
+        {/*  //*/}
+        {/*  error={errors['order-delivery']}*/}
+        {/*  className={'__lg'}*/}
+        {/*  inputRef={deliveryInput}*/}
+        {/*/>*/}
+
+        <input
           //
-          error={errors['order-delivery']}
-          className={'__lg'}
-          inputRef={deliveryInput}
+          className={'hide'}
+          ref={deliveryInput || null}
         />
+
+        {deliveryOptions.length ? <FormSelect onChange={handleChange} options={deliveryOptions} placeholder={'Доставка'} name="order-delivery" error={errors['order-delivery']} preSelectedValue={preSelectedDelivery} className="__lg" inputRef={deliveryInput} /> : null}
 
         <FormInput textarea={true} placeholder={'Комментарий'} name="order-delivery" error={null} className="__lg" inputRef={commentInput} />
 

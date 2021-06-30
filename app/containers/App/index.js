@@ -136,7 +136,7 @@ export default function App() {
     if (store.length) {
       setTotalCart(store.reduce((total, c) => total + c.cart * c.pricebreaks[findPriceIndex(c.pricebreaks, c.cart)].price, 0));
     } else {
-      if (window.location.pathname === '/order') {
+      if (window.location.pathname !== '/order') {
         history.push('/');
       }
     }
@@ -282,6 +282,7 @@ export default function App() {
                   path="/search"
                   render={routeProps => (
                     <FilterForm
+                      busy={formBusy}
                       currency={currency}
                       setCurrency={setCurrency}
                       RUB={RUB}
@@ -303,6 +304,7 @@ export default function App() {
                   path="/order"
                   render={routeProps => (
                     <FilterForm
+                      busy={formBusy}
                       currency={currency}
                       setCurrency={setCurrency}
                       RUB={RUB}

@@ -9,11 +9,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
-import Skeleton from '../Skeleton';
 import SearchRow from '../SearchRow';
 import Collapsible from 'react-collapsible';
-import Ripples from 'react-ripples';
-import InfiniteScroll from 'react-infinite-scroll-component';
 
 export function SearchResults(props) {
   let { bom, list, cart, pageY, scrollTriggers, setScrollTriggers, setShowTableHeadFixed, setTableHeadFixed, currency, count, showResults, highlight, notificationFunc, updateCart } = props;
@@ -128,41 +125,38 @@ export function SearchResults(props) {
         <div ref={tableHead} className={'search-results__head-wrapper'}>
           {tHead}
         </div>
-        {list && list.length ? (
-          bom ? (
-            list.map((query, qi) => {
-              return (
-                <Collapsible
-                  key={qi}
-                  open={true}
-                  transitionTime={200}
-                  transitionCloseTime={200}
-                  triggerTagName={'div'}
-                  className={'search-results__collapsed'}
-                  triggerClassName={'search-results__trigger __collapsed trigger-' + qi}
-                  triggerOpenedClassName={'search-results__trigger __expanded trigger-' + qi}
-                  openedClassName={'search-results__expanded'}
-                  trigger={<span>{query.q}</span>}
-                >
-                  {query.data.map((row, ri) => (
-                    <SearchRow key={ri} updateCart={updateCart} tableHeader={tableHeader} defaultCount={defaultCount} currency={currency} highlight={highlight} notificationFunc={notificationFunc} row={row} rowIndex={ri} />
-                  ))}
-                </Collapsible>
-              );
-            })
-          ) : (
-            //  (
-            //  rowCount.map((row, ri) => {
-            //    //console.log('InfiniteScroll', ri);
-            //    return <SearchRow key={ri} updateCart={updateCart} tableHeader={tableHeader} defaultCount={defaultCount} currency={currency} highlight={highlight} notificationFunc={notificationFunc} row={row} rowIndex={ri} />;
-            //  })
-            //)
 
-            list[0].data.map((row, ri) => <SearchRow key={ri} updateCart={updateCart} tableHeader={tableHeader} defaultCount={defaultCount} currency={currency} highlight={highlight} notificationFunc={notificationFunc} row={row} rowIndex={ri} />)
-          )
-        ) : showResults ? null : (
-          <Skeleton />
-        )}
+        {list && list.length
+          ? bom
+            ? list.map((query, qi) => {
+                return (
+                  <Collapsible
+                    key={qi}
+                    open={true}
+                    transitionTime={200}
+                    transitionCloseTime={200}
+                    triggerTagName={'div'}
+                    className={'search-results__collapsed'}
+                    triggerClassName={'search-results__trigger __collapsed trigger-' + qi}
+                    triggerOpenedClassName={'search-results__trigger __expanded trigger-' + qi}
+                    openedClassName={'search-results__expanded'}
+                    trigger={<span>{query.q}</span>}
+                  >
+                    {query.data.map((row, ri) => (
+                      <SearchRow key={ri} updateCart={updateCart} tableHeader={tableHeader} defaultCount={defaultCount} currency={currency} highlight={highlight} notificationFunc={notificationFunc} row={row} rowIndex={ri} />
+                    ))}
+                  </Collapsible>
+                );
+              })
+            : //  (
+              //  rowCount.map((row, ri) => {
+              //    //console.log('InfiniteScroll', ri);
+              //    return <SearchRow key={ri} updateCart={updateCart} tableHeader={tableHeader} defaultCount={defaultCount} currency={currency} highlight={highlight} notificationFunc={notificationFunc} row={row} rowIndex={ri} />;
+              //  })
+              //)
+
+              list[0].data.map((row, ri) => <SearchRow key={ri} updateCart={updateCart} tableHeader={tableHeader} defaultCount={defaultCount} currency={currency} highlight={highlight} notificationFunc={notificationFunc} row={row} rowIndex={ri} />)
+          : null}
       </div>
     </div>
   );

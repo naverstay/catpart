@@ -29,11 +29,15 @@ import priceFormatter from '../../utils/priceFormatter';
 import { xlsDownload } from '../../utils/xlsDownload';
 import { useDetectClickOutside } from 'react-detect-click-outside';
 import { findPriceIndex } from '../../utils/findPriceIndex';
+//import Skeleton from '../Skeleton';
+import SkeletonWide from '../SkeletonWide';
+import SkeletonDt from '../SkeletonDt';
+import SkeletonTab from '../SkeletonTab';
 
 //const key = 'home';
 const TRIGGER_DROPDOWN_LIMIT = 11;
 
-export function FilterForm({ props, cart, RUB, currency, setCurrency, setOrderSent, setShowTableHeadFixed, setTableHeadFixed, showResults, totalCart, notificationFunc, updateCart, setOpenMobMenu, searchData, loading, error, onChangeCurrency }) {
+export function FilterForm({ props, cart, RUB, busy, currency, setCurrency, setOrderSent, setShowTableHeadFixed, setTableHeadFixed, showResults, totalCart, notificationFunc, updateCart, setOpenMobMenu, searchData, loading, error, onChangeCurrency }) {
   //useInjectReducer({ key, reducer });
   //useInjectSaga({ key, saga });
 
@@ -75,6 +79,10 @@ export function FilterForm({ props, cart, RUB, currency, setCurrency, setOrderSe
     if (store) {
       setCartData([...JSON.parse(store)]);
     }
+
+    () => {
+      console.log('update link');
+    };
   }, []);
 
   const scrollTriggerHandler = goto => {
@@ -164,11 +172,13 @@ export function FilterForm({ props, cart, RUB, currency, setCurrency, setOrderSe
     return n + ' ' + (n % 10 == 1 && n % 100 != 11 ? str1 : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? str2 : str5);
   };
 
-  let searchInfo =
-    !cart && searchData && searchData.hasOwnProperty('res')
-      ? (searchData.bom ? 'BOM-поиск. Н' : 'По запросу «' + (query.get('art') || '') + '» н') +
-        (searchData.res.length ? 'айдено ' + plural(searchData.res.reduce((total, c) => total + c.data.length, 0), 'наименование', 'наименования', 'наименований') + '.' : 'ичего не найдено :(')
-      : '';
+  let totalData = 0;
+  let searchInfo = '';
+
+  if (!cart && searchData && searchData.hasOwnProperty('res')) {
+    totalData = searchData.res.reduce((total, c) => total + c.data.length, 0);
+    searchInfo = (searchData.bom ? 'BOM-поиск. Н' : 'По запросу «' + (query.get('art') || '') + '» н') + (searchData.res.length ? 'айдено ' + plural(totalData, 'наименование', 'наименования', 'наименований') + '.' : 'ичего не найдено :(');
+  }
 
   return (
     <>
@@ -187,6 +197,23 @@ export function FilterForm({ props, cart, RUB, currency, setCurrency, setOrderSe
           <link rel="canonical" href="https://catpart.ru/" />
         </Helmet>
       )}
+
+      {!cart && busy ? (
+        <div className={'skeleton-holder'}>
+          <div className="skeleton skeleton-mob">
+            <SkeletonWide />
+          </div>
+          <div className="skeleton skeleton-tab">
+            <SkeletonTab />
+          </div>
+          <div className="skeleton skeleton-dt">
+            <SkeletonDt />
+          </div>
+          <div className="skeleton skeleton-wide">
+            <SkeletonWide />
+          </div>
+        </div>
+      ) : null}
 
       <div className="form-filter">
         {!cart &&
@@ -224,82 +251,89 @@ export function FilterForm({ props, cart, RUB, currency, setCurrency, setOrderSe
 
         {!cart && showResults ? <div className="form-filter__stat">{searchInfo}</div> : <div className="form-filter__stat">&nbsp;</div>}
 
-        <div className={'form-filter__controls' + (cart ? ' __cart' : '')}>
-          {cart ? (
-            <div className="form-filter__controls_left">
-              <div className="form-filter__control">
-                <Ripples
-                  onClick={() => {
-                    xlsDownload(cartData, currency, 0);
-                  }}
-                  className="btn __gray"
-                  during={1000}
-                >
-                  <div className="btn-inner">
-                    <span className="btn __blue">
-                      <span className="btn-icon icon icon-download" />
+        {busy ? null : (
+          <div className={'form-filter__controls' + (cart ? ' __cart' : '')}>
+            {cart ? (
+              <div className="form-filter__controls_left">
+                <div className="form-filter__control">
+                  <Ripples
+                    onClick={() => {
+                      let store = localStorage.getItem('catpart');
+                      if (store) {
+                        xlsDownload([...JSON.parse(store)], currency, 0);
+                      } else {
+                        notificationFunc('success', 'Корзина пуста.', 'Нечего скачивать.');
+                      }
+                    }}
+                    className="btn __gray"
+                    during={1000}
+                  >
+                    <div className="btn-inner">
+                      <span className="btn __blue">
+                        <span className="btn-icon icon icon-download" />
+                      </span>
+                      <span>Скачать список</span>
+                    </div>
+                  </Ripples>
+                </div>
+              </div>
+            ) : (
+              <div className="form-filter__controls_left">
+                <div className="form-filter__control">
+                  <Ripples
+                    onClick={() => {
+                      xlsDownload(searchData.res, currency, searchData.bom ? 1 : -1);
+                    }}
+                    className="btn __gray"
+                    during={1000}
+                  >
+                    <span className="btn-inner">
+                      <span className="btn __blue">
+                        <span className="btn-icon icon icon-download" />
+                      </span>
+                      <span>Скачать результат поиска</span>
                     </span>
-                    <span>Скачать список</span>
-                  </div>
-                </Ripples>
+                  </Ripples>
+                </div>
+                <div className="form-filter__control">
+                  <Ripples
+                    onClick={() => {
+                      setOpenShare(true);
+                    }}
+                    className="btn __gray"
+                    during={1000}
+                  >
+                    <span className="btn-inner">Поделиться</span>
+                  </Ripples>
+                  {openShare && <Share shareUrl={decodeURIComponent(window.location.href)} shareText={decodeURIComponent(searchInfo)} notificationFunc={notificationFunc} setOpenFunc={setOpenShare} />}
+                </div>
               </div>
-            </div>
-          ) : (
-            <div className="form-filter__controls_left">
-              <div className="form-filter__control">
-                <Ripples
-                  onClick={() => {
-                    xlsDownload(searchData.res, currency, searchData.bom ? 1 : -1);
-                  }}
-                  className="btn __gray"
-                  during={1000}
-                >
-                  <span className="btn-inner">
-                    <span className="btn __blue">
-                      <span className="btn-icon icon icon-download" />
-                    </span>
-                    <span>Скачать результат поиска</span>
-                  </span>
-                </Ripples>
-              </div>
-              <div className="form-filter__control">
-                <Ripples
-                  onClick={() => {
-                    setOpenShare(true);
-                  }}
-                  className="btn __gray"
-                  during={1000}
-                >
-                  <span className="btn-inner">Поделиться</span>
-                </Ripples>
-                {openShare && <Share notificationFunc={notificationFunc} setOpenFunc={setOpenShare} />}
-              </div>
-            </div>
-          )}
+            )}
 
-          <div onChange={onChangeSwitch} className="form-filter__controls_right">
-            {currencyList.length > 1 &&
-              currencyList.map((cur, ind) => (
-                <Ripples key={ind} className="form-filter__control" during={1000}>
-                  <label className="form-radio__btn">
-                    <input
-                      name="currency"
-                      className="hide"
-                      //checked={}
-                      defaultChecked={currency.name === cur.name}
-                      data-currency={cur.name}
-                      type="radio"
-                      value={cur.exChange}
-                    />
-                    <span className="btn __gray">
-                      <b>{cur.name}</b>
-                      {cur.name !== 'RUB' && <span>{priceFormatter(cur.exChange)}</span>}
-                    </span>
-                  </label>
-                </Ripples>
-              ))}
+            <div onChange={onChangeSwitch} className="form-filter__controls_right">
+              {currencyList.length > 1 &&
+                currencyList.map((cur, ind) => (
+                  <Ripples key={ind} className="form-filter__control" during={1000}>
+                    <label className="form-radio__btn">
+                      <input
+                        name="currency"
+                        className="hide"
+                        //checked={}
+                        defaultChecked={currency.name === cur.name}
+                        data-currency={cur.name}
+                        type="radio"
+                        value={cur.exChange}
+                      />
+                      <span className="btn __gray">
+                        <b>{cur.name}</b>
+                        {cur.name !== 'RUB' && <span>{priceFormatter(cur.exChange)}</span>}
+                      </span>
+                    </label>
+                  </Ripples>
+                ))}
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {cart ? (
@@ -308,7 +342,7 @@ export function FilterForm({ props, cart, RUB, currency, setCurrency, setOrderSe
 
           <OrderForm updateCart={updateCart} notificationFunc={notificationFunc} setOrderSent={setOrderSent} totalCart={totalCart} currency={currency} delivery={true} />
         </>
-      ) : (
+      ) : busy || !totalData ? null : (
         <SearchResults
           scrollTriggers={scrollTriggers}
           setScrollTriggers={setScrollTriggers}

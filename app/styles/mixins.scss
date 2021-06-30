@@ -4,8 +4,14 @@
   }
 }
 
-@mixin respond-to-min($custom1) {
-  @media only screen and (min-width: $custom1) {
+@mixin respond-to-min($custom) {
+  @media only screen and (min-width: $custom) {
+    @content;
+  }
+}
+
+@mixin respond-to-min-max($custom1, $custom2) {
+  @media only screen and (min-width: $custom1) and (max-width: $custom2 - 1) {
     @content;
   }
 }

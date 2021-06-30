@@ -12,6 +12,37 @@
   position: relative;
 
 
-
 }
 
+.skeleton {
+  display: none;
+
+  &-holder {
+    overflow-x: hidden;
+    max-width: 100%;
+  }
+
+  &-mob {
+    @include respond-to-max($tablet) {
+      display: block;
+    }
+  }
+
+  &-tab {
+    @include respond-to-min-max($tablet, $dt) {
+      display: block;
+    }
+  }
+
+  &-dt {
+    @include respond-to-min-max($dt, $wide) {
+      display: block;
+    }
+  }
+
+  &-wide {
+    @include respond-to-min($wide) {
+      display: block;
+    }
+  }
+}

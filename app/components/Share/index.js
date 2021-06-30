@@ -2,7 +2,7 @@ import React from 'react';
 import { useDetectClickOutside } from 'react-detect-click-outside';
 import Ripples from 'react-ripples';
 
-function Share({ setOpenFunc, notificationFunc }) {
+function Share({ setOpenFunc, notificationFunc, shareUrl, shareText }) {
   const shareRef = useDetectClickOutside({
     onTriggered: () => {
       setOpenFunc(false);
@@ -70,29 +70,28 @@ function Share({ setOpenFunc, notificationFunc }) {
 
   let links = [
     {
-      href: '#',
-      name: 'вацап',
+      href: 'whatsapp://send?text=' + shareText + '%20' + shareUrl,
+      name: 'WhatsApp',
     },
     {
-      href: '#',
-      name: 'вацап бизнес',
+      href: 'whatsapp://send?text=' + shareText + '%20' + shareUrl,
+      name: 'WhatsApp Business',
     },
     {
-      href: '#',
-      name: 'телеграм',
+      href: 'https://telegram.me/share/url?text=' + shareText + '&amp;url=' + shareUrl,
+      name: 'Telegram',
     },
     {
-      href: '#',
-      name: 'вконтакте',
+      href: 'http://vk.com/share.php?title=' + shareText + '&amp;url=' + shareUrl,
+      name: 'Вконтакте',
     },
     {
-      href: '#',
-      name: 'почта',
+      href: 'mailto:?subject=' + shareText + '&amp;body=' + shareUrl,
+      name: 'Email',
     },
     {
       action: 'copy',
-      href: '#',
-      name: 'копировать ссылку',
+      name: 'Копировать ссылку',
     },
   ];
 
@@ -113,7 +112,7 @@ function Share({ setOpenFunc, notificationFunc }) {
               </Ripples>
             ) : (
               <Ripples className="dropdown-link" during={1000}>
-                <a className={'dropdown-link-inner'} href={l.href}>
+                <a target={'_blank'} className={'dropdown-link-inner'} href={l.href}>
                   {l.name}
                 </a>
               </Ripples>
