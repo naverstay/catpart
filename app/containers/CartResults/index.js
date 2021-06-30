@@ -15,6 +15,7 @@ import Ripples from 'react-ripples';
 import priceFormatter from '../../utils/priceFormatter';
 import SearchRow from '../SearchRow';
 import CartRow from '../CartRow';
+import { smoothScrollTo } from '../../utils/smoothScrollTo';
 
 export function CartResults(props) {
   let { cart, currency, count, pageY, setShowTableHeadFixed, setTableHeadFixed, updateCart, notificationFunc } = props;
@@ -59,6 +60,12 @@ export function CartResults(props) {
     setTableHeadFixed(<div className={'search-results__table __sticky __cart'}>{tHead}</div>);
 
     document.body.addEventListener('scroll', handleScroll);
+
+    if (window.innerWidth < 1200) {
+      setTimeout(() => {
+        smoothScrollTo(document.body, document.body.scrollTop, tableHead.current.getBoundingClientRect().top - 10, 600);
+      }, 200);
+    }
 
     return () => {
       document.body.removeEventListener('scroll', handleScroll);

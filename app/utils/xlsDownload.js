@@ -50,6 +50,8 @@ const prepareJSON = (data, mode, currency) => {
 };
 
 export const xlsDownload = (data, currency, mode) => {
+  console.log('xlsDownload', mode);
+
   if (data && data.length) {
     let fileName = mode === MODE_CART ? 'cart' : 'search';
 

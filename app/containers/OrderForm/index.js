@@ -167,8 +167,9 @@ export function OrderForm({ dndFile, delivery, updateCart, notificationFunc, set
       };
 
       apiORDER(url, order, {}, respData => {
-        console.log('respData', respData);
         setOrderSent(true);
+
+        ym && ym(81774553, 'reachGoal', 'senttheorder');
 
         if (respData && respData.hasOwnProperty('status') && respData.status === 'ok') {
           notificationFunc('success', 'Заказ доставлен!', 'И уже обрабатывается ;)');

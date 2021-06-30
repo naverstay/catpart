@@ -33,6 +33,7 @@ import { findPriceIndex } from '../../utils/findPriceIndex';
 import SkeletonWide from '../SkeletonWide';
 import SkeletonDt from '../SkeletonDt';
 import SkeletonTab from '../SkeletonTab';
+import { smoothScrollTo } from '../../utils/smoothScrollTo';
 
 //const key = 'home';
 const TRIGGER_DROPDOWN_LIMIT = 11;
@@ -93,30 +94,6 @@ export function FilterForm({ props, cart, RUB, busy, currency, setCurrency, setO
     if (target) {
       smoothScrollTo(document.body, document.body.scrollTop, target.getBoundingClientRect().top - 50, 600);
     }
-  };
-
-  let smoothScrollTo = (target, startY, endY, duration) => {
-    let distanceY = endY - startY;
-    let startTime = new Date().getTime();
-
-    function easeInOutQuart(time, from, distance, duration) {
-      if ((time /= duration / 2) < 1) {
-        return (distance / 2) * Math.pow(time, 4) + from;
-      }
-
-      return (-distance / 2) * ((time -= 2) * Math.pow(time, 3) - 2) + from;
-    }
-
-    let timer = window.setInterval(() => {
-      let time = new Date().getTime() - startTime;
-      let newY = easeInOutQuart(time, startY, distanceY, duration);
-
-      if (time >= duration) {
-        window.clearInterval(timer);
-      }
-
-      target.scrollTo(0, newY);
-    }, 1000 / 60);
   };
 
   useEffect(() => {
@@ -251,7 +228,7 @@ export function FilterForm({ props, cart, RUB, busy, currency, setCurrency, setO
 
         {!cart && showResults ? <div className="form-filter__stat">{searchInfo}</div> : <div className="form-filter__stat">&nbsp;</div>}
 
-        {busy ? null : (
+        {busy || !totalData ? null : (
           <div className={'form-filter__controls' + (cart ? ' __cart' : '')}>
             {cart ? (
               <div className="form-filter__controls_left">
