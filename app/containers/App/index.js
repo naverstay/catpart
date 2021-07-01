@@ -94,7 +94,7 @@ export default function App() {
     if (clear) {
       store = [];
     } else if (id) {
-      let storeItem = store.find(f => f.id === id);
+      const storeItem = store.find(f => f.id === id);
 
       if (count === 0) {
         if (storeItem) {
@@ -104,33 +104,31 @@ export default function App() {
 
           store = [...store.filter(f => f.id !== id)];
         }
-      } else {
-        if (storeItem) {
-          if (storeItem.cart !== count) {
-            storeItem.cart = count;
-            storeItem.cur = cur;
+      } else if (storeItem) {
+        if (storeItem.cart !== count) {
+          storeItem.cart = count;
+          storeItem.cur = cur;
 
-            createNotification('success', `Обновлен: ${storeItem.name}`, `Количество: ${count}`);
-          }
-        } else {
-          searchData.res.every(query => {
-            let item = query.data.find(f => f.id === id);
-
-            if (item) {
-              createNotification('success', `Добавлен: ${item.name}`, `Количество: ${count}`);
-
-              ym && ym(81774553, 'reachGoal', 'addtocart');
-
-              item.cart = count;
-              item.cur = cur;
-              store.push(item);
-
-              return false;
-            }
-
-            return true;
-          });
+          createNotification('success', `Обновлен: ${storeItem.name}`, `Количество: ${count}`);
         }
+      } else {
+        searchData.res.every(query => {
+          const item = query.data.find(f => f.id === id);
+
+          if (item) {
+            createNotification('success', `Добавлен: ${item.name}`, `Количество: ${count}`);
+
+            ym && ym(81774553, 'reachGoal', 'addtocart');
+
+            item.cart = count;
+            item.cur = cur;
+            store.push(item);
+
+            return false;
+          }
+
+          return true;
+        });
       }
     }
 
@@ -139,10 +137,8 @@ export default function App() {
 
     if (store.length) {
       setTotalCart(store.reduce((total, c) => total + c.cart * c.pricebreaks[findPriceIndex(c.pricebreaks, c.cart)].price, 0));
-    } else {
-      if (window.location.pathname !== '/order') {
-        history.push('/');
-      }
+    } else if (window.location.pathname !== '/order') {
+      history.push('/');
     }
   };
 
@@ -168,7 +164,7 @@ export default function App() {
 
         history.push(`/search/?art=${encodeURIComponent(art.value) || ''}&q=${encodeURIComponent(quantity.value || 1)}`);
 
-        let options = {
+        const options = {
           q: art.value,
           c: quantity.value || 1,
         };
@@ -194,7 +190,7 @@ export default function App() {
   const handleScroll = event => {
     setOpenMobMenu(false);
 
-    //setPageY(event.target.scrollTop);
+    // setPageY(event.target.scrollTop);
   };
 
   useEffect(() => {
@@ -288,6 +284,7 @@ export default function App() {
                   path="/search"
                   render={routeProps => (
                     <FilterForm
+                      history={history}
                       busy={formBusy}
                       currency={currency}
                       setCurrency={setCurrency}
@@ -310,6 +307,7 @@ export default function App() {
                   path="/order"
                   render={routeProps => (
                     <FilterForm
+                      history={history}
                       busy={formBusy}
                       currency={currency}
                       setCurrency={setCurrency}
@@ -322,7 +320,7 @@ export default function App() {
                       notificationFunc={createNotification}
                       setOpenMobMenu={setOpenMobMenu}
                       showResults={!formBusy}
-                      cart={true}
+                      cart
                       props={{ ...routeProps }}
                     />
                   )}

@@ -9,16 +9,16 @@ function Share({ setOpenFunc, notificationFunc, shareUrl, shareText }) {
     },
   });
 
-  let successCopy = text => {
+  const successCopy = text => {
     notificationFunc('success', `URL страницы скопирован в буфер обмена`, text);
   };
 
-  let failCopy = () => {
+  const failCopy = () => {
     notificationFunc('success', `Ошибка копирования в буфер обмена`, ':(');
   };
 
-  let fallbackCopyTextToClipboard = text => {
-    let textArea = document.createElement('textarea');
+  const fallbackCopyTextToClipboard = text => {
+    const textArea = document.createElement('textarea');
     textArea.value = text;
 
     // Avoid scrolling to bottom
@@ -31,7 +31,7 @@ function Share({ setOpenFunc, notificationFunc, shareUrl, shareText }) {
     textArea.select();
 
     try {
-      let successful = document.execCommand('copy');
+      const successful = document.execCommand('copy');
 
       if (successful) {
         successCopy(text);
@@ -45,7 +45,7 @@ function Share({ setOpenFunc, notificationFunc, shareUrl, shareText }) {
     document.body.removeChild(textArea);
   };
 
-  let dropdownAction = action => {
+  const dropdownAction = action => {
     if (action === 'copy') {
       copyTextToClipboard(window.location.href);
     }
@@ -68,25 +68,25 @@ function Share({ setOpenFunc, notificationFunc, shareUrl, shareText }) {
     );
   };
 
-  let links = [
+  const links = [
     {
-      href: 'whatsapp://send?text=' + shareText + '%20' + shareUrl,
+      href: `whatsapp://send?text=${shareText}%20${shareUrl}`,
       name: 'WhatsApp',
     },
     {
-      href: 'whatsapp://send?text=' + shareText + '%20' + shareUrl,
+      href: `whatsapp://send?text=${shareText}%20${shareUrl}`,
       name: 'WhatsApp Business',
     },
     {
-      href: 'https://telegram.me/share/url?text=' + shareText + '&amp;url=' + shareUrl,
+      href: `https://telegram.me/share/url?text=${shareText}&url=${shareUrl}`,
       name: 'Telegram',
     },
     {
-      href: 'http://vk.com/share.php?title=' + shareText + '&amp;url=' + shareUrl,
+      href: `http://vk.com/share.php?title=${shareText}&url=${shareUrl}`,
       name: 'Вконтакте',
     },
     {
-      href: 'mailto:?subject=' + shareText + '&amp;body=' + shareUrl,
+      href: `mailto:?subject=${shareText}&body=${shareUrl}`,
       name: 'Email',
     },
     {
@@ -112,7 +112,14 @@ function Share({ setOpenFunc, notificationFunc, shareUrl, shareText }) {
               </Ripples>
             ) : (
               <Ripples className="dropdown-link" during={1000}>
-                <a target={'_blank'} className={'dropdown-link-inner'} href={l.href}>
+                <a
+                  onClick={() => {
+                    dropdownAction();
+                  }}
+                  target="_blank"
+                  className="dropdown-link-inner"
+                  href={l.href}
+                >
                   {l.name}
                 </a>
               </Ripples>

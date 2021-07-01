@@ -30,7 +30,7 @@ import FormSelect from '../../components/FormSelect';
 
 const key = 'home';
 
-export function OrderForm({ dndFile, delivery, updateCart, notificationFunc, setOrderSent, currency, totalCart, onSubmitForm, loading, error, repos, onChangeUsername }) {
+export function OrderForm({ dndFile, delivery, updateCart, history, notificationFunc, setOrderSent, currency, totalCart, onSubmitForm, loading, error, repos, onChangeUsername }) {
   useInjectReducer({ key, reducer });
   useInjectSaga({ key, saga });
 
@@ -70,9 +70,7 @@ export function OrderForm({ dndFile, delivery, updateCart, notificationFunc, set
     return re.test(String(email).toLowerCase());
   };
 
-  const leadingZero = val => {
-    return ('0' + val).slice(-2);
-  };
+  const leadingZero = val => `0${val}`.slice(-2);
 
   const handleChange = (field, e) => {
     console.log('handleChange', field, e);
@@ -122,20 +120,20 @@ export function OrderForm({ dndFile, delivery, updateCart, notificationFunc, set
 
     function join(t, a, s) {
       function format(m) {
-        let f = new Intl.DateTimeFormat('en', m);
+        const f = new Intl.DateTimeFormat('en', m);
         return f.format(t);
       }
 
       return a.map(format).join(s);
     }
 
-    let products = store.map(s => {
-      let priceIndex = findPriceIndex(s.pricebreaks, s.cart);
-      let price = s.pricebreaks[priceIndex].price;
-      let pureprice = s.pricebreaks[priceIndex].pureprice;
+    const products = store.map(s => {
+      const priceIndex = findPriceIndex(s.pricebreaks, s.cart);
+      const { price } = s.pricebreaks[priceIndex];
+      const { pureprice } = s.pricebreaks[priceIndex];
 
-      let time = new Date();
-      let now = join(time, [{ day: '2-digit' }, { month: '2-digit' }, { year: 'numeric' }], '.');
+      const time = new Date();
+      const now = join(time, [{ day: '2-digit' }, { month: '2-digit' }, { year: 'numeric' }], '.');
 
       return {
         partNo: s.name,
@@ -144,14 +142,14 @@ export function OrderForm({ dndFile, delivery, updateCart, notificationFunc, set
         packingRate: s.pack_quant,
         amount: s.cart,
         pureprice: price,
-        price: price,
-        priceSumm: priceFormatter(s.cart * (price / currency.exChange), currency.precision) + ' RUB на ' + now + ' ' + leadingZero(time.getHours()) + ':' + leadingZero(time.getMinutes()),
+        price,
+        priceSumm: `${priceFormatter(s.cart * (price / currency.exChange), currency.precision)} RUB на ${now} ${leadingZero(time.getHours())}:${leadingZero(time.getMinutes())}`,
         deliveryTime: s.delivery_period,
       };
     });
 
     if (products.length) {
-      let order = {
+      const order = {
         authCode: '123456',
         catpartCompanyId: 213,
         catpartDealId: 133,
@@ -163,7 +161,7 @@ export function OrderForm({ dndFile, delivery, updateCart, notificationFunc, set
         comment: commentInput.current.value || '',
         maxDeliveryTime: 'Максимальный срок',
         summ: (totalCart / currency.exChange).toFixed(2),
-        products: products,
+        products,
       };
 
       apiORDER(url, order, {}, respData => {
@@ -196,7 +194,7 @@ export function OrderForm({ dndFile, delivery, updateCart, notificationFunc, set
       return /^\+?\d*$/.test(value); // Allow digits and '+' on beginning only, using a RegExp
     });
 
-    let deliveryList = [
+    const deliveryList = [
       {
         value: 'Самовывоз со склада в Новосибирске',
         label: 'Самовывоз со склада в Новосибирске',
@@ -204,10 +202,10 @@ export function OrderForm({ dndFile, delivery, updateCart, notificationFunc, set
       { value: 'Доставка курьерской службой', label: 'Доставка курьерской службой' },
     ];
 
-    let user = localStorage.getItem('catpart-user');
+    const user = localStorage.getItem('catpart-user');
 
     if (user) {
-      let userFields = JSON.parse(user);
+      const userFields = JSON.parse(user);
       setFields(userFields);
 
       if (userFields['order-email']) {
@@ -244,6 +242,10 @@ export function OrderForm({ dndFile, delivery, updateCart, notificationFunc, set
       }
     }
 
+    if (!totalCart) {
+      history.push('/');
+    }
+
     setDeliveryOptions([...deliveryList]);
 
     return () => {
@@ -252,12 +254,12 @@ export function OrderForm({ dndFile, delivery, updateCart, notificationFunc, set
   }, []);
 
   return (
-    <div className={'form-order' + (delivery ? ' __delivery' : '')}>
+    <div className={`form-order${delivery ? ' __delivery' : ''}`}>
       <form ref={formRef} className="form-content" onSubmit={contactSubmit}>
         {delivery && (
           <>
-            {/*<div className="form-order__text">Максимальный срок доставки:</div>*/}
-            {/*<div className="form-order__text">3-4 недели</div>*/}
+            {/* <div className="form-order__text">Максимальный срок доставки:</div> */}
+            {/* <div className="form-order__text">3-4 недели</div> */}
             <div className="form-order__text">Итого:</div>
             <div className="form-order__text">
               <span ref={totalPriceRef} className="form-order__price" /> {currency.name}
@@ -267,67 +269,67 @@ export function OrderForm({ dndFile, delivery, updateCart, notificationFunc, set
 
         <FormInput
           onChange={handleChange.bind(this, 'order-email')}
-          placeholder={'Ваш email'}
+          placeholder="Ваш email"
           name="order-email"
           //
           error={errors['order-email']}
-          className={'__lg'}
+          className="__lg"
           inputRef={emailInput}
         />
 
         <FormInput
           onChange={handleChange.bind(this, 'order-name')}
-          placeholder={'ФИО'}
+          placeholder="ФИО"
           name="order-name"
           //
           error={errors['order-name']}
-          className={'__lg'}
+          className="__lg"
           inputRef={nameInput}
         />
 
         <FormInput
           onChange={handleChange.bind(this, 'order-phone')}
-          placeholder={'Телефон'}
+          placeholder="Телефон"
           name="order-phone"
           //
           error={errors['order-phone']}
-          className={'__lg'}
+          className="__lg"
           inputRef={phoneInput}
         />
 
         <FormInput
           onChange={handleChange.bind(this, 'order-inn')}
-          placeholder={'ИНН'}
+          placeholder="ИНН"
           name="order-inn"
           //
           error={errors['order-inn']}
-          className={'__lg'}
+          className="__lg"
           inputRef={innInput}
         />
 
-        {/*<FormInput*/}
-        {/*  onChange={handleChange.bind(this, 'order-delivery')}*/}
-        {/*  placeholder={'Доставка'}*/}
-        {/*  name="order-delivery"*/}
-        {/*  //*/}
-        {/*  error={errors['order-delivery']}*/}
-        {/*  className={'__lg'}*/}
-        {/*  inputRef={deliveryInput}*/}
-        {/*/>*/}
+        {/* <FormInput */}
+        {/*  onChange={handleChange.bind(this, 'order-delivery')} */}
+        {/*  placeholder={'Доставка'} */}
+        {/*  name="order-delivery" */}
+        {/*  // */}
+        {/*  error={errors['order-delivery']} */}
+        {/*  className={'__lg'} */}
+        {/*  inputRef={deliveryInput} */}
+        {/* /> */}
 
         <input
           //
-          className={'hide'}
+          className="hide"
           ref={deliveryInput || null}
         />
 
-        {deliveryOptions.length ? <FormSelect onChange={handleChange} options={deliveryOptions} placeholder={'Доставка'} name="order-delivery" error={errors['order-delivery']} preSelectedValue={preSelectedDelivery} className="__lg" inputRef={deliveryInput} /> : null}
+        {deliveryOptions.length ? <FormSelect onChange={handleChange} options={deliveryOptions} placeholder="Доставка" name="order-delivery" error={errors['order-delivery']} preSelectedValue={preSelectedDelivery} className="__lg" inputRef={deliveryInput} /> : null}
 
-        <FormInput textarea={true} placeholder={'Комментарий'} name="order-delivery" error={null} className="__lg" inputRef={commentInput} />
+        <FormInput textarea placeholder="Комментарий" name="order-delivery" error={null} className="__lg" inputRef={commentInput} />
 
         <div className="form-control">
-          <Ripples className={'__w-100p btn __blue __lg' + (!validForm ? ' __disabled' : '')} during={1000}>
-            <button name={'order-submit'} className="btn-inner">
+          <Ripples className={`__w-100p btn __blue __lg${!validForm ? ' __disabled' : ''}`} during={1000}>
+            <button name="order-submit" className="btn-inner">
               <span>Оформить заказ</span>
             </button>
           </Ripples>
@@ -359,11 +361,11 @@ const mapStateToProps = createStructuredSelector({
 export function mapDispatchToProps(dispatch) {
   return {
     onChangeUsername: evt => dispatch(changeArtNumber(evt.target.value)),
-    //onSubmitForm: evt => {
+    // onSubmitForm: evt => {
     //  console.log('## dispatch onSubmitForm');
     //  if (evt !== undefined && evt.preventDefault) evt.preventDefault();
     //  dispatch(loadRepos());
-    //},
+    // },
   };
 }
 

@@ -13,13 +13,14 @@ import { compose } from 'redux';
 import { createStructuredSelector } from 'reselect';
 import Ripples from 'react-ripples';
 
-//import { useInjectReducer } from 'utils/injectReducer';
-//import { useInjectSaga } from 'utils/injectSaga';
+// import { useInjectReducer } from 'utils/injectReducer';
+// import { useInjectSaga } from 'utils/injectSaga';
 import { makeSelectRepos, makeSelectLoading, makeSelectError } from 'containers/App/selectors';
 
+import { useDetectClickOutside } from 'react-detect-click-outside';
 import { changeCurrency } from './actions';
-//import reducer from './reducer';
-//import saga from './saga';
+// import reducer from './reducer';
+// import saga from './saga';
 import Share from '../../components/Share';
 import { SearchResults } from '../SearchResults';
 import { CartResults } from '../CartResults';
@@ -27,20 +28,19 @@ import apiGET from '../../utils/search';
 import { OrderForm } from '../OrderForm';
 import priceFormatter from '../../utils/priceFormatter';
 import { xlsDownload } from '../../utils/xlsDownload';
-import { useDetectClickOutside } from 'react-detect-click-outside';
 import { findPriceIndex } from '../../utils/findPriceIndex';
-//import Skeleton from '../Skeleton';
+// import Skeleton from '../Skeleton';
 import SkeletonWide from '../SkeletonWide';
 import SkeletonDt from '../SkeletonDt';
 import SkeletonTab from '../SkeletonTab';
 import { smoothScrollTo } from '../../utils/smoothScrollTo';
 
-//const key = 'home';
+// const key = 'home';
 const TRIGGER_DROPDOWN_LIMIT = 11;
 
-export function FilterForm({ props, cart, RUB, busy, currency, setCurrency, setOrderSent, setShowTableHeadFixed, setTableHeadFixed, showResults, totalCart, notificationFunc, updateCart, setOpenMobMenu, searchData, loading, error, onChangeCurrency }) {
-  //useInjectReducer({ key, reducer });
-  //useInjectSaga({ key, saga });
+export function FilterForm({ props, cart, RUB, busy, currency, history, setCurrency, setOrderSent, setShowTableHeadFixed, setTableHeadFixed, showResults, totalCart, notificationFunc, updateCart, setOpenMobMenu, searchData, loading, error, onChangeCurrency }) {
+  // useInjectReducer({ key, reducer });
+  // useInjectSaga({ key, saga });
 
   const query = new URLSearchParams(props.location.search);
 
@@ -65,18 +65,16 @@ export function FilterForm({ props, cart, RUB, busy, currency, setCurrency, setO
     apiGET(requestURL, {}, data => {
       setCurrencyList(
         Object.keys(data)
-          .map(c => {
-            return {
-              name: c,
-              precision: 4,
-              exChange: data[c],
-            };
-          })
+          .map(c => ({
+            name: c,
+            precision: 4,
+            exChange: data[c],
+          }))
           .concat(RUB),
       );
     });
 
-    let store = localStorage.getItem('catpart');
+    const store = localStorage.getItem('catpart');
     if (store) {
       setCartData([...JSON.parse(store)]);
     }
@@ -89,7 +87,7 @@ export function FilterForm({ props, cart, RUB, busy, currency, setCurrency, setO
   const scrollTriggerHandler = goto => {
     setOpenMoreTriggers(false);
 
-    let target = document.querySelector('.search-results__table .trigger-' + goto);
+    const target = document.querySelector(`.search-results__table .trigger-${goto}`);
 
     if (target) {
       smoothScrollTo(document.body, document.body.scrollTop, target.getBoundingClientRect().top - 50, 600);
@@ -99,8 +97,8 @@ export function FilterForm({ props, cart, RUB, busy, currency, setCurrency, setO
   useEffect(() => {
     if (searchData && searchData.bom) {
       setScrollTriggers(
-        searchData.res.map((c, ci) => {
-          return ci >= TRIGGER_DROPDOWN_LIMIT ? (
+        searchData.res.map((c, ci) =>
+          ci >= TRIGGER_DROPDOWN_LIMIT ? (
             <Ripples
               key={ci}
               onClick={() => {
@@ -122,8 +120,8 @@ export function FilterForm({ props, cart, RUB, busy, currency, setCurrency, setO
             >
               <span className="btn-inner">{c.q}</span>
             </Ripples>
-          );
-        }),
+          ),
+        ),
       );
     } else {
       setScrollTriggers([]);
@@ -136,8 +134,8 @@ export function FilterForm({ props, cart, RUB, busy, currency, setCurrency, setO
   };
 
   const onChangeSwitch = evt => {
-    //console.log('onChangeSwitch', currency, evt.target);
-    //onChangeCurrency(evt.target.value, evt.target.dataset.currency);
+    // console.log('onChangeSwitch', currency, evt.target);
+    // onChangeCurrency(evt.target.value, evt.target.dataset.currency);
     setCurrency({
       exChange: parseFloat(evt.target.value),
       name: evt.target.dataset.currency,
@@ -145,16 +143,14 @@ export function FilterForm({ props, cart, RUB, busy, currency, setCurrency, setO
     });
   };
 
-  const plural = (n, str1, str2, str5) => {
-    return n + ' ' + (n % 10 == 1 && n % 100 != 11 ? str1 : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? str2 : str5);
-  };
+  const plural = (n, str1, str2, str5) => `${n} ${n % 10 == 1 && n % 100 != 11 ? str1 : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? str2 : str5}`;
 
   let totalData = 0;
   let searchInfo = '';
 
   if (!cart && searchData && searchData.hasOwnProperty('res')) {
-    totalData = searchData.res.reduce((total, c) => total + c.data.length, 0);
-    searchInfo = (searchData.bom ? 'BOM-поиск. Н' : 'По запросу «' + (query.get('art') || '') + '» н') + (searchData.res.length ? 'айдено ' + plural(totalData, 'наименование', 'наименования', 'наименований') + '.' : 'ичего не найдено :(');
+    totalData = searchData.res.reduce((total, c) => total + (c.hasOwnProperty('data') ? c.data.length : 0), 0);
+    searchInfo = (searchData.bom ? 'BOM-поиск. Н' : `По запросу «${query.get('art') || ''}» н`) + (searchData.res.length ? `айдено ${plural(totalData, 'наименование', 'наименования', 'наименований')}.` : 'ичего не найдено :(');
   }
 
   return (
@@ -176,7 +172,7 @@ export function FilterForm({ props, cart, RUB, busy, currency, setCurrency, setO
       )}
 
       {!cart && busy ? (
-        <div className={'skeleton-holder'}>
+        <div className="skeleton-holder">
           <div className="skeleton skeleton-mob">
             <SkeletonWide />
           </div>
@@ -195,9 +191,9 @@ export function FilterForm({ props, cart, RUB, busy, currency, setCurrency, setO
       <div className="form-filter">
         {!cart &&
           (scrollTriggers.length ? (
-            <div className={'form-filter__controls __wide'}>
+            <div className="form-filter__controls __wide">
               {scrollTriggers.slice(0, TRIGGER_DROPDOWN_LIMIT).map((t, ti) => (
-                <div key={ti} className={'form-filter__control'}>
+                <div key={ti} className="form-filter__control">
                   {t}
                 </div>
               ))}
@@ -229,13 +225,13 @@ export function FilterForm({ props, cart, RUB, busy, currency, setCurrency, setO
         {!cart && showResults ? <div className="form-filter__stat">{searchInfo}</div> : <div className="form-filter__stat">&nbsp;</div>}
 
         {busy || !totalData ? null : (
-          <div className={'form-filter__controls' + (cart ? ' __cart' : '')}>
+          <div className={`form-filter__controls${cart ? ' __cart' : ''}`}>
             {cart ? (
               <div className="form-filter__controls_left">
                 <div className="form-filter__control">
                   <Ripples
                     onClick={() => {
-                      let store = localStorage.getItem('catpart');
+                      const store = localStorage.getItem('catpart');
                       if (store) {
                         xlsDownload([...JSON.parse(store)], currency, 0);
                       } else {
@@ -282,7 +278,7 @@ export function FilterForm({ props, cart, RUB, busy, currency, setCurrency, setO
                   >
                     <span className="btn-inner">Поделиться</span>
                   </Ripples>
-                  {openShare && <Share shareUrl={decodeURIComponent(window.location.href)} shareText={decodeURIComponent(searchInfo)} notificationFunc={notificationFunc} setOpenFunc={setOpenShare} />}
+                  {openShare && <Share shareUrl={encodeURIComponent(window.location.href)} shareText={encodeURIComponent(searchInfo)} notificationFunc={notificationFunc} setOpenFunc={setOpenShare} />}
                 </div>
               </div>
             )}
@@ -295,7 +291,7 @@ export function FilterForm({ props, cart, RUB, busy, currency, setCurrency, setO
                       <input
                         name="currency"
                         className="hide"
-                        //checked={}
+                        // checked={}
                         defaultChecked={currency.name === cur.name}
                         data-currency={cur.name}
                         type="radio"
@@ -317,7 +313,7 @@ export function FilterForm({ props, cart, RUB, busy, currency, setCurrency, setO
         <>
           <CartResults setTableHeadFixed={setTableHeadFixed} setShowTableHeadFixed={setShowTableHeadFixed} updateCart={updateCart} list={cartData} notificationFunc={notificationFunc} showResults={showResults} count={count} currency={currency} />
 
-          <OrderForm updateCart={updateCart} notificationFunc={notificationFunc} setOrderSent={setOrderSent} totalCart={totalCart} currency={currency} delivery={true} />
+          <OrderForm history={history} updateCart={updateCart} notificationFunc={notificationFunc} setOrderSent={setOrderSent} totalCart={totalCart} currency={currency} delivery />
         </>
       ) : busy || !totalData ? null : (
         <SearchResults
@@ -347,12 +343,12 @@ FilterForm.propTypes = {
   error: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
   notificationFunc: PropTypes.func,
   onSubmitForm: PropTypes.func,
-  //currency: PropTypes.string,
+  // currency: PropTypes.string,
   onChangeCurrency: PropTypes.func,
 };
 
 const mapStateToProps = createStructuredSelector({
-  //currency: makeSelectCurrency(),
+  // currency: makeSelectCurrency(),
   loading: makeSelectLoading(),
   error: makeSelectError(),
 });

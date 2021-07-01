@@ -9,26 +9,27 @@ import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
-import SearchRow from '../SearchRow';
 import Collapsible from 'react-collapsible';
+import SearchRow from '../SearchRow';
+import { smoothScrollTo } from '../../utils/smoothScrollTo';
 
 export function SearchResults(props) {
-  let { bom, list, cart, pageY, scrollTriggers, setScrollTriggers, setShowTableHeadFixed, setTableHeadFixed, currency, count, showResults, highlight, notificationFunc, updateCart } = props;
+  const { bom, list, cart, pageY, scrollTriggers, setScrollTriggers, setShowTableHeadFixed, setTableHeadFixed, currency, count, showResults, highlight, notificationFunc, updateCart } = props;
 
   const tableHead = useRef();
 
-  let defaultCount = count;
+  const defaultCount = count;
 
   let loaderInterval;
-  let stepCounter = 0;
+  const stepCounter = 0;
   let listCounter = 0;
-  let rowCounter = 0;
+  const rowCounter = 0;
   const INF_STEP = 30;
 
   const [rowCount, setRowCount] = useState([]);
   const [hasMore, setHasMore] = useState(true);
 
-  let tableHeader = {
+  const tableHeader = {
     manufacturer: 'Поставщик',
     name: 'Наименование',
     brand: 'Бренд',
@@ -41,8 +42,8 @@ export function SearchResults(props) {
     delivery_period: 'Срок',
   };
 
-  let tHead = (
-    <div className={'search-results__row __even __head'}>
+  const tHead = (
+    <div className="search-results__row __even __head">
       {Object.keys(tableHeader).map((head, hi) => (
         <div key={hi} className={`search-results__cell __${head}`}>
           {tableHeader[head]}
@@ -55,13 +56,21 @@ export function SearchResults(props) {
   const handleScroll = event => {
     tableHead.current.closest('.main').classList[tableHead.current.getBoundingClientRect().y <= 0 ? 'add' : 'remove']('__stick');
 
-    //console.log('handleScroll', list, listCounter);
+    // console.log('handleScroll', list, listCounter);
   };
 
   useEffect(() => {
-    setTableHeadFixed(<div className={'search-results__table __sticky'}>{tHead}</div>);
+    setTableHeadFixed(<div className="search-results__table __sticky">{tHead}</div>);
 
     document.body.addEventListener('scroll', handleScroll);
+
+    console.log('search mount');
+
+    if (window.innerWidth < 1200) {
+      setTimeout(() => {
+        smoothScrollTo(document.body, document.body.scrollTop, tableHead.current.getBoundingClientRect().top - 10, 600);
+      }, 200);
+    }
 
     return () => {
       document.body.removeEventListener('scroll', handleScroll);
@@ -102,60 +111,60 @@ export function SearchResults(props) {
     }, 200);
   };
 
-  //useEffect(() => {
+  // useEffect(() => {
   //  clearInterval(loaderInterval);
   //
   //  if (list && list[listCounter].data.length) {
-  //setRowCount(list[listCounter].data.slice(0, INF_STEP));
+  // setRowCount(list[listCounter].data.slice(0, INF_STEP));
 
-  //console.log('setRowCount', list);
-  //getMoreData(list, 0);
+  // console.log('setRowCount', list);
+  // getMoreData(list, 0);
 
-  //return () => {
+  // return () => {
   //  loaderInterval = setInterval(() => {
   //
   //  }, 1000);
-  //};
+  // };
   //  }
-  //}, [list]);
+  // }, [list]);
 
   return (
     <div className="search-results">
       <div className="search-results__table">
-        <div ref={tableHead} className={'search-results__head-wrapper'}>
+        <div ref={tableHead} className="search-results__head-wrapper">
           {tHead}
         </div>
 
         {list && list.length
           ? bom
-            ? list.map((query, qi) => {
-                return (
-                  <Collapsible
-                    key={qi}
-                    open={true}
-                    transitionTime={200}
-                    transitionCloseTime={200}
-                    triggerTagName={'div'}
-                    className={'search-results__collapsed'}
-                    triggerClassName={'search-results__trigger __collapsed trigger-' + qi}
-                    triggerOpenedClassName={'search-results__trigger __expanded trigger-' + qi}
-                    openedClassName={'search-results__expanded'}
-                    trigger={<span>{query.q}</span>}
-                  >
-                    {query.data.map((row, ri) => (
-                      <SearchRow key={ri} updateCart={updateCart} tableHeader={tableHeader} defaultCount={defaultCount} currency={currency} highlight={highlight} notificationFunc={notificationFunc} row={row} rowIndex={ri} />
-                    ))}
-                  </Collapsible>
-                );
-              })
+            ? list.map((query, qi) => (
+              <Collapsible
+                key={qi}
+                  open
+                  transitionTime={200}
+                  transitionCloseTime={200}
+                triggerTagName="div"
+                  className="search-results__collapsed"
+                  triggerClassName={`search-results__trigger __collapsed trigger-${qi}`}
+                  triggerOpenedClassName={`search-results__trigger __expanded trigger-${qi}`}
+                  openedClassName="search-results__expanded"
+                trigger={<span>{query.q}</span>}
+                >
+                {query.hasOwnProperty('data')
+                    ? query.data.map((row, ri) => <SearchRow key={ri} updateCart={updateCart} tableHeader={tableHeader} defaultCount={defaultCount} currency={currency} highlight={highlight} notificationFunc={notificationFunc} row={row} rowIndex={ri} />)
+                    : null}
+                </Collapsible>
+              ))
             : //  (
-              //  rowCount.map((row, ri) => {
-              //    //console.log('InfiniteScroll', ri);
-              //    return <SearchRow key={ri} updateCart={updateCart} tableHeader={tableHeader} defaultCount={defaultCount} currency={currency} highlight={highlight} notificationFunc={notificationFunc} row={row} rowIndex={ri} />;
-              //  })
-              //)
+            //  rowCount.map((row, ri) => {
+            //    //console.log('InfiniteScroll', ri);
+            //    return <SearchRow key={ri} updateCart={updateCart} tableHeader={tableHeader} defaultCount={defaultCount} currency={currency} highlight={highlight} notificationFunc={notificationFunc} row={row} rowIndex={ri} />;
+            //  })
+            // )
 
-              list[0].data.map((row, ri) => <SearchRow key={ri} updateCart={updateCart} tableHeader={tableHeader} defaultCount={defaultCount} currency={currency} highlight={highlight} notificationFunc={notificationFunc} row={row} rowIndex={ri} />)
+            list[0].hasOwnProperty('data')
+            ? list[0].data.map((row, ri) => <SearchRow key={ri} updateCart={updateCart} tableHeader={tableHeader} defaultCount={defaultCount} currency={currency} highlight={highlight} notificationFunc={notificationFunc} row={row} rowIndex={ri} />)
+            : null
           : null}
       </div>
     </div>

@@ -6,18 +6,19 @@ const MODE_CART = 0;
 const MODE_BOM = 1;
 const MODE_SEARCH = -1;
 
-const transformSearchData = data => {
-  return data.reduce(
+const transformSearchData = data =>
+  data.reduce(
     (arr, c) =>
       arr.concat(
-        c.data.map(d => {
-          d.query = c.q;
-          return d;
-        }),
+        c.hasOwnProperty('data')
+          ? c.data.map(d => {
+              d.query = c.q;
+            return d;
+            })
+          : [],
       ),
     [],
   );
-};
 
 const prepareJSON = (data, mode, currency) => {
   if (mode !== MODE_CART) {
@@ -31,7 +32,7 @@ const prepareJSON = (data, mode, currency) => {
     if (mode === MODE_CART) {
       priceMatch = findPriceIndex(row.pricebreaks, row.cart);
       price = priceFormatter((row.cart * parseFloat(row.pricebreaks[priceMatch].price / currency.exChange)).toFixed(currency.precision), currency.precision);
-      row.price = priceMatch + '#' + price;
+      row.price = `${priceMatch}#${price}`;
     } else {
       delete row.cart;
     }
@@ -53,7 +54,7 @@ export const xlsDownload = (data, currency, mode) => {
   console.log('xlsDownload', mode);
 
   if (data && data.length) {
-    let fileName = mode === MODE_CART ? 'cart' : 'search';
+    const fileName = mode === MODE_CART ? 'cart' : 'search';
 
     let tableHeader = ['manufacturer', 'name', 'brand', 'quantity', 'pack_quant', 'price_unit', 'moq', 'delivery_period'];
 
@@ -76,12 +77,12 @@ export const xlsDownload = (data, currency, mode) => {
     let WS = XLSX.utils.json_to_sheet(prepareJSON(JSON.parse(JSON.stringify(data)), mode, currency), { header: tableHeader });
 
     if (mode === MODE_CART) {
-      let newJSON = XLSX.utils.sheet_to_json(WS);
+      const newJSON = XLSX.utils.sheet_to_json(WS);
 
       Object.keys(newJSON).map(j => {
-        let row = newJSON[j];
-        let priceMatch = row.price.split('#');
-        let space = '\n'.repeat(+priceMatch[0]);
+        const row = newJSON[j];
+        const priceMatch = row.price.split('#');
+        const space = '\n'.repeat(+priceMatch[0]);
         row.currency = space + row.currency;
         row.cart = space + row.cart;
         row.price = space + priceMatch[1];
@@ -90,9 +91,9 @@ export const xlsDownload = (data, currency, mode) => {
       WS = XLSX.utils.json_to_sheet(newJSON, { header: tableHeader });
     }
 
-    let WB = XLSX.utils.book_new();
+    const WB = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(WB, WS, fileName);
 
-    XLSX.writeFile(WB, fileName + '.xls');
+    XLSX.writeFile(WB, `${fileName}.xls`);
   }
 };
