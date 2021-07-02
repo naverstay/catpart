@@ -138,20 +138,20 @@ export function SearchResults(props) {
         {list && list.length
           ? bom
             ? list.map((query, qi) => (
-              <Collapsible
-                key={qi}
+                <Collapsible
+                  key={qi}
                   open
                   transitionTime={200}
                   transitionCloseTime={200}
-                triggerTagName="div"
+                  triggerTagName="div"
                   className="search-results__collapsed"
                   triggerClassName={`search-results__trigger __collapsed trigger-${qi}`}
                   triggerOpenedClassName={`search-results__trigger __expanded trigger-${qi}`}
                   openedClassName="search-results__expanded"
-                trigger={<span>{query.q}</span>}
+                  trigger={<span>{query.q}</span>}
                 >
-                {query.hasOwnProperty('data')
-                    ? query.data.map((row, ri) => <SearchRow key={ri} updateCart={updateCart} tableHeader={tableHeader} defaultCount={defaultCount} currency={currency} highlight={highlight} notificationFunc={notificationFunc} row={row} rowIndex={ri} />)
+                  {query.hasOwnProperty('data')
+                    ? query.data.map((row, ri) => <SearchRow key={ri} updateCart={updateCart} tableHeader={tableHeader} defaultCount={defaultCount} currency={currency} highlight={query.q} notificationFunc={notificationFunc} row={row} rowIndex={ri} />)
                     : null}
                 </Collapsible>
               ))
@@ -163,7 +163,7 @@ export function SearchResults(props) {
             // )
 
             list[0].hasOwnProperty('data')
-            ? list[0].data.map((row, ri) => <SearchRow key={ri} updateCart={updateCart} tableHeader={tableHeader} defaultCount={defaultCount} currency={currency} highlight={highlight} notificationFunc={notificationFunc} row={row} rowIndex={ri} />)
+            ? list[0].data.map((row, ri) => <SearchRow key={ri} updateCart={updateCart} tableHeader={tableHeader} defaultCount={defaultCount} currency={currency} highlight={list[0].q} notificationFunc={notificationFunc} row={row} rowIndex={ri} />)
             : null
           : null}
       </div>

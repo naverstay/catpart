@@ -21,16 +21,16 @@ import { readFile } from '../../utils/fileReader';
 import { changeArtNumber } from './actions';
 import { makeSelectArtNumber } from './selectors';
 import { setInputFilter } from '../../utils/inputFilter';
-//import reducer from './reducer';
-//import saga from './saga';
+// import reducer from './reducer';
+// import saga from './saga';
 import apiPOST from '../../utils/upload';
 import FormInput from '../../components/FormInput';
 
-//const key = 'home';
+// const key = 'home';
 
 export function SearchForm({ dndFile, notificationFunc, busy, setFormBusy, history, setSearchData, location, onSubmitForm, artNumber, loading, error, repos, onChangeUsername }) {
-  //useInjectReducer({ key, reducer });
-  //useInjectSaga({ key, saga });
+  // useInjectReducer({ key, reducer });
+  // useInjectSaga({ key, saga });
 
   const formRef = React.createRef();
   const formArtNumber = React.createRef();
@@ -50,7 +50,7 @@ export function SearchForm({ dndFile, notificationFunc, busy, setFormBusy, histo
   });
   const [validForm, setValidForm] = useState(false);
 
-  let searchBtnText = useLocation().pathname === '/' ? 'Искать' : 'Продолжить искать';
+  const searchBtnText = useLocation().pathname === '/' ? 'Искать' : 'Продолжить искать';
 
   useEffect(() => {
     setInputFilter(formQuantity.current, function(value) {
@@ -115,11 +115,14 @@ export function SearchForm({ dndFile, notificationFunc, busy, setFormBusy, histo
 
             <FormInput
               onChange={handleChange.bind(this, 'art-number')}
+              onBlur={e => {
+                e.target.value = e.target.value.trim();
+              }}
               name="art-number"
               //
               disabled={busy}
               defaultValue={decodeURIComponent(query.get('art') || '')}
-              className={'__lg' + (errors['art-number'] === null ? '' : errors['art-number'] ? ' __error' : '')}
+              className={`__lg${errors['art-number'] === null ? '' : errors['art-number'] ? ' __error' : ''}`}
               error={null}
               id="art-number"
               inputRef={formArtNumber}
@@ -156,7 +159,7 @@ export function SearchForm({ dndFile, notificationFunc, busy, setFormBusy, histo
               //
               disabled={busy}
               defaultValue={(decodeURIComponent(query.get('q')) || '1').replace(/\D/g, '')}
-              className={'__lg' + (errors['quantity'] === null ? '' : errors['quantity'] ? ' __error' : '')}
+              className={`__lg${errors.quantity === null ? '' : errors.quantity ? ' __error' : ''}`}
               error={null}
               id="quantity"
               inputRef={formQuantity}
@@ -196,8 +199,8 @@ export function SearchForm({ dndFile, notificationFunc, busy, setFormBusy, histo
           <div className="form-cell form-cell__search column sm-col-12 md-col-4 lg-col-2">
             <span className="form-label">&nbsp;</span>
             <div className="form-control">
-              <Ripples className={'__w-100p btn __blue __lg'} during={1000}>
-                <button name={'search-submit'} className="btn-inner __abs">
+              <Ripples className="__w-100p btn __blue __lg" during={1000}>
+                <button name="search-submit" className="btn-inner __abs">
                   <span>{searchBtnText}</span>
                 </button>
               </Ripples>
@@ -217,11 +220,11 @@ export function SearchForm({ dndFile, notificationFunc, busy, setFormBusy, histo
                     type="file"
                     onChange={() => {
                       const requestURL = '/search/bom';
-                      let file = formFile.current.files[0];
+                      const file = formFile.current.files[0];
 
                       if (file && file.name.match(/\.(xls[x]?)$/)) {
-                        let formData = new FormData();
-                        let options = {};
+                        const formData = new FormData();
+                        const options = {};
 
                         setSearchData({});
                         setFormBusy(true);
@@ -245,7 +248,7 @@ export function SearchForm({ dndFile, notificationFunc, busy, setFormBusy, histo
                         file && notificationFunc('success', `Файл: ${file.name}`, 'не соответствует формату .xls, . xlsx');
                       }
 
-                      //readFile(formFile.current.files[0], ret => {
+                      // readFile(formFile.current.files[0], ret => {
                       //  console.log('readFile', ret);
                       //
                       //  if (ret.success) {
@@ -253,7 +256,7 @@ export function SearchForm({ dndFile, notificationFunc, busy, setFormBusy, histo
                       //  } else {
                       //    notificationFunc('success', `Файл: ${ret.name}`, `Ошибка: ${ret.text}`);
                       //  }
-                      //});
+                      // });
                     }}
                   />
                 </label>
@@ -263,9 +266,9 @@ export function SearchForm({ dndFile, notificationFunc, busy, setFormBusy, histo
           </div>
         </div>
 
-        {/*<label style={{ position: 'absolute' }} htmlFor="artNumber">*/}
-        {/*  <Input id="artNumber" type="text" placeholder="mxstbr" value={artNumber} onChange={onChangeUsername} />*/}
-        {/*</label>*/}
+        {/* <label style={{ position: 'absolute' }} htmlFor="artNumber"> */}
+        {/*  <Input id="artNumber" type="text" placeholder="mxstbr" value={artNumber} onChange={onChangeUsername} /> */}
+        {/* </label> */}
       </form>
     </div>
   );
@@ -293,11 +296,11 @@ const mapStateToProps = createStructuredSelector({
 export function mapDispatchToProps(dispatch) {
   return {
     onChangeUsername: evt => dispatch(changeArtNumber(evt.target.value)),
-    //onSubmitForm: evt => {
+    // onSubmitForm: evt => {
     //  console.log('## dispatch onSubmitForm');
     //  if (evt !== undefined && evt.preventDefault) evt.preventDefault();
     //  dispatch(loadRepos());
-    //},
+    // },
   };
 }
 

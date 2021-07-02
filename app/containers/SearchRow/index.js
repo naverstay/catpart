@@ -1,6 +1,6 @@
 import React, { createRef, useEffect, useState } from 'react';
-import priceFormatter from '../../utils/priceFormatter';
 import Ripples from 'react-ripples';
+import priceFormatter from '../../utils/priceFormatter';
 
 import { setInputFilter } from '../../utils/inputFilter';
 import { findPriceIndex } from '../../utils/findPriceIndex';
@@ -22,16 +22,16 @@ const SearchRow = props => {
   const [itemCount, setItemCount] = useState(defaultCount || 1);
   let priceMatch = defaultCount ? row.pricebreaks.length - 1 : -1;
 
-  let textHighlighter = txt => {
+  const textHighlighter = txt => {
     let ret = <>{txt}</>;
 
     if (highlight && highlight.length) {
-      let rx = new RegExp(escapeRegExp(highlight), 'i');
+      // let rx = new RegExp(escapeRegExp(highlight), 'i');
 
       ret = (
         <>
           <b>{highlight}</b>
-          {txt.replace(rx, '')}
+          {txt.slice(highlight.length)}
         </>
       );
     }
@@ -39,9 +39,7 @@ const SearchRow = props => {
     return ret;
   };
 
-  let priceHighlighter = (ind, price) => {
-    return ind === priceMatch ? <b>{price}</b> : <>{price}</>;
-  };
+  const priceHighlighter = (ind, price) => (ind === priceMatch ? <b>{price}</b> : <>{price}</>);
 
   useEffect(() => {
     setInputFilter(inputRef.current, function(value) {
@@ -62,7 +60,7 @@ const SearchRow = props => {
       {Object.keys(tableHeader).map((cell, ci) => (
         <div key={ci} className={`search-results__cell __${cell}`}>
           {cell === 'name' ? null : <span className="search-results__label">{tableHeader[cell]}</span>}
-          <span className={'search-results__value'}>
+          <span className="search-results__value">
             {cell === 'pricebreaks'
               ? row.pricebreaks.map((p, pi) => (
                   <span key={pi} className="search-results__item">
@@ -79,7 +77,7 @@ const SearchRow = props => {
               ? cell === 'name'
                 ? textHighlighter(row[cell])
                 : row[cell]
-              : '!' + cell + '!'}
+              : `!${cell}!`}
           </span>
         </div>
       ))}
@@ -89,28 +87,28 @@ const SearchRow = props => {
           <input
             ref={inputRef}
             onChange={e => {
-              //setDisableAddBtn(!e.target.value.length || +e.target.value < 1);
+              // setDisableAddBtn(!e.target.value.length || +e.target.value < 1);
 
-              let val = +(e.target.value || 1);
+              const val = +(e.target.value || 1);
               if (val > 0) {
                 setItemCount(Math.max(row.moq, val));
-                //updateCart(row.id, val, row.cur);
+                // updateCart(row.id, val, row.cur);
               }
             }}
             onBlur={e => {
-              let val = +(e.target.value || 1);
+              const val = +(e.target.value || 1);
               if (e.target.value.length && val < row.moq) {
-                e.target.value = row.moq + '';
+                e.target.value = `${row.moq}`;
                 setItemCount(row.moq);
                 notificationFunc('success', `Для ${row.name}`, `минимальное количество: ${row.moq}`);
               }
               if (e.target.value.length && val > row.quantity) {
-                e.target.value = row.quantity + '';
+                e.target.value = `${row.quantity}`;
                 setItemCount(row.quantity);
                 notificationFunc('success', `Для ${row.name}`, `максимальное количество: ${row.quantity}`);
               }
             }}
-            //value={itemCount}
+            // value={itemCount}
             placeholder={itemCount}
             type="text"
             className="input"
@@ -121,9 +119,9 @@ const SearchRow = props => {
                 updateCart(row.id, +inputRef.current.value || itemCount, currency);
               }}
               during={1000}
-              className={'btn __blue' + (disableAddBtn ? ' __disabled' : '')}
+              className={`btn __blue${disableAddBtn ? ' __disabled' : ''}`}
             >
-              <button aria-label={row.name} name={'search-add-' + row.id} disabled={disableAddBtn} className="btn-inner">
+              <button aria-label={row.name} name={`search-add-${row.id}`} disabled={disableAddBtn} className="btn-inner">
                 <span className="btn__icon icon icon-cart" />
               </button>
             </Ripples>

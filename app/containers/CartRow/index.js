@@ -5,11 +5,10 @@ import { findPriceIndex } from '../../utils/findPriceIndex';
 import { setInputFilter } from '../../utils/inputFilter';
 
 const CartRow = props => {
-  let { rowIndex, tableHeader, currency, row, highlight, notificationFunc, defaultCount, updateCart } = props;
+  const { rowIndex, tableHeader, currency, row, highlight, notificationFunc, defaultCount, updateCart } = props;
 
   const inputRef = createRef();
 
-  const [itemCount, setItemCount] = useState(defaultCount || 1);
   const [cartCount, setCartCount] = useState(parseFloat(row.cart));
   let priceMatch = defaultCount ? row.pricebreaks.length - 1 : -1;
 
@@ -36,17 +35,17 @@ const CartRow = props => {
               <>
                 <p>
                   <span className="cart-results__label __show">{tableHeader[cell]}:</span>
-                  <span className={'cart-results__value'}>{row[cell]}</span>
+                  <span className="cart-results__value">{row[cell]}</span>
                 </p>
                 <p>
                   <span className="cart-results__label __show">{tableHeader.brand}:</span>
-                  <span className={'cart-results__value'}>{row.brand}</span>
+                  <span className="cart-results__value">{row.brand}</span>
                 </p>
               </>
             ) : (
               <>
                 {cell === 'name' ? null : <span className="cart-results__label">{tableHeader[cell]}</span>}
-                <span className={'cart-results__value'}>
+                <span className="cart-results__value">
                   {cell === 'pricebreaks' ? (
                     <span className="cart-results__item">{priceFormatter(parseFloat(row.pricebreaks[priceMatch].price / currency.exChange).toFixed(currency.precision), currency.precision)}</span>
                   ) : cell === 'quantity' ? (
@@ -54,32 +53,34 @@ const CartRow = props => {
                       <input
                         ref={inputRef}
                         onChange={e => {
-                          let val = +e.target.value;
+                          const val = +e.target.value;
                           if (val > 0) {
                             setCartCount(parseFloat(val));
                             console.log('row', row);
                           }
                         }}
                         onBlur={e => {
-                          let val = +e.target.value;
+                          const val = +e.target.value;
                           if (val > 0) {
                           } else {
                             e.target.value = '1';
                           }
 
                           if (e.target.value.length && +e.target.value < row.moq) {
-                            e.target.value = row.moq + '';
-                            setItemCount(row.moq);
+                            e.target.value = `${row.moq}`;
+                            setCartCount(row.moq);
 
                             notificationFunc('success', `Для ${row.name}`, `минимальное количество: ${row.moq}`);
                           }
 
                           if (e.target.value.length && +e.target.value > row.quantity) {
-                            e.target.value = row.quantity + '';
-                            setItemCount(row.quantity);
+                            e.target.value = `${row.quantity}`;
+                            setCartCount(row.quantity);
 
                             notificationFunc('success', `Для ${row.name}`, `максимальное количество: ${row.quantity}`);
                           }
+
+                          setCartCount(parseFloat(e.target.value));
 
                           updateCart(row.id, +e.target.value, row.cur);
                         }}
@@ -91,7 +92,7 @@ const CartRow = props => {
                   ) : cell === 'total' ? (
                     <span className="cart-results__item">{priceFormatter((cartCount * parseFloat(row.pricebreaks[priceMatch].price / currency.exChange)).toFixed(currency.precision), currency.precision)}</span>
                   ) : (
-                    row[cell] || '!' + cell + '!'
+                    row[cell] || `!${cell}!`
                   )}
                 </span>
               </>
@@ -109,7 +110,7 @@ const CartRow = props => {
             during={1000}
             className="btn __blue"
           >
-            <button aria-label={row.name} name={'cart-row-rm-' + row.id} className="btn-inner">
+            <button aria-label={row.name} name={`cart-row-rm-${row.id}`} className="btn-inner">
               <span className="btn__icon icon icon-close" />
             </button>
           </Ripples>
