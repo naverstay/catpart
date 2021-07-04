@@ -43,7 +43,7 @@ function Header({ openMobMenu, cartCount, setOpenMobMenu }) {
         <ul className="header-navbar__list">
           <li>
             <Link className="header-navbar__link" to="/about">
-              О сервисе
+              О компании
             </Link>
           </li>
           {/*<li>*/}

@@ -141,8 +141,8 @@ export function OrderForm({ dndFile, delivery, updateCart, history, notification
         manufacturer: s.brand,
         packingRate: s.pack_quant,
         amount: s.cart,
-        pureprice: price,
-        price,
+        pureprice: pureprice,
+        price: price,
         priceSumm: `${priceFormatter(s.cart * (price / currency.exChange), currency.precision)} RUB на ${now} ${leadingZero(time.getHours())}:${leadingZero(time.getMinutes())}`,
         deliveryTime: s.delivery_period,
       };

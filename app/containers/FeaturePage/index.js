@@ -16,26 +16,34 @@ export default function FeaturePage(props) {
     <>
       <div className="row">
         <Helmet>
-          <title>О сервисе - CATPART.RU</title>
-          <meta name="description" content="О сервисе - CATPART.RU" />
-          <meta name="keywords" content="О сервисе - CATPART.RU" />
+          <title>О компании - CATPART.RU</title>
+          <meta name="description" content="О компании - CATPART.RU" />
+          <meta name="keywords" content="О компании - CATPART.RU" />
           <link rel="canonical" href="https://catpart.ru/about/" />
         </Helmet>
 
         <div className="column sm-col-12 xl-col-9">
           <article className="article">
             <h1 className="article-title">О компании</h1>
+
             <p>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Quis ipsum suspendisse ultrices gravida. Risus commodo viverra maecenas accumsan lacus vel facilisis. Lorem ipsum dolor sit amet, consectetur
-              adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Quis ipsum suspendisse ultrices gravida. Risus commodo viverra maecenas accumsan lacus vel facilisis. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
-              incididunt ut labore et dolore magna aliqua. Quis ipsum suspendisse ultrices gravida. Risus commodo viverra maecenas accumsan lacus vel facilisis. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna
-              aliqua. Quis ipsum suspendisse ultrices gravida. Risus commodo viverra maecenas accumsan lacus vel facilisis. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Quis ipsum suspendisse ultrices
-              gravida. Risus commodo viverra maecenas accumsan lacus vel facilisis.
+              ООО «СибЭлКом-Логистик» основана в 2012-м году в Новосибирске как ответ на потребность рынка необходимого уровня сервиса и автоматизации. Забюрокративанность процессов как крупных компаний, так и рядовых снижает доступность электронных компонентов. Цена при этом
+              растет, а срок увеличивается.
             </p>
+
             <p>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Quis ipsum suspendisse ultrices gravida. Risus commodo viverra maecenas accumsan lacus vel facilisis. Lorem ipsum dolor sit amet, consectetur
-              adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Quis ipsum suspendisse ultrices gravida. Risus commodo viverra maecenas accumsan lacus vel facilisis. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
-              incididunt ut labore et dolore magna aliqua. Quis ip
+              Заводы, производящие электронные приборы в России, ориентирующиеся как на Российских, так и на зарубежных заказчиков, нуждаются в ускорении и облегчении процессов, связанных с быстрым подбором и комплектацией необходимых электронных компонентов. При этом важно
+              выбрать наиболее приемлемый вариант как по цене, так и по сроку поставки.
+            </p>
+
+            <p>
+              ООО «СибЭлКом-Логистик» решает эти задачи путем глубокой проработки запросов. Мы используем широкую наработанную сеть поставщиков путем online запросов, а также взаимодействуем с десятками поставщиков в Юго-Восточной Азии, общаясь с ними напрямую через наш офис в
+              г.Шэньчжэнь. Так становится возможным решение задач заказчиков в быстрые сроки и по приемлемым ценам.
+            </p>
+
+            <p>
+              Особое внимание мы уделяем дефицитным и трудным по тем или иным причинам позициям. Наша инфраструктура позволяет оперативно закупать товар в условиях постоянных изменений рынка и требований к конечному электронному продукту. Благодаря высокой
+              клиентоориентированности наша компания позволяет сохранять репутацию заказчика любого размера, доверие которых подтверждается ежегодным увеличением годового оборота компании, который составил более 235 млн.рублей в 2020-м году.
             </p>
           </article>
         </div>

@@ -137,7 +137,7 @@ export default function App() {
 
     if (store.length) {
       setTotalCart(store.reduce((total, c) => total + c.cart * c.pricebreaks[findPriceIndex(c.pricebreaks, c.cart)].price, 0));
-    } else if (window.location.pathname !== '/order') {
+    } else if (window.location.pathname === '/order') {
       history.push('/');
     }
   };

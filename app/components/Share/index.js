@@ -74,10 +74,6 @@ function Share({ setOpenFunc, notificationFunc, shareUrl, shareText }) {
       name: 'WhatsApp',
     },
     {
-      href: `whatsapp://send?text=${shareText}%20${shareUrl}`,
-      name: 'WhatsApp Business',
-    },
-    {
       href: `https://telegram.me/share/url?text=${shareText}&url=${shareUrl}`,
       name: 'Telegram',
     },

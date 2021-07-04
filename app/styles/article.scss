@@ -3,9 +3,23 @@
   padding-bottom: 15px;
   color: $main_gray;
 
-  &-title {
+  h1 {
     font-size: 36px;
     margin: 0 0 15px;
+  }
+
+  h2 {
+    font-size: 24px;
+    margin: 15px 0 8px;
+  }
+
+  a {
+    text-decoration: underline;
+    color: inherit;
+
+    &:hover {
+      color: $main_blue_light;
+    }
   }
 
   p {
