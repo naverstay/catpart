@@ -110,6 +110,7 @@
         //padding-right: 140px;
 
         display: grid;
+        min-height: 100px;
         grid-template-areas:
           "item_1 norm_1 term_1 price_1 total_1 cart_1 "
           "item_2 norm_2 term_2 price_2 total_2 cart_2 "
@@ -131,6 +132,7 @@
       }
 
       @include respond-to-max($dt) {
+        min-height: 0;
         grid-template-areas:
           "item_1 term_1 price_1 total_1 cart_1"
           "item_2 term_2 price_2 total_2 cart_2"
