@@ -27,6 +27,7 @@ import { counterEffect } from '../../utils/counterEffect';
 import apiORDER from '../../utils/order';
 import { findPriceIndex } from '../../utils/findPriceIndex';
 import FormSelect from '../../components/FormSelect';
+import { validateEmail } from '../../utils/validateEmail';
 
 const key = 'home';
 
@@ -64,11 +65,6 @@ export function OrderForm({ dndFile, delivery, updateCart, history, notification
   const formRef = React.createRef();
 
   const requiredFields = ['order-email', 'order-name', 'order-phone', 'order-inn', 'order-delivery'];
-
-  const validateEmail = email => {
-    const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    return re.test(String(email).toLowerCase());
-  };
 
   const leadingZero = val => `0${val}`.slice(-2);
 

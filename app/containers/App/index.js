@@ -251,7 +251,7 @@ export default function App() {
   return (
     <>
       <div className={`app-wrapper${appDrag ? ' __over' : ''}`}>
-        <Header cartCount={cartCount} openMobMenu={openMobMenu} setOpenMobMenu={setOpenMobMenu} />
+        <Header profile={{}} cartCount={cartCount} openMobMenu={openMobMenu} setOpenMobMenu={setOpenMobMenu} />
 
         <main className={`main${centeredForm ? ' __center' : ''}`}>
           <SearchForm setFormBusy={setFormBusy} history={history} setSearchData={setSearchData} setOpenMobMenu={setOpenMobMenu} busy={formBusy} onSubmitForm={onSubmitSearchForm} notificationFunc={createNotification} />

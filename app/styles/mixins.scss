@@ -34,6 +34,7 @@
   transition: color .3s, background-color .3s, box-shadow .3s;
 
   &-inner {
+    max-width: 100%;
     cursor: inherit;
     background: none;
     border: 0;
@@ -41,6 +42,13 @@
     align-items: center;
     color: inherit;
     text-decoration: inherit;
+
+    span.__dotted {
+      width: 100%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
 
     &:before {
       content: '';
