@@ -224,7 +224,7 @@ export function FilterForm({ props, cart, RUB, busy, currency, history, setCurre
 
         {!cart && showResults ? <div className="form-filter__stat">{searchInfo}</div> : <div className="form-filter__stat">&nbsp;</div>}
 
-        {busy || !totalData ? null : (
+        {busy ? null : (
           <div className={`form-filter__controls${cart ? ' __cart' : ''}`}>
             {cart ? (
               <div className="form-filter__controls_left">
