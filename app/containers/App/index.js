@@ -21,6 +21,9 @@ import apiGET from '../../utils/search';
 import PolicyPage from '../PolicyPage';
 import { findPriceIndex } from '../../utils/findPriceIndex';
 import DeliveryPage from '../DeliveryPage';
+import { OrdersPage } from '../Orders';
+import AsideContainer from '../AsideContainer';
+import Profile from '../Profile';
 
 export default function App() {
   const history = useHistory();
@@ -44,6 +47,10 @@ export default function App() {
   const [centeredForm, setCenteredForm] = useState(true);
   const [formBusy, setFormBusy] = useState(false);
   const [formDrag, setFormDrag] = useState(false);
+
+  const [openProfile, setOpenProfile] = useState(false);
+  const [asideOpen, setAsideOpen] = useState(false);
+  const [asideContent, setAsideContent] = useState(null);
 
   history.listen(function(loc) {
     setCenteredForm(loc.pathname === '/');
@@ -248,6 +255,17 @@ export default function App() {
     };
   }, []);
 
+  useEffect(() => {
+    setAsideOpen(openProfile);
+    setAsideContent(openProfile ? <Profile /> : null);
+  }, [openProfile]);
+
+  useEffect(() => {
+    if (!asideOpen) {
+      setOpenProfile(false);
+    }
+  }, [asideOpen]);
+
   return (
     <>
       <div className={`app-wrapper${appDrag ? ' __over' : ''}`}>
@@ -279,6 +297,7 @@ export default function App() {
 
                 <Route path="/about" render={routeProps => <FeaturePage updateCart={updateCart} notificationFunc={createNotification} setOrderSent={setOrderSent} totalCart={totalCart} currency={currency} setOpenMobMenu={setOpenMobMenu} {...routeProps} />} />
                 <Route path="/delivery" render={routeProps => <DeliveryPage setOpenMobMenu={setOpenMobMenu} {...routeProps} />} />
+                <Route path="/orders" render={routeProps => <OrdersPage setOpenProfile={setOpenProfile} history={history} setTableHeadFixed={setTableHeadFixed} {...routeProps} />} />
                 <Route path="/privacy-policy" render={routeProps => <PolicyPage setOpenMobMenu={setOpenMobMenu} {...routeProps} />} />
                 <Route
                   path="/search"
@@ -335,6 +354,10 @@ export default function App() {
         </main>
         <Footer />
       </div>
+
+      <AsideContainer className={asideOpen ? ' __opened' : ''} setAsideOpen={setAsideOpen}>
+        {asideContent}
+      </AsideContainer>
 
       <ReactNotification />
     </>

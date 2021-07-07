@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDetectClickOutside } from 'react-detect-click-outside';
 import { Link } from 'react-router-dom';
 import Ripples from 'react-ripples';
@@ -34,11 +34,11 @@ function Header({ openMobMenu, cartCount, setOpenMobMenu }) {
   const loginInput = React.createRef();
   const passwordInput = React.createRef();
 
-  const [profile, setProfile] = useState({});
+  const [profile, setProfile] = useState({ auth: 1 });
+  const [validForm, setValidForm] = useState(false);
   const [openResetPassword, setOpenResetPassword] = useState(false);
   const [openAuthPopup, setOpenAuthPopup] = useState(false);
   const [justRedraw, setJustRedraw] = useState(0);
-  const [validForm, setValidForm] = useState(false);
   const [validResetForm, setValidResetForm] = useState(false);
 
   const popupRef = useDetectClickOutside({
@@ -58,7 +58,7 @@ function Header({ openMobMenu, cartCount, setOpenMobMenu }) {
         errors[field] = e.target.value.length ? '' : 'Не может быть пустым';
         break;
       case 'auth-password':
-        errors[field] = e.target.value.length > 8 ? '' : 'Минимум 8 символов';
+        errors[field] = e.target.value.length >= 8 ? '' : 'Минимум 8 символов';
         break;
     }
 
@@ -137,6 +137,13 @@ function Header({ openMobMenu, cartCount, setOpenMobMenu }) {
     //}
   };
 
+  useEffect(() => {
+    if (openAuthPopup) {
+      handleChange('auth-login', { target: loginInput.current });
+      handleChange('auth-password', { target: passwordInput.current });
+    }
+  }, [openAuthPopup]);
+
   return (
     <header ref={headerRef} className={`header${openMobMenu ? ' __open-mob-menu' : ''}`}>
       <div className="header-left">
@@ -194,7 +201,7 @@ function Header({ openMobMenu, cartCount, setOpenMobMenu }) {
         </ul>
       </div>
 
-      <div className={'header-right' + (profile.hasOwnProperty('auth') ? ' __auth' : '')}>
+      <div className={'header-right __auth'}>
         {profile.hasOwnProperty('auth') ? (
           <Ripples during={1000} className={'btn __blue'}>
             <Link to={'/orders'} className="btn-inner">
@@ -203,16 +210,19 @@ function Header({ openMobMenu, cartCount, setOpenMobMenu }) {
           </Ripples>
         ) : (
           <div ref={popupRef} className={'header-popup__holder'}>
-            <span
+            <Ripples
               onClick={() => {
                 setOpenAuthPopup(!openAuthPopup);
 
                 console.log('open', openAuthPopup);
               }}
-              className="header-navbar__link"
+              during={1000}
+              className={'btn __blue'}
             >
-              Личный кабинет
-            </span>
+              <span className="btn-inner">
+                <span className={'__dotted'}>Личный кабинет</span>
+              </span>
+            </Ripples>
 
             {openAuthPopup || openResetPassword ? (
               <div className="header-popup">
@@ -227,6 +237,7 @@ function Header({ openMobMenu, cartCount, setOpenMobMenu }) {
                       name="auth-login"
                       //
                       error={errors['auth-login']}
+                      defaultValue={'test@test.ru'}
                       className="__lg"
                       inputRef={loginInput}
                     />
@@ -236,6 +247,7 @@ function Header({ openMobMenu, cartCount, setOpenMobMenu }) {
                       name="auth-password"
                       //
                       error={errors['auth-password']}
+                      defaultValue={'12345678'}
                       className="__lg"
                       inputRef={passwordInput}
                     />

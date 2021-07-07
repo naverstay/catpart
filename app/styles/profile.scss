@@ -1,0 +1,28 @@
+.profile {
+  width: 270px;
+  max-width: calc(100vw - 30px);
+
+  .form-content {
+    margin-bottom: 25px;
+  }
+
+  &-info {
+    border-radius: 5px;
+    background-color: #f7f8fd;
+    padding: 15px 20px;
+    font-size: 12px;
+    margin-bottom: 18px;
+
+    ul {
+
+      li {
+        + li {
+          margin-top: 7px;
+        }
+      }
+    }
+  }
+
+}
+
+

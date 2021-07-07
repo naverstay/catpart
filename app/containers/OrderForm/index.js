@@ -80,7 +80,7 @@ export function OrderForm({ dndFile, delivery, updateCart, history, notification
         errors[field] = e.target.value.length ? '' : 'Не может быть пустым';
         break;
       case 'order-phone':
-        errors[field] = e.target.value.length > 8 ? '' : 'Минимум 8 символов';
+        errors[field] = e.target.value.length >= 8 ? '' : 'Минимум 8 символов';
         break;
       case 'order-email':
         errors[field] = e.target.value.length && validateEmail(e.target.value) ? '' : 'Проверьте формат e-mail';
