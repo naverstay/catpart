@@ -24,6 +24,7 @@ import DeliveryPage from '../DeliveryPage';
 import { OrdersPage } from '../Orders';
 import AsideContainer from '../AsideContainer';
 import Profile from '../Profile';
+import ProfileRequisites from '../ProfileRequisites';
 
 export default function App() {
   const history = useHistory();
@@ -48,7 +49,10 @@ export default function App() {
   const [formBusy, setFormBusy] = useState(false);
   const [formDrag, setFormDrag] = useState(false);
 
+  const [profile, setProfile] = useState({});
+  const [profileRequisites, setProfileRequisites] = useState({});
   const [openProfile, setOpenProfile] = useState(false);
+  const [openRequisites, setOpenRequisites] = useState(0);
   const [asideOpen, setAsideOpen] = useState(false);
   const [asideContent, setAsideContent] = useState(null);
 
@@ -56,6 +60,64 @@ export default function App() {
     setCenteredForm(loc.pathname === '/');
     setOrderSent(false);
   });
+
+  let ordersList = [
+    {
+      data: [
+        {
+          id: 1,
+          order_num: '1596321',
+          requisites: 'ООО "СИБЭЛКОМ-ЛОГИСТИК"',
+          client: 'Телков Вячеслав Алексеевич',
+          total: 20156321.36,
+          rest: 385962.21,
+          date_create: '25.05.2021',
+          date_delivery: '25.05.2021',
+          chronology: '25.05.2021 — отгружено 20%',
+        },
+        {
+          id: 2,
+          order_num: '1596322',
+          requisites: 'ООО "СИБЭЛКОМ-ЛОГИСТИК"',
+          client: 'Телков Вячеслав Алексеевич',
+          total: 20156321.36,
+          rest: 385962.21,
+          date_create: '25.05.2021',
+          date_delivery: '25.05.2021',
+          chronology: '25.05.2021 — счёт выставлен',
+        },
+      ],
+    },
+  ];
+
+  let requisitesList = [
+    {
+      data: [
+        {
+          id: 1,
+          company: 'ООО "СИБЭЛКОМ-ЛОГИСТИК"',
+          inn: '5406617971',
+          account: '40702810504000002378',
+          bank: 'Банк «Левобережный» (ПАО)',
+          bik: '045004850',
+          unallocated: '20 156 698,1235 RUB',
+          available: '20 156 698,1235 RUB',
+          contact: 'Телков Вячеслав Алексеевич',
+        },
+        {
+          id: 2,
+          company: 'ООО "СИБЭЛКОМ-ЛОГИСТИК"',
+          inn: '5406617971',
+          account: '40702810504000002378',
+          bank: 'Банк «Левобережный» (ПАО)',
+          bik: '045004850',
+          unallocated: '20 156 698,1235 RUB',
+          available: '20 156 698,1235 RUB',
+          contact: 'Телков Вячеслав Алексеевич',
+        },
+      ],
+    },
+  ];
 
   const createNotification = (type, title, text) => {
     console.log('createNotification', type, text);
@@ -257,19 +319,31 @@ export default function App() {
 
   useEffect(() => {
     setAsideOpen(openProfile);
-    setAsideContent(openProfile ? <Profile /> : null);
+    setAsideContent(openProfile ? <Profile profile={profile} setProfile={setProfile} /> : null);
   }, [openProfile]);
+
+  useEffect(() => {
+    setAsideOpen(openRequisites);
+    setAsideContent(openRequisites ? <ProfileRequisites requisitesId={openRequisites > 0 ? openRequisites : null} profile={profile} setProfileRequisites={setProfile} /> : null);
+  }, [openRequisites]);
+
+  useEffect(() => {
+    if (!profile.hasOwnProperty('auth')) {
+      setOpenProfile(false);
+    }
+  }, [profile]);
 
   useEffect(() => {
     if (!asideOpen) {
       setOpenProfile(false);
+      setOpenRequisites(0);
     }
   }, [asideOpen]);
 
   return (
     <>
       <div className={`app-wrapper${appDrag ? ' __over' : ''}`}>
-        <Header profile={{}} cartCount={cartCount} openMobMenu={openMobMenu} setOpenMobMenu={setOpenMobMenu} />
+        <Header notificationFunc={createNotification} setProfile={setProfile} history={history} profile={profile} cartCount={cartCount} openMobMenu={openMobMenu} setOpenMobMenu={setOpenMobMenu} />
 
         <main className={`main${centeredForm ? ' __center' : ''}`}>
           <SearchForm setFormBusy={setFormBusy} history={history} setSearchData={setSearchData} setOpenMobMenu={setOpenMobMenu} busy={formBusy} onSubmitForm={onSubmitSearchForm} notificationFunc={createNotification} />
@@ -296,9 +370,16 @@ export default function App() {
                 />
 
                 <Route path="/about" render={routeProps => <FeaturePage updateCart={updateCart} notificationFunc={createNotification} setOrderSent={setOrderSent} totalCart={totalCart} currency={currency} setOpenMobMenu={setOpenMobMenu} {...routeProps} />} />
+
                 <Route path="/delivery" render={routeProps => <DeliveryPage setOpenMobMenu={setOpenMobMenu} {...routeProps} />} />
-                <Route path="/orders" render={routeProps => <OrdersPage setOpenProfile={setOpenProfile} history={history} setTableHeadFixed={setTableHeadFixed} {...routeProps} />} />
+
+                <Route
+                  path="/orders"
+                  render={routeProps => <OrdersPage requisitesList={requisitesList} ordersList={ordersList} currency={currency} setOpenProfile={setOpenProfile} setOpenRequisites={setOpenRequisites} history={history} setTableHeadFixed={setTableHeadFixed} {...routeProps} />}
+                />
+
                 <Route path="/privacy-policy" render={routeProps => <PolicyPage setOpenMobMenu={setOpenMobMenu} {...routeProps} />} />
+
                 <Route
                   path="/search"
                   render={routeProps => (
@@ -322,6 +403,7 @@ export default function App() {
                     />
                   )}
                 />
+
                 <Route
                   path="/order"
                   render={routeProps => (

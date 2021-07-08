@@ -2,8 +2,31 @@
   width: 270px;
   max-width: calc(100vw - 30px);
 
+  .form-control {
+    margin-bottom: 11px;
+  }
+
+  &.__requisites {
+    width: 540px;
+
+    .form-control:not(.__ta) {
+      max-width: 270px;
+    }
+  }
+
   .form-content {
     margin-bottom: 25px;
+  }
+
+  &-logout {
+    padding: 5px 0;
+    display: flex;
+    justify-content: flex-end;
+
+    .form-control {
+      width: 135px;
+      max-width: 100%;
+    }
   }
 
   &-info {

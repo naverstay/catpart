@@ -12,11 +12,18 @@ import { connect } from 'react-redux';
 import { smoothScrollTo } from '../../utils/smoothScrollTo';
 import Ripples from 'react-ripples';
 import CabinetTabs from '../CabinetTabs';
+import Collapsible from 'react-collapsible';
+import SearchRow from '../SearchRow';
+import OrderRow from '../OrderRow';
+import RequisitesRow from '../RequisitesRow';
 
 export function OrdersPage(props) {
-  const { history, list, cart, setTableHeadFixed, setOpenProfile, count, notificationFunc, updateCart } = props;
+  const { requisitesList, ordersList, currency, setTableHeadFixed, setOpenRequisites, setOpenProfile, count, notificationFunc, updateCart } = props;
+
+  const defaultCount = count;
 
   const tableHead = useRef();
+  const requisitesSearchRef = useRef();
 
   const tableHeaderOrders = {
     order_num: 'Заказ №',
@@ -44,13 +51,13 @@ export function OrdersPage(props) {
   const [tableHeader, setTableHeader] = useState(tableHeaderRequisites);
 
   let tHead = (
-    <div className="search-results__row __even __head">
+    <div className="orders-results__row __even __head">
       {Object.keys(tableHeader).map((head, hi) => (
-        <div key={hi} className={`search-results__cell __${head}`}>
+        <div key={hi} className={`orders-results__cell __${head}`}>
           {tableHeader[head]}
         </div>
       ))}
-      <div className="search-results__cell __cart">&nbsp;</div>
+      <div className="orders-results__cell __cart">&nbsp;</div>
     </div>
   );
 
@@ -68,8 +75,6 @@ export function OrdersPage(props) {
     updateTableHeader();
 
     document.body.addEventListener('scroll', handleScroll);
-
-    console.log('search mount');
 
     if (window.innerWidth < 1200) {
       setTimeout(() => {
@@ -91,13 +96,121 @@ export function OrdersPage(props) {
     <div className="orders-results">
       <CabinetTabs setOpenProfile={setOpenProfile} activeIndex={activeTab} setActiveIndex={setActiveTab} />
 
-      <div className="orders-results__table" />
+      {activeTab === 1 ? (
+        <div className="form-filter">
+          <div className={`form-filter__controls`}>
+            <div className="form-filter__controls_left">
+              <div className="form-filter__control">
+                <input
+                  ref={requisitesSearchRef}
+                  onChange={e => {
+                    console.log('requisitesSearchRef', e.target.value);
+                  }}
+                  // value={itemCount}
+                  placeholder={'Быстрый поиск'}
+                  type="text"
+                  className="input"
+                />
+              </div>
+            </div>
+            <div className="form-filter__controls_right">
+              <div className="form-filter__control">
+                <Ripples
+                  onClick={() => {
+                    setOpenRequisites(-1);
+                  }}
+                  className="btn __blue"
+                  during={1000}
+                >
+                  <span className="btn-inner">Добавить реквизиты</span>
+                </Ripples>
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="form-filter">
+          <div className={`form-filter__controls`}>
+            <div className="form-filter__controls_left">
+              <div className="form-filter__control">
+                <input
+                  ref={requisitesSearchRef}
+                  onChange={e => {
+                    console.log('requisitesSearchRef', e.target.value);
+                  }}
+                  // value={itemCount}
+                  placeholder={'Быстрый поиск'}
+                  type="text"
+                  className="input"
+                />
+              </div>
+            </div>
+            <div className="form-filter__controls_right">
+              <div className="form-filter__control">
+                <Ripples
+                  onClick={() => {
+                    setOpenRequisites(-1);
+                  }}
+                  className="btn __blue"
+                  during={1000}
+                >
+                  <span className="btn-inner">Добавить реквизиты</span>
+                </Ripples>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div className="orders-results__table">
+        <div ref={tableHead} className="orders-results__head-wrapper">
+          {tHead}
+        </div>
+
+        {activeTab === 1
+          ? ordersList && ordersList.length
+            ? ordersList[0].hasOwnProperty('data')
+              ? ordersList[0].data.map((row, ri) => (
+                  <OrderRow
+                    key={ri}
+                    rowClick={e => {
+                      setOpenRequisites(e);
+                    }}
+                    updateCart={updateCart}
+                    tableHeader={tableHeaderOrders}
+                    defaultCount={defaultCount}
+                    currency={currency}
+                    notificationFunc={notificationFunc}
+                    row={row}
+                    rowIndex={ri}
+                  />
+                ))
+              : null
+            : null
+          : requisitesList && requisitesList.length
+          ? requisitesList[0].hasOwnProperty('data')
+            ? requisitesList[0].data.map((row, ri) => (
+                <RequisitesRow
+                  key={ri}
+                  rowClick={e => {
+                    setOpenRequisites(e);
+                  }}
+                  updateCart={updateCart}
+                  tableHeader={tableHeaderOrders}
+                  defaultCount={defaultCount}
+                  currency={currency}
+                  notificationFunc={notificationFunc}
+                  row={row}
+                  rowIndex={ri}
+                />
+              ))
+            : null
+          : null}
+      </div>
     </div>
   );
 }
 
-OrdersPage.propTypes = {
-  list: PropTypes.array,
-};
+OrdersPage.propTypes = {};
 
 export default connect(null)(OrdersPage);

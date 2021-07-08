@@ -321,7 +321,7 @@ export function OrderForm({ dndFile, delivery, updateCart, history, notification
 
         {deliveryOptions.length ? <FormSelect onChange={handleChange} options={deliveryOptions} placeholder="Доставка" name="order-delivery" error={errors['order-delivery']} preSelectedValue={preSelectedDelivery} className="__lg" inputRef={deliveryInput} /> : null}
 
-        <FormInput textarea placeholder="Комментарий" name="order-delivery" error={null} className="__lg" inputRef={commentInput} />
+        <FormInput textarea placeholder="Комментарий" name="order-comment" error={null} className="__lg" inputRef={commentInput} />
 
         <div className="form-control">
           <Ripples className={`__w-100p btn __blue __lg${!validForm ? ' __disabled' : ''}`} during={1000}>

@@ -248,6 +248,10 @@
   &-filter {
     color: $gray_link;
 
+    + .form-filter {
+      padding: 10px 0;
+    }
+
     &__stat {
       letter-spacing: -.03em;
       font-size: 12px;

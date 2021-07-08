@@ -48,17 +48,6 @@ function checkStatus(response) {
  */
 
 export default function apiGET(url, options, cb) {
-  //if (typeof cancel === 'function' && url.indexOf('search') > -1) {
-  //  cancel();
-  //  cancel = null;
-  //
-  //  if (typeof cb === 'function') {
-  //    cb([]);
-  //  }
-  //
-  //  console.log('canceled', cancel);
-  //}
-
   return axios(API + url, {
     headers: {
       'Content-Type': 'application/json',

@@ -3,7 +3,7 @@
   &-results {
     padding: 20px 0 10px;
     font-size: 12px;
-    overflow: hidden;
+    //overflow: hidden;
 
     &__count {
       width: 82px;
@@ -151,7 +151,7 @@
         &.__requisites {
           grid-row: 1;
 
-          .search-results__label:not(.__show) {
+          .orders-results__label:not(.__show) {
             display: none;
           }
         }
@@ -194,7 +194,7 @@
           grid-row: 1;
           grid-column: 2;
 
-          .search-results__label {
+          .orders-results__label {
             display: block;
             padding-right: 0;
             padding-bottom: 4px;
@@ -205,7 +205,7 @@
           grid-row: 2;
           grid-column: 2;
 
-          .search-results__label {
+          .orders-results__label {
             display: block;
             padding-right: 0;
             padding-bottom: 4px;
@@ -274,7 +274,7 @@
       @include respond-to-min($wide) {
 
         &.__order_num {
-          width: 23.5%;
+          width: 13.5%;
         }
 
         &.__requisites {

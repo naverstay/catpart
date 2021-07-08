@@ -51,17 +51,6 @@ function checkStatus(response) {
  */
 
 export default function apiPOST(url, data, options, cb) {
-  //if (typeof cancel === 'function' && url.indexOf('search') > -1) {
-  //  cancel();
-  //  cancel = null;
-  //
-  //  if (typeof cb === 'function') {
-  //    cb([]);
-  //  }
-  //
-  //  console.log('canceled', cancel);
-  //}
-
   return axios
     .post(API + url, data, {
       headers: {

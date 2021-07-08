@@ -3,7 +3,7 @@ import Ripples from 'react-ripples';
 import FormInput from '../../components/FormInput';
 
 const Profile = props => {
-  let { activeIndex } = props;
+  let { activeIndex, setProfile } = props;
 
   const authRef = React.createRef();
   const resetRef = React.createRef();
@@ -20,7 +20,6 @@ const Profile = props => {
     'auth-password': null,
   });
 
-  const [profile, setProfile] = useState({ auth: 1 });
   const [validForm, setValidForm] = useState(false);
   const [justRedraw, setJustRedraw] = useState(0);
 
@@ -132,6 +131,22 @@ const Profile = props => {
           <li>+7 923 456-54-54</li>
           <li>skjghlwuieg@sibelcom54.com</li>
         </ul>
+      </div>
+
+      <div className="profile-logout">
+        <div className="form-control">
+          <Ripples
+            onClick={() => {
+              setProfile({});
+            }}
+            className={`__w-100p btn __blue __lg`}
+            during={1000}
+          >
+            <button name="auth-submit" className="btn-inner">
+              <span>Выйти</span>
+            </button>
+          </Ripples>
+        </div>
       </div>
     </div>
   );

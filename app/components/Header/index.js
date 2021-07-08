@@ -4,8 +4,9 @@ import { Link } from 'react-router-dom';
 import Ripples from 'react-ripples';
 import FormInput from '../FormInput';
 import { validateEmail } from '../../utils/validateEmail';
+import apiPOST from '../../utils/upload';
 
-function Header({ openMobMenu, cartCount, setOpenMobMenu }) {
+function Header({ history, notificationFunc, openMobMenu, cartCount, profile, setProfile, setOpenMobMenu }) {
   const headerRef = useDetectClickOutside({
     onTriggered: () => {
       setOpenMobMenu(false);
@@ -34,7 +35,6 @@ function Header({ openMobMenu, cartCount, setOpenMobMenu }) {
   const loginInput = React.createRef();
   const passwordInput = React.createRef();
 
-  const [profile, setProfile] = useState({ auth: 1 });
   const [validForm, setValidForm] = useState(false);
   const [openResetPassword, setOpenResetPassword] = useState(false);
   const [openAuthPopup, setOpenAuthPopup] = useState(false);
@@ -94,9 +94,26 @@ function Header({ openMobMenu, cartCount, setOpenMobMenu }) {
 
     console.log('authSubmit');
 
-    setOpenAuthPopup(false);
+    const requestURL = '/auth/login';
 
-    setProfile({ auth: 1 });
+    const formData = new FormData();
+    const options = {};
+
+    formData.append('email', loginInput.current.value);
+    formData.append('password', passwordInput.current.value);
+
+    apiPOST(requestURL, formData, options, data => {
+      console.log('data', data);
+
+      if (data.error) {
+        notificationFunc('success', `Авторизация: `, 'ошибка обработки');
+      } else {
+        setProfile({ auth: 1 });
+        history.push('/orders');
+      }
+    });
+
+    setOpenAuthPopup(false);
 
     //const url = '/set/deal';
     //
@@ -237,7 +254,7 @@ function Header({ openMobMenu, cartCount, setOpenMobMenu }) {
                       name="auth-login"
                       //
                       error={errors['auth-login']}
-                      defaultValue={'test@test.ru'}
+                      //defaultValue={'test@test.ru'}
                       className="__lg"
                       inputRef={loginInput}
                     />
@@ -247,7 +264,7 @@ function Header({ openMobMenu, cartCount, setOpenMobMenu }) {
                       name="auth-password"
                       //
                       error={errors['auth-password']}
-                      defaultValue={'12345678'}
+                      //defaultValue={'12345678'}
                       className="__lg"
                       inputRef={passwordInput}
                     />

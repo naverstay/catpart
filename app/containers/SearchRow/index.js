@@ -17,10 +17,6 @@ const SearchRow = props => {
     defaultCount = row.moq;
   }
 
-  if (!defaultCount || defaultCount > row.quantity) {
-    defaultCount = row.quantity;
-  }
-
   const inputRef = createRef();
   const [disableAddBtn, setDisableAddBtn] = useState(false);
   const [itemCount, setItemCount] = useState(defaultCount || 1);

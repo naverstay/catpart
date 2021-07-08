@@ -1,0 +1,244 @@
+import React, { useEffect, useState } from 'react';
+import Ripples from 'react-ripples';
+import FormInput from '../../components/FormInput';
+import { setInputFilter } from '../../utils/inputFilter';
+import { validateEmail } from '../../utils/validateEmail';
+
+const ProfileRequisites = props => {
+  let { requisitesId, setProfileRequisites } = props;
+
+  const authRef = React.createRef();
+  const resetRef = React.createRef();
+  const phoneInput = React.createRef();
+  const commentInput = React.createRef();
+  const contactInput = React.createRef();
+  const emailInput = React.createRef();
+  const innInput = React.createRef();
+  const accountInput = React.createRef();
+  const bikInput = React.createRef();
+  const addressInput = React.createRef();
+
+  const [fields, setFields] = useState({
+    'requisites-inn': '',
+    'requisites-account': '',
+    'requisites-bik': '',
+    'requisites-address': '',
+    'requisites-contact': '',
+    'requisites-phone': '',
+    'requisites-email': '',
+  });
+  const [errors, setErrors] = useState({
+    'requisites-inn': null,
+    'requisites-account': null,
+    'requisites-bik': null,
+    'requisites-address': null,
+    'requisites-contact': null,
+    'requisites-phone': null,
+    'requisites-email': null,
+  });
+
+  const [validForm, setValidForm] = useState(false);
+  const [justRedraw, setJustRedraw] = useState(0);
+
+  const changeSubmit = e => {
+    e.preventDefault();
+
+    console.log('changeSubmit');
+
+    //const url = '/set/deal';
+    //
+    //let store = localStorage.getItem('catpart');
+    //
+    //if (store) {
+    //  store = JSON.parse(store);
+    //} else {
+    //  store = {};
+    //}
+    //
+    //if (!store.hasOwnProperty('order')) {
+    //  store.order = [];
+    //  localStorage.setItem('catpart', JSON.stringify(store));
+    //}
+  };
+
+  const handleChange = (field, e) => {
+    console.log('handleChange', field, e);
+    fields[field] = e.target.value;
+    setFields(fields);
+
+    switch (field) {
+      case 'requisites-bik':
+      case 'requisites-inn':
+      case 'requisites-address':
+      case 'requisites-contact':
+        errors[field] = e.target.value.length ? '' : 'Не может быть пустым';
+        break;
+      case 'requisites-account':
+        errors[field] = e.target.value.length >= 8 ? '' : 'Минимум 8 символов';
+        break;
+      case 'requisites-phone':
+        errors[field] = e.target.value.length >= 8 ? '' : 'Минимум 8 символов';
+        break;
+      case 'requisites-email':
+        errors[field] = e.target.value.length && validateEmail(e.target.value) ? '' : 'Проверьте формат e-mail';
+        break;
+    }
+
+    //localStorage.setItem('catpart-user', JSON.stringify(fields));
+
+    setErrors(errors);
+
+    setValidForm(!Object.values(errors).filter(er => er === null || er.length).length);
+
+    setJustRedraw(justRedraw + 1);
+  };
+
+  useEffect(() => {
+    setInputFilter(phoneInput.current, function(value) {
+      return /^\+?\d*$/.test(value); // Allow digits and '+' on beginning only, using a RegExp
+    });
+
+    return () => {
+      phoneInput.current = false;
+    };
+  }, []);
+
+  return (
+    <div className="profile __requisites">
+      <div className="aside-title">{requisitesId ? 'Редактируем реквизиты' : 'Добавляем новые реквизиты'}</div>
+
+      {requisitesId ? (
+        <div className="profile-info">
+          <ul>
+            <li>
+              <span>Компания:&nbsp;</span> <b>ООО "СИБЭЛКОМ-ЛОГИСТИК"</b>
+            </li>
+            <li>
+              <span>ИНН:&nbsp;</span> <b>5404462899</b>
+            </li>
+            <li>
+              <span>Директор:&nbsp;</span> <b>Поспих Артур Вячеславович на основании Устава</b>
+            </li>
+            <li>
+              <span>КПП:&nbsp;</span> <b>541001001</b>
+            </li>
+            <li>
+              <span>ОГРН:&nbsp;</span> <b>1125476094567</b>
+            </li>
+            <li>
+              <span>р/с:&nbsp;</span> <b>40702810504000002378</b>
+            </li>
+            <li>
+              <span>Банк:&nbsp;</span> <b>Банк«Левобережный» (ПАО)</b>
+            </li>
+            <li>
+              <span>к/с:&nbsp;</span> <b>30101810100000000850</b>
+            </li>
+            <li>
+              <span>БИК:&nbsp;</span> <b>045004850</b>
+            </li>
+            <li>
+              <span>Юридический адрес:&nbsp;</span> <b>630110, г. Новосибирск, ул. Менделеева 5, 30</b>
+            </li>
+            <li>
+              <span>Фактический адрес:&nbsp;</span> <b>630005, г. Новосибирск, ул. Достоевского 58, 605</b>
+            </li>
+            <li>
+              <span>Контактное лицо:&nbsp;</span> <b>Телков Вячеслав Алексеевич</b>
+            </li>
+            <li>
+              <span>Телефон:&nbsp;</span> <b>+7 (383) 378-77-26</b>
+            </li>
+            <li>
+              <span>Email:&nbsp;</span> <b>info@sibelcom54.com</b>
+            </li>
+          </ul>
+        </div>
+      ) : null}
+
+      <form ref={authRef} className="form-content" onSubmit={changeSubmit}>
+        <FormInput
+          onChange={handleChange.bind(this, 'requisites-inn')}
+          placeholder="ИНН"
+          name="requisites-inn"
+          //
+          error={errors['requisites-inn']}
+          className="__lg"
+          inputRef={innInput}
+        />
+
+        <FormInput
+          onChange={handleChange.bind(this, 'requisites-account')}
+          placeholder="Расчетный счет"
+          name="requisites-account"
+          //
+          error={errors['requisites-account']}
+          className="__lg"
+          inputRef={accountInput}
+        />
+
+        <FormInput
+          onChange={handleChange.bind(this, 'requisites-bik')}
+          placeholder="Расчетный счет"
+          name="requisites-bik"
+          //
+          error={errors['requisites-bik']}
+          className="__lg"
+          inputRef={bikInput}
+        />
+
+        <FormInput
+          onChange={handleChange.bind(this, 'requisites-address')}
+          placeholder="Фактический адрес"
+          name="requisites-address"
+          //
+          error={errors['requisites-address']}
+          className="__lg"
+          inputRef={addressInput}
+        />
+
+        <FormInput
+          onChange={handleChange.bind(this, 'requisites-contact')}
+          placeholder="Контактное лицо"
+          name="requisites-contact"
+          //
+          error={errors['requisites-contact']}
+          className="__lg"
+          inputRef={contactInput}
+        />
+
+        <FormInput
+          onChange={handleChange.bind(this, 'requisites-phone')}
+          placeholder="Телефон"
+          name="requisites-phone"
+          //
+          error={errors['requisites-phone']}
+          className="__lg"
+          inputRef={phoneInput}
+        />
+
+        <FormInput
+          onChange={handleChange.bind(this, 'requisites-email')}
+          placeholder="Ваш email"
+          name="requisites-email"
+          //
+          error={errors['requisites-email']}
+          className="__lg"
+          inputRef={emailInput}
+        />
+
+        <FormInput textarea placeholder="Заметки" name="requisites-delivery" error={null} className="__lg" inputRef={commentInput} />
+
+        <div className="form-control">
+          <Ripples className={`__w-100p btn __blue __lg${!validForm ? ' __disabled' : ''}`} during={1000}>
+            <button name="requisites-submit" className="btn-inner">
+              <span>Сохранить</span>
+            </button>
+          </Ripples>
+        </div>
+      </form>
+    </div>
+  );
+};
+
+export default ProfileRequisites;
