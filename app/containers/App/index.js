@@ -25,6 +25,7 @@ import { OrdersPage } from '../Orders';
 import AsideContainer from '../AsideContainer';
 import Profile from '../Profile';
 import ProfileRequisites from '../ProfileRequisites';
+import { validateJSON } from '../../utils/validateJSON';
 
 export default function App() {
   const history = useHistory();
@@ -106,6 +107,17 @@ export default function App() {
         },
         {
           id: 2,
+          company: 'ООО "СИБЭЛКОМ-ЛОГИСТИК"',
+          inn: '5406617971',
+          account: '40702810504000002378',
+          bank: 'Банк «Левобережный» (ПАО)',
+          bik: '045004850',
+          unallocated: '20 156 698,1235 RUB',
+          available: '20 156 698,1235 RUB',
+          contact: 'Телков Вячеслав Алексеевич',
+        },
+        {
+          id: 3,
           company: 'ООО "СИБЭЛКОМ-ЛОГИСТИК"',
           inn: '5406617971',
           account: '40702810504000002378',
@@ -264,6 +276,16 @@ export default function App() {
 
   useEffect(() => {
     setCenteredForm(window.location.pathname === '/');
+
+    let profileLS = localStorage.getItem('catpart-profile');
+
+    if (profileLS) {
+      if (validateJSON(profileLS)) {
+        setProfile({ auth: JSON.parse(profileLS) });
+      } else {
+        localStorage.removeItem('catpart-profile');
+      }
+    }
 
     const dropContainer = document.getElementById('app');
 

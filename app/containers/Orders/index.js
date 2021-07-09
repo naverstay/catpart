@@ -16,6 +16,8 @@ import Collapsible from 'react-collapsible';
 import SearchRow from '../SearchRow';
 import OrderRow from '../OrderRow';
 import RequisitesRow from '../RequisitesRow';
+import FormSelect from '../../components/FormSelect';
+import { validateEmail } from '../../utils/validateEmail';
 
 export function OrdersPage(props) {
   const { requisitesList, ordersList, currency, setTableHeadFixed, setOpenRequisites, setOpenProfile, count, notificationFunc, updateCart } = props;
@@ -49,6 +51,7 @@ export function OrdersPage(props) {
 
   const [activeTab, setActiveTab] = useState(1);
   const [tableHeader, setTableHeader] = useState(tableHeaderRequisites);
+  const stateInput = React.createRef();
 
   let tHead = (
     <div className="orders-results__row __even __head">
@@ -87,16 +90,34 @@ export function OrdersPage(props) {
     };
   }, []);
 
+  const [preSelectedState, setPreSelectedDelivery] = useState(-1);
+
+  const stateOptions = [
+    { value: 'Сделка', label: 'Сделка' },
+    { value: 'Заявка', label: 'Заявка' },
+    { value: 'Запрос отправлен', label: 'Запрос отправлен' },
+    { value: 'Есть условия поставки частично', label: 'Есть условия поставки частично' },
+    { value: 'Пришел ответ, надо посчитать', label: 'Пришел ответ, надо посчитать' },
+    { value: 'Есть условия поставки', label: 'Есть условия поставки' },
+    { value: 'Коммерческое предложение', label: 'Коммерческое предложение' },
+    { value: 'Счет выставлен', label: 'Счет выставлен' },
+    { value: 'Согласование заказа', label: 'Согласование заказа' },
+  ];
+
   useEffect(() => {
-    setTableHeader(activeTab === 0 ? tableHeaderRequisites : tableHeaderOrders);
+    setTableHeader(activeTab === 0 ? tableHeaderOrders : tableHeaderRequisites);
     updateTableHeader();
   }, [activeTab]);
+
+  const handleChange = (field, e) => {
+    console.log('handleChange', field, e);
+  };
 
   return (
     <div className="orders-results">
       <CabinetTabs setOpenProfile={setOpenProfile} activeIndex={activeTab} setActiveIndex={setActiveTab} />
 
-      {activeTab === 1 ? (
+      {activeTab === 0 ? (
         <div className="form-filter">
           <div className={`form-filter__controls`}>
             <div className="form-filter__controls_left">
@@ -144,19 +165,14 @@ export function OrdersPage(props) {
                   className="input"
                 />
               </div>
-            </div>
-            <div className="form-filter__controls_right">
-              <div className="form-filter__control">
-                <Ripples
-                  onClick={() => {
-                    setOpenRequisites(-1);
-                  }}
-                  className="btn __blue"
-                  during={1000}
-                >
-                  <span className="btn-inner">Добавить реквизиты</span>
-                </Ripples>
-              </div>
+
+              <input
+                //
+                className="hide"
+                ref={stateInput || null}
+              />
+
+              {stateOptions.length ? <FormSelect onChange={handleChange} options={stateOptions} placeholder="Статус" name="order-state" error={null} preSelectedValue={preSelectedState} inputRef={stateInput} /> : null}
             </div>
           </div>
         </div>
@@ -167,7 +183,7 @@ export function OrdersPage(props) {
           {tHead}
         </div>
 
-        {activeTab === 1
+        {activeTab === 0
           ? ordersList && ordersList.length
             ? ordersList[0].hasOwnProperty('data')
               ? ordersList[0].data.map((row, ri) => (
@@ -196,7 +212,7 @@ export function OrdersPage(props) {
                     setOpenRequisites(e);
                   }}
                   updateCart={updateCart}
-                  tableHeader={tableHeaderOrders}
+                  tableHeader={tableHeaderRequisites}
                   defaultCount={defaultCount}
                   currency={currency}
                   notificationFunc={notificationFunc}

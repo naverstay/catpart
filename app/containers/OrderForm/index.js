@@ -190,13 +190,7 @@ export function OrderForm({ dndFile, delivery, updateCart, history, notification
       return /^\+?\d*$/.test(value); // Allow digits and '+' on beginning only, using a RegExp
     });
 
-    const deliveryList = [
-      {
-        value: 'Самовывоз со склада в Новосибирске',
-        label: 'Самовывоз со склада в Новосибирске',
-      },
-      { value: 'Доставка курьерской службой', label: 'Доставка курьерской службой' },
-    ];
+    const deliveryList = [{ value: 'Самовывоз со склада в Новосибирске', label: 'Самовывоз со склада в Новосибирске' }, { value: 'Доставка курьерской службой', label: 'Доставка курьерской службой' }];
 
     const user = localStorage.getItem('catpart-user');
 

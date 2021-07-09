@@ -52,6 +52,7 @@ export default function apiGET(url, options, cb) {
     headers: {
       'Content-Type': 'application/json',
       Accept: 'application/json',
+      Authorization: `Bearer ${localStorage.getItem('access_token') || ''}`,
     },
     data: {},
     params: options,

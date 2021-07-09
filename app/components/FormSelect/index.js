@@ -20,16 +20,6 @@ const FormSelect = ({ id, preSelectedValue, disabled, onChange, onBlur, inputRef
   const customStyles = {
     option: (provided, state) => ({
       ...provided,
-      display: 'block',
-      width: '100%',
-      borderRadius: '4px',
-      height: '50px',
-      padding: '15px 20px',
-      lineHeight: '18px',
-      fontSize: '12px',
-      background: '#fff',
-      border: 'none',
-      transition: 'border .3s, box-shadow .3s',
     }),
     control: () => ({
       // none of react-select's styles are passed to <Control />

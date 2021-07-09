@@ -371,57 +371,75 @@
   }
 }
 
-.custom-select .select {
+.custom-select {
+  .select {
 
-  &__indicators {
-    display: none !important;
-  }
-
-  &__control {
-    @extend .input;
-  }
-
-  &.__lg .select__control {
-    @extend .input.__lg;
-  }
-
-  &.__success .select__control {
-    @extend .input.__success;
-  }
-
-  &.__error .select__control {
-    @extend .input.__error;
-  }
-
-  &__menu {
-
-  }
-
-  &__menu-list {
-    padding: 0;
-  }
-
-  &__option {
-    cursor: pointer;
-    transition: background .3s;
-
-    &:hover {
-      background: $main_gray_hover;
+    &__indicators {
+      display: none !important;
     }
 
-    &.select__option--is-selected {
-      cursor: default;
-      color: $main_gray;
-      background: $main_gray_light;
+    &__control {
+      @extend .input;
+    }
+
+    &.__lg .select__control {
+      @extend .input.__lg;
+    }
+
+    &.__success .select__control {
+      @extend .input.__success;
+    }
+
+    &.__error .select__control {
+      @extend .input.__error;
+    }
+
+    &__menu {
+
+    }
+
+    &__menu-list {
+      padding: 0;
+    }
+
+    &__option {
+      cursor: pointer;
+      //transition: background .3s;
+      display: block;
+      width: 100%;
+      border-radius: 4px;
+      height: 30px;
+      padding: 5px 20px;
+      line-height: 18px;
+      font-size: 12px;
+      background: #fff;
+      border: none;
+      transition: border .3s, box-shadow .3s;
+
+
+      &:hover {
+        background: $main_gray_hover;
+      }
+
+      &.select__option--is-selected {
+        cursor: default;
+        color: $main_gray;
+        background: $main_gray_light;
+      }
+    }
+
+    &__placeholder {
+      margin: 0;
+      color: $gray_placeholder;
+    }
+
+    &__value-container {
+      padding: 0;
     }
   }
 
-  &__placeholder {
-    margin: 0;
-    color: $gray_placeholder;
-  }
-
-  &__value-container {
-    padding: 0;
+  .__lg.select .select__option {
+    height: 50px;
+    padding: 15px 20px;
   }
 }

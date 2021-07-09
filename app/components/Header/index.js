@@ -5,6 +5,7 @@ import Ripples from 'react-ripples';
 import FormInput from '../FormInput';
 import { validateEmail } from '../../utils/validateEmail';
 import apiPOST from '../../utils/upload';
+import apiGET from '../../utils/search';
 
 function Header({ history, notificationFunc, openMobMenu, cartCount, profile, setProfile, setOpenMobMenu }) {
   const headerRef = useDetectClickOutside({
@@ -47,6 +48,16 @@ function Header({ history, notificationFunc, openMobMenu, cartCount, profile, se
       setOpenAuthPopup(false);
     },
   });
+
+  const getUserData = () => {
+    const requestURL = '/auth/me';
+
+    apiGET(requestURL, {}, data => {
+      localStorage.setItem('catpart-profile', JSON.stringify(data));
+      setProfile({ auth: data });
+      history.push('/orders');
+    });
+  };
 
   const handleChange = (field, e) => {
     console.log('handleChange', field, e);
@@ -108,8 +119,8 @@ function Header({ history, notificationFunc, openMobMenu, cartCount, profile, se
       if (data.error) {
         notificationFunc('success', `Авторизация: `, 'ошибка обработки');
       } else {
-        setProfile({ auth: 1 });
-        history.push('/orders');
+        localStorage.setItem('access_token', data.access_token);
+        getUserData();
       }
     });
 
@@ -222,7 +233,7 @@ function Header({ history, notificationFunc, openMobMenu, cartCount, profile, se
         {profile.hasOwnProperty('auth') ? (
           <Ripples during={1000} className={'btn __blue'}>
             <Link to={'/orders'} className="btn-inner">
-              <span className={'__dotted'}>Телков Вячеслав Алексеевич</span>
+              <span className={'__dotted'}>{profile.auth.contact_name}</span>
             </Link>
           </Ripples>
         ) : (
