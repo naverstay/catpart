@@ -9,10 +9,10 @@ import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 
-import { smoothScrollTo } from '../../utils/smoothScrollTo';
 import Ripples from 'react-ripples';
-import CabinetTabs from '../CabinetTabs';
 import Collapsible from 'react-collapsible';
+import { smoothScrollTo } from '../../utils/smoothScrollTo';
+import CabinetTabs from '../CabinetTabs';
 import SearchRow from '../SearchRow';
 import OrderRow from '../OrderRow';
 import RequisitesRow from '../RequisitesRow';
@@ -42,27 +42,27 @@ export function OrdersPage(props) {
     updated_at: 'Дата\nпоставки',
     chronology: '  ',
     //
-    //amount: 7377,
-    //contact_name: 'Aleen Harvey',
-    //created_at: '2021-07-08T15:40:06.000000Z',
-    //delivery_type: 'test',
-    //id: 28,
-    //in_stock: 60,
-    //payed: 9903,
-    //unloaded: 19,
-    //updated_at: '2021-07-08T15:40:06.000000Z',
+    // amount: 7377,
+    // contact_name: 'Aleen Harvey',
+    // created_at: '2021-07-08T15:40:06.000000Z',
+    // delivery_type: 'test',
+    // id: 28,
+    // in_stock: 60,
+    // payed: 9903,
+    // unloaded: 19,
+    // updated_at: '2021-07-08T15:40:06.000000Z',
   };
 
   const tableHeaderRequisites = {
-    //address: '39846 Demetris Fords',
-    //bank_name: 'Volkman-Schmitt',
-    //contact_email: 'crist.baby@example.net',
-    //contact_phone: '79999999999',
-    //created_at: '2021-07-08T15:40:06.000000Z',
-    //id: 28,
-    //notes: 'test',
-    //profile_id: 10,
-    //updated_at: '2021-07-08T15:40:06.000000Z',
+    // address: '39846 Demetris Fords',
+    // bank_name: 'Volkman-Schmitt',
+    // contact_email: 'crist.baby@example.net',
+    // contact_phone: '79999999999',
+    // created_at: '2021-07-08T15:40:06.000000Z',
+    // id: 28,
+    // notes: 'test',
+    // profile_id: 10,
+    // updated_at: '2021-07-08T15:40:06.000000Z',
     //
     company_name: 'Компания',
     inn: 'ИНН',
@@ -75,23 +75,31 @@ export function OrdersPage(props) {
   };
 
   const [preSelectedState, setPreSelectedDelivery] = useState(-1);
-  //const [activeTab, setActiveTab] = useState(1);
-  const [tableHeader, setTableHeader] = useState(activeTab === 0 ? tableHeaderOrders : tableHeaderRequisites);
   const stateInput = React.createRef();
 
-  let tHead = (
+  const tHeadOrders = (
     <div className="orders-results__row __even __head">
-      {Object.keys(tableHeader).map((head, hi) => (
+      {Object.keys(tableHeaderOrders).map((head, hi) => (
         <div key={hi} className={`orders-results__cell __${head}`}>
-          {tableHeader[head]}
+          {tableHeaderOrders[head]}
         </div>
       ))}
-      <div className="orders-results__cell __cart">&nbsp;</div>
+    </div>
+  );
+
+  const tHeadRequisites = (
+    <div className="requisites-results__row __even __head">
+      {Object.keys(tableHeaderRequisites).map((head, hi) => (
+        <div key={hi} className={`requisites-results__cell __${head}`}>
+          {tableHeaderRequisites[head]}
+        </div>
+      ))}
+      <div className="requisites-results__cell __rm">&nbsp;</div>
     </div>
   );
 
   const updateTableHeader = () => {
-    setTableHeadFixed(<div className="search-results__table __sticky">{tHead}</div>);
+    setTableHeadFixed(<div className="search-results__table __sticky">{activeTab === 0 ? tHeadOrders : tHeadRequisites}</div>);
   };
 
   const handleScroll = event => {
@@ -131,19 +139,14 @@ export function OrdersPage(props) {
   const getData = () => {
     if (activeTab === 0) {
       getOrders();
-      setTableHeader(tableHeaderOrders);
     } else {
       getRequisites();
-      setTableHeader(tableHeaderRequisites);
     }
   };
 
   useEffect(() => {
-    updateTableHeader();
-  }, [tableHeader]);
-
-  useEffect(() => {
     getData();
+    updateTableHeader();
   }, [activeTab]);
 
   useEffect(() => {
@@ -176,13 +179,6 @@ export function OrdersPage(props) {
     { value: 'Согласование заказа', label: 'Согласование заказа' },
   ];
 
-  //useEffect(() => {
-  //  console.log('activeTab', activeTab);
-  //  setTableHeader(activeTab === 0 ? tableHeaderOrders : tableHeaderRequisites);
-  //
-  //  updateTableHeader();
-  //}, [activeTab]);
-
   const handleChange = (field, e) => {
     console.log('handleChange', field, e);
   };
@@ -194,7 +190,7 @@ export function OrdersPage(props) {
       {activeTab === 0 ? (
         <>
           <div className="form-filter">
-            <div className={`form-filter__controls`}>
+            <div className="form-filter__controls">
               <div className="form-filter__controls_left">
                 <div className="form-filter__control">
                   <input
@@ -203,7 +199,7 @@ export function OrdersPage(props) {
                       console.log('requisitesSearchRef', e.target.value);
                     }}
                     // value={itemCount}
-                    placeholder={'Быстрый поиск'}
+                    placeholder="Быстрый поиск"
                     type="text"
                     className="input"
                   />
@@ -221,14 +217,13 @@ export function OrdersPage(props) {
           </div>
 
           <div className="orders-results__table">
-            {requisitesList && requisitesList.length ? (
-              <div ref={tableHead} className="orders-results__head-wrapper">
-                {tHead}
-              </div>
-            ) : null}
+            {ordersList && ordersList.length ? (
+              <>
+                <div ref={tableHead} className="orders-results__head-wrapper">
+                  {tHeadOrders}
+                </div>
 
-            {ordersList && ordersList.length
-              ? ordersList.map((row, ri) => (
+                {ordersList.map((row, ri) => (
                   <OrderRow
                     key={ri}
                     rowClick={e => {
@@ -242,14 +237,15 @@ export function OrdersPage(props) {
                     row={row}
                     rowIndex={ri}
                   />
-                ))
-              : null}
+                ))}
+              </>
+            ) : null}
           </div>
         </>
       ) : (
         <>
           <div className="form-filter">
-            <div className={`form-filter__controls`}>
+            <div className="form-filter__controls">
               <div className="form-filter__controls_left">
                 <div className="form-filter__control">
                   <input
@@ -258,7 +254,7 @@ export function OrdersPage(props) {
                       console.log('requisitesSearchRef', e.target.value);
                     }}
                     // value={itemCount}
-                    placeholder={'Быстрый поиск'}
+                    placeholder="Быстрый поиск"
                     type="text"
                     className="input"
                   />
@@ -280,15 +276,14 @@ export function OrdersPage(props) {
             </div>
           </div>
 
-          <div className="orders-results__table">
+          <div className="requisites-results__table">
             {requisitesList && requisitesList.length ? (
-              <div ref={tableHead} className="orders-results__head-wrapper">
-                {tHead}
-              </div>
-            ) : null}
+              <>
+                <div ref={tableHead} className="requisites-results__head-wrapper">
+                  {tHeadRequisites}
+                </div>
 
-            {requisitesList && requisitesList.length
-              ? requisitesList.map((row, ri) => (
+                {requisitesList.map((row, ri) => (
                   <RequisitesRow
                     key={ri}
                     rowClick={e => {
@@ -302,8 +297,9 @@ export function OrdersPage(props) {
                     row={row}
                     rowIndex={ri}
                   />
-                ))
-              : null}
+                ))}
+              </>
+            ) : null}
           </div>
         </>
       )}

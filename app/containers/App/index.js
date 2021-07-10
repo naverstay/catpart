@@ -58,21 +58,17 @@ export default function App() {
   const [openDetails, setOpenDetails] = useState(0);
   const [asideOpen, setAsideOpen] = useState(false);
   const [asideContent, setAsideContent] = useState(null);
-  const [activeTab, setActiveTab] = useState(1);
+
+  const updateLocationParams = loc => {
+    setCenteredForm(loc.pathname === '/');
+  };
 
   history.listen(function(loc) {
-    setCenteredForm(loc.pathname === '/');
-
-    if (loc.pathname === '/orders') {
-      setActiveTab(0);
-    } else if (loc.pathname === '/bankinformation') {
-      setActiveTab(1);
-    }
-
+    updateLocationParams(loc);
     setOrderSent(false);
   });
 
-  let ordersList = [
+  const ordersList = [
     {
       data: [
         {
@@ -101,7 +97,7 @@ export default function App() {
     },
   ];
 
-  let requisitesList = [
+  const requisitesList = [
     {
       data: [
         {
@@ -300,9 +296,9 @@ export default function App() {
   };
 
   useEffect(() => {
-    setCenteredForm(window.location.pathname === '/');
+    updateLocationParams(window.location.pathname);
 
-    let profileLS = localStorage.getItem('catpart-profile');
+    const profileLS = localStorage.getItem('catpart-profile');
 
     if (profileLS) {
       if (validateJSON(profileLS)) {
@@ -364,23 +360,31 @@ export default function App() {
     };
   }, []);
 
+  const updateAsideContent = content => {
+    if (content !== null) {
+      setAsideContent(content);
+    }
+  };
+
   useEffect(() => {
     setAsideOpen(openProfile);
-    setAsideContent(openProfile ? <Profile notificationFunc={createNotification} logOut={logOut} profile={profile} setProfile={setProfile} /> : null);
+    updateAsideContent(openProfile ? <Profile notificationFunc={createNotification} logOut={logOut} profile={profile} setProfile={setProfile} /> : null);
   }, [openProfile]);
 
   useEffect(() => {
     setAsideOpen(openRequisites);
-    setAsideContent(openRequisites ? <ProfileRequisites notificationFunc={createNotification} requisitesId={openRequisites > 0 ? openRequisites : null} profile={profile} setProfileRequisites={setProfile} /> : null);
+
+    updateAsideContent(openRequisites ? <ProfileRequisites notificationFunc={createNotification} requisitesId={openRequisites > 0 ? openRequisites : null} profile={profile} setProfileRequisites={setProfile} /> : null);
   }, [openRequisites]);
 
   useEffect(() => {
     setAsideOpen(openDetails);
-    setAsideContent(openDetails ? <OrderDetails notificationFunc={createNotification} detailsId={openDetails > 0 ? openDetails : null} profile={profile} setProfileRequisites={setProfile} /> : null);
+
+    updateAsideContent(openDetails ? <OrderDetails notificationFunc={createNotification} detailsId={openDetails > 0 ? openDetails : null} profile={profile} setProfileRequisites={setProfile} /> : null);
   }, [openDetails]);
 
   useEffect(() => {
-    if (!profile.hasOwnProperty('auth')) {
+    if (!profile.hasOwnProperty('id')) {
       setOpenProfile(false);
     }
   }, [profile]);
@@ -389,6 +393,7 @@ export default function App() {
     if (!asideOpen) {
       setOpenProfile(false);
       setOpenRequisites(0);
+      setOpenDetails(0);
     }
   }, [asideOpen]);
 
@@ -429,7 +434,7 @@ export default function App() {
                   path="/orders"
                   render={routeProps => (
                     <OrdersPage
-                      activeTab={activeTab}
+                      activeTab={0}
                       profile={profile}
                       needLogin={needLogin}
                       requisitesList={requisitesList}
@@ -449,7 +454,7 @@ export default function App() {
                   path="/bankinformation"
                   render={routeProps => (
                     <OrdersPage
-                      activeTab={activeTab}
+                      activeTab={1}
                       profile={profile}
                       needLogin={needLogin}
                       requisitesList={requisitesList}

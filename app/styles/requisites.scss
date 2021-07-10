@@ -50,9 +50,14 @@
 
       &.__head {
         //z-index: 10;
-        white-space: nowrap;
+        //white-space: nowrap;
+        white-space: pre;
+        padding: 8px 10px;
+        min-height: 48px;
         //position: sticky;
         //top: 0;
+
+
       }
 
       &.__even {
@@ -104,23 +109,19 @@
       padding-bottom: 2px;
       padding-left: 10px;
 
-      &.__id {
+      &.__company_name {
 
       }
 
-      &.__requisites {
+      &.__inn {
 
       }
 
-      &.__chronology {
+      &.__bank_account {
         white-space: nowrap;
       }
 
-      &.__in_stock {
-        white-space: nowrap;
-      }
-
-      &.__created_at {
+      &.__bank_name {
         white-space: nowrap;
       }
 
@@ -128,7 +129,7 @@
         white-space: nowrap;
       }
 
-      &.__pricebreaks {
+      &.__undistributed_amount {
         text-align: center;
 
         p {
@@ -136,15 +137,15 @@
         }
       }
 
-      &.__payed {
+      &.__available {
         text-align: left;
       }
 
-      &.__delivery_period {
+      &.__contact_name {
         text-align: center;
       }
 
-      &.__cart {
+      &.__rm {
         .input {
           padding-right: 40px;
         }
@@ -152,58 +153,42 @@
 
       @include respond-to-max($wide) {
 
-        &.__requisites,
-        &.__id {
+        &.__inn,
+        &.__company_name {
           grid-column: 1;
           //align-self: baseline;
         }
 
-        &.__id {
-          grid-row: 2 / 4;
+        &.__company_name {
+          grid-row: 1;
         }
 
-        &.__requisites {
-          grid-row: 1;
+        &.__inn {
+          grid-row: 2;
 
           .orders-results__label:not(.__show) {
             display: none;
           }
         }
 
-        &.__chronology {
-          grid-row: 4 / 5;
-          grid-column: 2;
-          display: flex;
-          flex-flow: row wrap;
-          align-items: center;
-
-          .cart-results__label {
-            margin-right: 6px;
-          }
-        }
-
-        &.__in_stock {
+             &.__bank_account {
           white-space: nowrap;
-          transform: translateY(-200%);
           grid-row: 3;
-          position: absolute;
-          grid-column: 2;
-        }
-
-        &.__created_at {
-          grid-row: 3;
-          position: absolute;
-          white-space: nowrap;
-          transform: translateY(-100%);
-          grid-column: 2;
-        }
-
-        &.__updated_at {
-          grid-row: 4 / 5;
           grid-column: 1;
         }
 
-        &.__pricebreaks {
+        &.__bank_name {
+          grid-row: 5;
+          white-space: nowrap;
+          grid-column: 1;
+        }
+
+        &.__bic {
+          grid-row: 4;
+          grid-column: 1;
+        }
+
+        &.__undistributed_amount {
           text-align: left;
           grid-row: 1;
           grid-column: 2;
@@ -215,7 +200,7 @@
           }
         }
 
-        &.__payed {
+        &.__available {
           grid-row: 2;
           grid-column: 2;
 
@@ -226,13 +211,13 @@
           }
         }
 
-        &.__delivery_period {
+        &.__contact_name {
           text-align: left;
           grid-row: 3;
           grid-column: 2;
         }
 
-        &.__cart {
+        &.__rm {
           grid-row: 1 / 5;
           grid-column: 3;
         }
@@ -243,13 +228,12 @@
         text-align: left;
         width: 100%;
 
-        &.__requisites {
-          order: -1;
-          margin-bottom: 5px;
+        &.__inn {
+
         }
 
-        &.__requisites,
-        &.__id {
+        &.__inn,
+        &.__company_name {
           padding-right: 40px;
         }
 
@@ -257,26 +241,21 @@
           margin-bottom: 10px;
         }
 
-        &.__pricebreaks {
+        &.__undistributed_amount {
 
         }
 
-        &.__payed {
+        &.__available {
 
         }
 
-        &.__chronology {
-          order: 1
-
-        }
-
-        &.__delivery_period {
+        &.__contact_name {
           width: auto;
           padding-right: 0;
           text-align: left;
         }
 
-        &.__cart {
+        &.__rm {
           position: absolute;
           top: 10px;
           right: 10px;
@@ -287,27 +266,32 @@
 
       @include respond-to-min($wide) {
 
-        &.__id {
-          width: 13.5%;
+        &.__company_name {
+          width: 10.5%;
+
+          .__head & {
+            text-align: center;
+          }
         }
 
-        &.__requisites {
+        &.__inn {
+          width: 10%;
+          text-align: center;
+        }
+
+        &.__bank_account {
+          text-align: center;
+          width: 10.5%;
+        }
+
+        &.__bic {
+          width: 5%;
+          text-align: center;
+        }
+
+        &.__bank_name {
+          text-align: center;
           width: 20%;
-        }
-
-        &.__chronology {
-          text-align: center;
-          width: 11%;
-        }
-
-        &.__in_stock {
-          text-align: center;
-          width: 7.5%;
-        }
-
-        &.__created_at {
-          text-align: center;
-          width: 4.8%;
         }
 
         &.__pack_quant {
@@ -315,26 +299,30 @@
           width: 9%;
         }
 
-        &.__pricebreaks {
-          width: 10%;
+        &.__undistributed_amount {
+          width: 15.5%;
           text-align: center;
         }
 
-        &.__payed {
-          width: 12%;
+        &.__available {
+          width: 9.5%;
         }
 
-        &.__delivery_period {
-          width: 10%;
+        &.__contact_name {
+          width: 15%;
           text-align: left;
+
+          .__head & {
+            text-align: center;
+          }
         }
 
-        &.__cart {
+        &.__rm {
           flex: 1 0 40px;
           opacity: 0;
           pointer-events: none;
 
-          .cart-results__row:hover & {
+          .requisites-results__row:hover & {
             opacity: 1;
             pointer-events: all;
           }
