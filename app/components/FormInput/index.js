@@ -7,7 +7,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const FormInput = ({ id, value, defaultValue, disabled, error, onChange, onBlur, inputRef, placeholder, name, textarea, className, intl }) => {
+const FormInput = ({ id, type, value, defaultValue, disabled, error, onChange, onBlur, inputRef, placeholder, name, textarea, className, intl }) => {
   return (
     <div className={'custom-input form-control' + (textarea ? ' __ta' : '')}>
       {textarea ? (
@@ -22,7 +22,7 @@ const FormInput = ({ id, value, defaultValue, disabled, error, onChange, onBlur,
           defaultValue={defaultValue || null}
           disabled={disabled || null}
           value={value}
-          id={value}
+          id={id}
         />
       ) : (
         <input
@@ -36,6 +36,7 @@ const FormInput = ({ id, value, defaultValue, disabled, error, onChange, onBlur,
           defaultValue={defaultValue || null}
           disabled={disabled || null}
           value={value}
+          type={type}
           id={id}
         />
       )}

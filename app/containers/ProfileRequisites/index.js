@@ -3,9 +3,11 @@ import Ripples from 'react-ripples';
 import FormInput from '../../components/FormInput';
 import { setInputFilter } from '../../utils/inputFilter';
 import { validateEmail } from '../../utils/validateEmail';
+import apiPATCH from '../../utils/change';
+import apiPOST from '../../utils/upload';
 
 const ProfileRequisites = props => {
-  let { requisitesId, setProfileRequisites } = props;
+  let { requisitesId, setProfileRequisites, notificationFunc } = props;
 
   const authRef = React.createRef();
   const resetRef = React.createRef();
@@ -40,10 +42,58 @@ const ProfileRequisites = props => {
   const [validForm, setValidForm] = useState(false);
   const [justRedraw, setJustRedraw] = useState(0);
 
-  const changeSubmit = e => {
+  const requisitesSubmit = e => {
     e.preventDefault();
+    let requestURL = '/requisites';
 
-    console.log('changeSubmit');
+    const formData = new FormData();
+    const options = {};
+
+    formData.append('address', addressInput.current.value);
+    formData.append('bank_account', accountInput.current.value);
+    formData.append('bic', bikInput.current.value);
+    formData.append('inn', innInput.current.value);
+    formData.append('contact_name', contactInput.current.value);
+    formData.append('contact_email', emailInput.current.value);
+    formData.append('contact_phone', phoneInput.current.value);
+    formData.append('notes', commentInput.current.value);
+
+    console.log('requisitesSubmit');
+
+    if (requisitesId) {
+      //address: "274 O'Keefe Camp Apt. 171"
+      //available: 69970
+      //bank_account: "4817744862"
+      //bank_name: "Zemlak, Turcotte and Conn"
+      //bic: "40936482"
+      //company_name: "Conroy, Parisian and Wintheiser"
+      //contact_email: "elenor91@example.com"
+      //contact_name: "Meaghan Torp"
+      //contact_phone: "79999999999"
+      //created_at: "2021-07-08T15:40:05.000000Z"
+      //id: 13
+      //inn: 77449659
+      //notes: "test"
+      //profile_id: 5
+      //undistributed_amount: 22198
+      //updated_at: "2021-07-08T15:40:05.000000Z"
+
+      apiPATCH(requestURL + '/' + requisitesId, formData, options, data => {
+        if (data.error) {
+          notificationFunc('success', `Ошибка при обновлении реквизитов`, ' ');
+        } else {
+          notificationFunc('success', `Реквизиты обновлены`, ' ');
+        }
+      });
+    } else {
+      apiPOST(requestURL, formData, options, data => {
+        if (data.error) {
+          notificationFunc('success', `Ошибка при добавлении реквизитов`, ' ');
+        } else {
+          notificationFunc('success', `Реквизиты добавлены`, ' ');
+        }
+      });
+    }
 
     //const url = '/set/deal';
     //
@@ -156,7 +206,7 @@ const ProfileRequisites = props => {
         </div>
       ) : null}
 
-      <form ref={authRef} className="form-content" onSubmit={changeSubmit}>
+      <form ref={authRef} className="form-content" onSubmit={requisitesSubmit}>
         <FormInput
           onChange={handleChange.bind(this, 'requisites-inn')}
           placeholder="ИНН"
@@ -179,7 +229,7 @@ const ProfileRequisites = props => {
 
         <FormInput
           onChange={handleChange.bind(this, 'requisites-bik')}
-          placeholder="Расчетный счет"
+          placeholder="БИК"
           name="requisites-bik"
           //
           error={errors['requisites-bik']}

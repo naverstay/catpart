@@ -28,6 +28,7 @@ import apiORDER from '../../utils/order';
 import { findPriceIndex } from '../../utils/findPriceIndex';
 import FormSelect from '../../components/FormSelect';
 import { validateEmail } from '../../utils/validateEmail';
+import dateFormatter from '../../utils/dateFormatter';
 
 const key = 'home';
 
@@ -65,8 +66,6 @@ export function OrderForm({ dndFile, delivery, updateCart, history, notification
   const formRef = React.createRef();
 
   const requiredFields = ['order-email', 'order-name', 'order-phone', 'order-inn', 'order-delivery'];
-
-  const leadingZero = val => `0${val}`.slice(-2);
 
   const handleChange = (field, e) => {
     console.log('handleChange', field, e);
@@ -114,22 +113,12 @@ export function OrderForm({ dndFile, delivery, updateCart, history, notification
       localStorage.setItem('catpart', JSON.stringify(store));
     }
 
-    function join(t, a, s) {
-      function format(m) {
-        const f = new Intl.DateTimeFormat('en', m);
-        return f.format(t);
-      }
-
-      return a.map(format).join(s);
-    }
-
     const products = store.map(s => {
       const priceIndex = findPriceIndex(s.pricebreaks, s.cart);
       const { price } = s.pricebreaks[priceIndex];
       const { pureprice } = s.pricebreaks[priceIndex];
 
-      const time = new Date();
-      const now = join(time, [{ day: '2-digit' }, { month: '2-digit' }, { year: 'numeric' }], '.');
+      const now = new Date();
 
       return {
         partNo: s.name,
@@ -139,7 +128,7 @@ export function OrderForm({ dndFile, delivery, updateCart, history, notification
         amount: s.cart,
         pureprice: pureprice,
         price: price,
-        priceSumm: `${priceFormatter(s.cart * (price / currency.exChange), currency.precision)} RUB на ${now} ${leadingZero(time.getHours())}:${leadingZero(time.getMinutes())}`,
+        priceSumm: `${priceFormatter(s.cart * (price / currency.exChange), currency.precision)} RUB на ${dateFormatter(now, true)}`,
         deliveryTime: s.delivery_period,
       };
     });

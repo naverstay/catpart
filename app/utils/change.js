@@ -50,9 +50,9 @@ function checkStatus(response) {
  * @return {object}           The response data
  */
 
-export default function apiPOST(url, data, options, cb) {
+export default function apiPATCH(url, data, options, cb) {
   return axios
-    .post(API + url, data, {
+    .patch(API + url, data, {
       headers: {
         //'Content-Type': 'application/json',
         'Content-Type': 'multipart/form-data',

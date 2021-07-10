@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import Ripples from 'react-ripples';
 import FormInput from '../../components/FormInput';
+import apiPATCH from '../../utils/change';
+import apiPOST from '../../utils/upload';
 
 const Profile = props => {
-  let { activeIndex, setProfile } = props;
+  let { profile, setProfile, notificationFunc, logOut } = props;
 
   const authRef = React.createRef();
   const resetRef = React.createRef();
@@ -12,21 +14,36 @@ const Profile = props => {
   const passwordInput = React.createRef();
 
   const [fields, setFields] = useState({
-    'auth-login': '',
-    'auth-password': '',
+    'profile-login': '',
+    'profile-password': '',
   });
   const [errors, setErrors] = useState({
-    'auth-login': null,
-    'auth-password': null,
+    'profile-password': null,
   });
 
   const [validForm, setValidForm] = useState(false);
   const [justRedraw, setJustRedraw] = useState(0);
 
-  const changeSubmit = e => {
+  const profileSubmit = e => {
     e.preventDefault();
 
-    console.log('changeSubmit');
+    console.log('profileSubmit');
+
+    const requestURL = '/profiles/' + profile.id;
+    const password = passwordInput.current.value;
+
+    const formData = new FormData();
+    const options = {};
+
+    formData.append('password', password);
+
+    apiPATCH(requestURL, formData, options, data => {
+      if (data.error) {
+        notificationFunc('success', `Ошибка при изменении пароля`, ' ');
+      } else {
+        notificationFunc('success', `Пароль успешно изменен`, ' ');
+      }
+    });
 
     //const url = '/set/deal';
     //
@@ -50,10 +67,7 @@ const Profile = props => {
     setFields(fields);
 
     switch (field) {
-      case 'auth-login':
-        errors[field] = e.target.value.length ? '' : 'Не может быть пустым';
-        break;
-      case 'auth-password':
+      case 'profile-password':
         errors[field] = e.target.value.length >= 8 ? '' : 'Минимум 8 символов';
         break;
     }
@@ -71,31 +85,32 @@ const Profile = props => {
     <div className="profile">
       <div className="aside-title">Профиль</div>
 
-      <form ref={authRef} className="form-content" onSubmit={changeSubmit}>
+      <form ref={authRef} className="form-content" onSubmit={profileSubmit}>
         <FormInput
-          onChange={handleChange.bind(this, 'auth-login')}
+          disabled={true}
+          onChange={handleChange.bind(this, 'profile-login')}
           placeholder="Логин"
-          name="auth-login"
+          name="profile-login"
           //
-          error={errors['auth-login']}
-          defaultValue={'test@test.ru'}
+          error={null}
+          defaultValue={profile.email}
           className="__lg"
           inputRef={loginInput}
         />
         <FormInput
-          onChange={handleChange.bind(this, 'auth-password')}
+          //type="password"
+          onChange={handleChange.bind(this, 'profile-password')}
           placeholder="Пароль"
-          name="auth-password"
+          name="profile-password"
           //
-          error={errors['auth-password']}
-          defaultValue={'12345678'}
+          error={errors['profile-password']}
           className="__lg"
           inputRef={passwordInput}
         />
 
         <div className="form-control">
           <Ripples className={`__w-100p btn __blue __lg${!validForm ? ' __disabled' : ''}`} during={1000}>
-            <button name="auth-submit" className="btn-inner">
+            <button name="profile-submit" className="btn-inner">
               <span>Изменить</span>
             </button>
           </Ripples>
@@ -127,9 +142,9 @@ const Profile = props => {
 
       <div className="profile-info">
         <ul>
-          <li>Иван Иванов</li>
-          <li>+7 923 456-54-54</li>
-          <li>skjghlwuieg@sibelcom54.com</li>
+          <li>{profile.responsible_name}</li>
+          <li>{profile.responsible_phone}</li>
+          <li>{profile.responsible_email}</li>
         </ul>
       </div>
 
@@ -137,12 +152,12 @@ const Profile = props => {
         <div className="form-control">
           <Ripples
             onClick={() => {
-              setProfile({});
+              logOut();
             }}
             className={`__w-100p btn __blue __lg`}
             during={1000}
           >
-            <button name="auth-submit" className="btn-inner">
+            <button name="profile-submit" className="btn-inner">
               <span>Выйти</span>
             </button>
           </Ripples>

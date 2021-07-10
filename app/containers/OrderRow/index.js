@@ -1,6 +1,7 @@
 import React, { createRef, useEffect, useState } from 'react';
 import Ripples from 'react-ripples';
 import priceFormatter from '../../utils/priceFormatter';
+import dateFormatter from '../../utils/dateFormatter';
 
 const OrderRow = props => {
   let { rowIndex, tableHeader, rowClick, row, updateCart, notificationFunc } = props;
@@ -14,8 +15,16 @@ const OrderRow = props => {
     >
       {Object.keys(tableHeader).map((cell, ci) => (
         <div key={ci} className={`orders-results__cell __${cell}`}>
-          {cell === 'name' ? null : <span className="orders-results__label">{tableHeader[cell]}</span>}
-          <span className="orders-results__value">{row[cell] ? row[cell] : `!${cell}!`}</span>
+          <span className="orders-results__label">{tableHeader[cell]}</span>
+          {cell === 'created_at' || cell === 'updated_at' ? (
+            <span className="orders-results__value">{dateFormatter(new Date(row[cell]))}</span>
+          ) : cell === 'payed' || cell === 'in_stock' ? (
+            <span className="orders-results__value">{priceFormatter(row[cell])}</span>
+          ) : cell === 'requisites' ? (
+            <span className="orders-results__value">{row[cell].company_name}</span>
+          ) : (
+            <span className="orders-results__value">{row[cell] ? row[cell] : `!${cell}!`}</span>
+          )}
         </div>
       ))}
     </div>

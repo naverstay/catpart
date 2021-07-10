@@ -1,7 +1,8 @@
 /**
- * Requests a URL, returning a promise
+ * Форматирование цены
  *
  * @param  {string} val       The value to format
+ * @param  {number} precision The precision 2 or 4
  *
  * @return {string}           The response string
  */

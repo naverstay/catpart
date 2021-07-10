@@ -54,7 +54,7 @@ function Header({ history, notificationFunc, openMobMenu, cartCount, profile, se
 
     apiGET(requestURL, {}, data => {
       localStorage.setItem('catpart-profile', JSON.stringify(data));
-      setProfile({ auth: data });
+      setProfile(data);
       history.push('/orders');
     });
   };
@@ -117,7 +117,7 @@ function Header({ history, notificationFunc, openMobMenu, cartCount, profile, se
       console.log('data', data);
 
       if (data.error) {
-        notificationFunc('success', `Авторизация: `, 'ошибка обработки');
+        notificationFunc('success', `Авторизация не удалась. `, 'Проверьте логин/пароль.');
       } else {
         localStorage.setItem('access_token', data.access_token);
         getUserData();
@@ -165,12 +165,12 @@ function Header({ history, notificationFunc, openMobMenu, cartCount, profile, se
     //}
   };
 
-  useEffect(() => {
-    if (openAuthPopup) {
-      handleChange('auth-login', { target: loginInput.current });
-      handleChange('auth-password', { target: passwordInput.current });
-    }
-  }, [openAuthPopup]);
+  //useEffect(() => {
+  //  if (openAuthPopup) {
+  //    handleChange('auth-login', { target: loginInput.current });
+  //    handleChange('auth-password', { target: passwordInput.current });
+  //  }
+  //}, [openAuthPopup]);
 
   return (
     <header ref={headerRef} className={`header${openMobMenu ? ' __open-mob-menu' : ''}`}>
@@ -230,10 +230,10 @@ function Header({ history, notificationFunc, openMobMenu, cartCount, profile, se
       </div>
 
       <div className={'header-right __auth'}>
-        {profile.hasOwnProperty('auth') ? (
+        {profile.hasOwnProperty('id') ? (
           <Ripples during={1000} className={'btn __blue'}>
             <Link to={'/orders'} className="btn-inner">
-              <span className={'__dotted'}>{profile.auth.contact_name}</span>
+              <span className={'__dotted'}>{profile.contact_name}</span>
             </Link>
           </Ripples>
         ) : (

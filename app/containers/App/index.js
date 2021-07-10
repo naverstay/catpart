@@ -21,11 +21,12 @@ import apiGET from '../../utils/search';
 import PolicyPage from '../PolicyPage';
 import { findPriceIndex } from '../../utils/findPriceIndex';
 import DeliveryPage from '../DeliveryPage';
-import { OrdersPage } from '../Orders';
 import AsideContainer from '../AsideContainer';
 import Profile from '../Profile';
 import ProfileRequisites from '../ProfileRequisites';
 import { validateJSON } from '../../utils/validateJSON';
+import OrderDetails from '../OrderDetails';
+import { OrdersPage } from '../OrdersPage';
 
 export default function App() {
   const history = useHistory();
@@ -54,11 +55,20 @@ export default function App() {
   const [profileRequisites, setProfileRequisites] = useState({});
   const [openProfile, setOpenProfile] = useState(false);
   const [openRequisites, setOpenRequisites] = useState(0);
+  const [openDetails, setOpenDetails] = useState(0);
   const [asideOpen, setAsideOpen] = useState(false);
   const [asideContent, setAsideContent] = useState(null);
+  const [activeTab, setActiveTab] = useState(1);
 
   history.listen(function(loc) {
     setCenteredForm(loc.pathname === '/');
+
+    if (loc.pathname === '/orders') {
+      setActiveTab(0);
+    } else if (loc.pathname === '/bankinformation') {
+      setActiveTab(1);
+    }
+
     setOrderSent(false);
   });
 
@@ -130,6 +140,21 @@ export default function App() {
       ],
     },
   ];
+
+  const logOut = () => {
+    console.log('logOut');
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('catpart-profile');
+    history.push('/');
+    setProfile({});
+  };
+
+  const needLogin = () => {
+    console.log('needLogin', profile);
+
+    logOut();
+    createNotification('success', `Требуется авторизация`, ' ');
+  };
 
   const createNotification = (type, title, text) => {
     console.log('createNotification', type, text);
@@ -281,7 +306,7 @@ export default function App() {
 
     if (profileLS) {
       if (validateJSON(profileLS)) {
-        setProfile({ auth: JSON.parse(profileLS) });
+        setProfile(JSON.parse(profileLS));
       } else {
         localStorage.removeItem('catpart-profile');
       }
@@ -341,13 +366,18 @@ export default function App() {
 
   useEffect(() => {
     setAsideOpen(openProfile);
-    setAsideContent(openProfile ? <Profile profile={profile} setProfile={setProfile} /> : null);
+    setAsideContent(openProfile ? <Profile notificationFunc={createNotification} logOut={logOut} profile={profile} setProfile={setProfile} /> : null);
   }, [openProfile]);
 
   useEffect(() => {
     setAsideOpen(openRequisites);
-    setAsideContent(openRequisites ? <ProfileRequisites requisitesId={openRequisites > 0 ? openRequisites : null} profile={profile} setProfileRequisites={setProfile} /> : null);
+    setAsideContent(openRequisites ? <ProfileRequisites notificationFunc={createNotification} requisitesId={openRequisites > 0 ? openRequisites : null} profile={profile} setProfileRequisites={setProfile} /> : null);
   }, [openRequisites]);
+
+  useEffect(() => {
+    setAsideOpen(openDetails);
+    setAsideContent(openDetails ? <OrderDetails notificationFunc={createNotification} detailsId={openDetails > 0 ? openDetails : null} profile={profile} setProfileRequisites={setProfile} /> : null);
+  }, [openDetails]);
 
   useEffect(() => {
     if (!profile.hasOwnProperty('auth')) {
@@ -397,7 +427,43 @@ export default function App() {
 
                 <Route
                   path="/orders"
-                  render={routeProps => <OrdersPage requisitesList={requisitesList} ordersList={ordersList} currency={currency} setOpenProfile={setOpenProfile} setOpenRequisites={setOpenRequisites} history={history} setTableHeadFixed={setTableHeadFixed} {...routeProps} />}
+                  render={routeProps => (
+                    <OrdersPage
+                      activeTab={activeTab}
+                      profile={profile}
+                      needLogin={needLogin}
+                      requisitesList={requisitesList}
+                      ordersList={ordersList}
+                      currency={currency}
+                      setOpenProfile={setOpenProfile}
+                      setOpenRequisites={setOpenRequisites}
+                      setOpenDetails={setOpenDetails}
+                      history={history}
+                      setTableHeadFixed={setTableHeadFixed}
+                      {...routeProps}
+                    />
+                  )}
+                />
+
+                <Route
+                  path="/bankinformation"
+                  render={routeProps => (
+                    <OrdersPage
+                      activeTab={activeTab}
+                      profile={profile}
+                      needLogin={needLogin}
+                      requisitesList={requisitesList}
+                      ordersList={ordersList}
+                      notificationFunc={createNotification}
+                      currency={currency}
+                      setOpenProfile={setOpenProfile}
+                      setOpenRequisites={setOpenRequisites}
+                      setOpenDetails={setOpenDetails}
+                      history={history}
+                      setTableHeadFixed={setTableHeadFixed}
+                      {...routeProps}
+                    />
+                  )}
                 />
 
                 <Route path="/privacy-policy" render={routeProps => <PolicyPage setOpenMobMenu={setOpenMobMenu} {...routeProps} />} />
