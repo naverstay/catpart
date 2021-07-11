@@ -8,14 +8,14 @@ const RequisitesRow = props => {
   return (
     <div
       onClick={() => {
-        rowClick(row.id);
+        rowClick(row);
       }}
       className={`requisites-results__row${rowIndex % 2 === 0 ? ' __odd' : ' __even'}`}
     >
       {Object.keys(tableHeader).map((cell, ci) => (
         <div key={ci} className={`requisites-results__cell __${cell}`}>
-          {cell === 'name' ? null : <span className="requisites-results__label">{tableHeader[cell]}</span>}
-          <span className="requisites-results__value">{row[cell] ? row[cell] : `!${cell}!`}</span>
+          <span className="requisites-results__label">{tableHeader[cell]}</span>
+          {cell === 'undistributed_amount' || cell === 'available' ? <span className="requisites-results__value">{priceFormatter(row[cell])}</span> : <span className="requisites-results__value">{row[cell] ? row[cell] : `!${cell}!`}</span>}
         </div>
       ))}
 

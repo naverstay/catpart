@@ -7,7 +7,7 @@ import apiPATCH from '../../utils/change';
 import apiPOST from '../../utils/upload';
 
 const ProfileRequisites = props => {
-  let { requisitesId, setProfileRequisites, notificationFunc } = props;
+  let { requisitesId, setProfileRequisites, requisites, notificationFunc } = props;
 
   const authRef = React.createRef();
   const resetRef = React.createRef();
@@ -153,6 +153,8 @@ const ProfileRequisites = props => {
     };
   }, []);
 
+  console.log('requisites', requisites);
+
   return (
     <div className="profile __requisites">
       <div className="aside-title">{requisitesId ? 'Редактируем реквизиты' : 'Добавляем новые реквизиты'}</div>
@@ -161,13 +163,13 @@ const ProfileRequisites = props => {
         <div className="profile-info">
           <ul>
             <li>
-              <span>Компания:&nbsp;</span> <b>ООО "СИБЭЛКОМ-ЛОГИСТИК"</b>
+              <span>Компания:&nbsp;</span> <b>{requisites.company_name}</b>
             </li>
             <li>
-              <span>ИНН:&nbsp;</span> <b>5404462899</b>
+              <span>ИНН:&nbsp;</span> <b>{requisites.inn}</b>
             </li>
             <li>
-              <span>Директор:&nbsp;</span> <b>Поспих Артур Вячеславович на основании Устава</b>
+              <span>Директор:&nbsp;</span> <b>{requisites.contact_name}</b>
             </li>
             <li>
               <span>КПП:&nbsp;</span> <b>541001001</b>
@@ -179,28 +181,28 @@ const ProfileRequisites = props => {
               <span>р/с:&nbsp;</span> <b>40702810504000002378</b>
             </li>
             <li>
-              <span>Банк:&nbsp;</span> <b>Банк«Левобережный» (ПАО)</b>
+              <span>Банк:&nbsp;</span> <b>{requisites.bank_name}</b>
             </li>
             <li>
               <span>к/с:&nbsp;</span> <b>30101810100000000850</b>
             </li>
             <li>
-              <span>БИК:&nbsp;</span> <b>045004850</b>
+              <span>БИК:&nbsp;</span> <b>{requisites.bic}</b>
             </li>
             <li>
-              <span>Юридический адрес:&nbsp;</span> <b>630110, г. Новосибирск, ул. Менделеева 5, 30</b>
+              <span>Юридический адрес:&nbsp;</span> <b>{requisites.address}</b>
             </li>
             <li>
-              <span>Фактический адрес:&nbsp;</span> <b>630005, г. Новосибирск, ул. Достоевского 58, 605</b>
+              <span>Фактический адрес:&nbsp;</span> <b>{requisites.address}</b>
             </li>
             <li>
-              <span>Контактное лицо:&nbsp;</span> <b>Телков Вячеслав Алексеевич</b>
+              <span>Контактное лицо:&nbsp;</span> <b>{requisites.contact_name}</b>
             </li>
             <li>
-              <span>Телефон:&nbsp;</span> <b>+7 (383) 378-77-26</b>
+              <span>Телефон:&nbsp;</span> <b>{requisites.contact_phone}</b>
             </li>
             <li>
-              <span>Email:&nbsp;</span> <b>info@sibelcom54.com</b>
+              <span>Email:&nbsp;</span> <b>{requisites.contact_email}</b>
             </li>
           </ul>
         </div>

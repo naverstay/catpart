@@ -416,7 +416,6 @@
       border: none;
       transition: border .3s, box-shadow .3s;
 
-
       &:hover {
         background: $main_gray_hover;
       }
@@ -428,6 +427,7 @@
       }
     }
 
+
     &__placeholder {
       margin: 0;
       color: $gray_placeholder;
@@ -435,6 +435,14 @@
 
     &__value-container {
       padding: 0;
+    }
+
+    &__single-value {
+      position: relative;
+      top: auto;
+      transform: none;
+      margin: 0;
+      max-width: none;
     }
   }
 

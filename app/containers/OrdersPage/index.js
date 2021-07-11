@@ -39,8 +39,9 @@ export function OrdersPage(props) {
     payed: 'Сумма',
     in_stock: 'Остаток',
     created_at: 'Дата\nсоздания',
-    updated_at: 'Дата\nпоставки',
-    chronology: '  ',
+    delivery_date: 'Дата\nпоставки',
+    chronology_health: ' ',
+    chronology: 'Хронология',
     //
     // amount: 7377,
     // contact_name: 'Aleen Harvey',
@@ -81,7 +82,7 @@ export function OrdersPage(props) {
     <div className="orders-results__row __even __head">
       {Object.keys(tableHeaderOrders).map((head, hi) => (
         <div key={hi} className={`orders-results__cell __${head}`}>
-          {tableHeaderOrders[head]}
+          <span>{tableHeaderOrders[head]}</span>
         </div>
       ))}
     </div>
@@ -91,7 +92,7 @@ export function OrdersPage(props) {
     <div className="requisites-results__row __even __head">
       {Object.keys(tableHeaderRequisites).map((head, hi) => (
         <div key={hi} className={`requisites-results__cell __${head}`}>
-          {tableHeaderRequisites[head]}
+          <span>{tableHeaderRequisites[head]}</span>
         </div>
       ))}
       <div className="requisites-results__cell __rm">&nbsp;</div>
@@ -192,7 +193,7 @@ export function OrdersPage(props) {
           <div className="form-filter">
             <div className="form-filter__controls">
               <div className="form-filter__controls_left">
-                <div className="form-filter__control">
+                <div className="form-filter__control __search">
                   <input
                     ref={requisitesSearchRef}
                     onChange={e => {
@@ -247,7 +248,7 @@ export function OrdersPage(props) {
           <div className="form-filter">
             <div className="form-filter__controls">
               <div className="form-filter__controls_left">
-                <div className="form-filter__control">
+                <div className="form-filter__control __search">
                   <input
                     ref={requisitesSearchRef}
                     onChange={e => {

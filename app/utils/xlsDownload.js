@@ -1,9 +1,11 @@
 import XLSX from 'xlsx';
 import priceFormatter from './priceFormatter';
+import dateFormatter from './dateFormatter';
 import { findPriceIndex } from './findPriceIndex';
 
 const MODE_CART = 0;
 const MODE_BOM = 1;
+const MODE_DETAILS = 2;
 const MODE_SEARCH = -1;
 
 const transformSearchData = data =>
@@ -13,7 +15,7 @@ const transformSearchData = data =>
         c.hasOwnProperty('data')
           ? c.data.map(d => {
               d.query = c.q;
-            return d;
+              return d;
             })
           : [],
       ),
@@ -21,9 +23,11 @@ const transformSearchData = data =>
   );
 
 const prepareJSON = (data, mode, currency) => {
-  if (mode !== MODE_CART) {
+  if (mode !== MODE_CART && mode !== MODE_DETAILS) {
     data = transformSearchData(data);
   }
+
+  console.log('prepareJSON', data);
 
   return data.map(row => {
     let price = '';
@@ -37,9 +41,15 @@ const prepareJSON = (data, mode, currency) => {
       delete row.cart;
     }
 
-    row.pricebreaks = row.pricebreaks.map(p => `${p.quant} - ${priceFormatter(p.price / currency.exChange, currency.precision)}`).join('\n');
-
-    row.currency = currency.name;
+    if (mode === MODE_DETAILS) {
+      row.calculated_delivery_date = dateFormatter(new Date(row.calculated_delivery_date));
+      row.real_delivery_date = dateFormatter(new Date(row.real_delivery_date));
+      row.sum = priceFormatter(row.quantity * row.price);
+      row.statuses = row.statuses.map(p => `${p.name} - ${dateFormatter(new Date(p.updated_at))}`).join('\n');
+    } else {
+      row.pricebreaks = row.pricebreaks.map(p => `${p.quant} - ${priceFormatter(p.price / currency.exChange, currency.precision)}`).join('\n');
+      row.currency = currency.name;
+    }
 
     delete row.id;
     delete row.cur;
@@ -54,7 +64,7 @@ export const xlsDownload = (data, currency, mode) => {
   console.log('xlsDownload', mode);
 
   if (data && data.length) {
-    const fileName = mode === MODE_CART ? 'cart' : 'search';
+    let fileName = mode === MODE_CART ? 'cart' : 'search';
 
     let tableHeader = ['manufacturer', 'name', 'brand', 'quantity', 'pack_quant', 'price_unit', 'moq', 'delivery_period'];
 
@@ -72,6 +82,11 @@ export const xlsDownload = (data, currency, mode) => {
 
     if (mode === MODE_BOM) {
       tableHeader = ['query', ...tableHeader];
+    }
+
+    if (mode === MODE_DETAILS) {
+      fileName = 'details';
+      tableHeader = ['name', 'supplier', 'manufacturer', 'quantity', 'price', 'sum', 'statuses', 'calculated_delivery_date', 'real_delivery_date', 'comment'];
     }
 
     let WS = XLSX.utils.json_to_sheet(prepareJSON(JSON.parse(JSON.stringify(data)), mode, currency), { header: tableHeader });

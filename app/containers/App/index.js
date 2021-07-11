@@ -372,15 +372,15 @@ export default function App() {
   }, [openProfile]);
 
   useEffect(() => {
-    setAsideOpen(openRequisites);
+    setAsideOpen(openRequisites && openRequisites.id);
 
-    updateAsideContent(openRequisites ? <ProfileRequisites notificationFunc={createNotification} requisitesId={openRequisites > 0 ? openRequisites : null} profile={profile} setProfileRequisites={setProfile} /> : null);
+    updateAsideContent(openRequisites ? <ProfileRequisites notificationFunc={createNotification} requisitesId={openRequisites ? openRequisites.id : null} profile={profile} requisites={openRequisites} setProfileRequisites={setProfile} /> : null);
   }, [openRequisites]);
 
   useEffect(() => {
-    setAsideOpen(openDetails);
+    setAsideOpen(openDetails && openDetails.id);
 
-    updateAsideContent(openDetails ? <OrderDetails notificationFunc={createNotification} detailsId={openDetails > 0 ? openDetails : null} profile={profile} setProfileRequisites={setProfile} /> : null);
+    updateAsideContent(openDetails ? <OrderDetails RUB={RUB} notificationFunc={createNotification} detailsId={openDetails ? openDetails.id : null} profile={profile} order={openDetails} setProfileRequisites={setProfile} /> : null);
   }, [openDetails]);
 
   useEffect(() => {
