@@ -29,6 +29,7 @@ import { findPriceIndex } from '../../utils/findPriceIndex';
 import FormSelect from '../../components/FormSelect';
 import { validateEmail } from '../../utils/validateEmail';
 import dateFormatter from '../../utils/dateFormatter';
+import innValidation from '../../utils/innValidation';
 
 const key = 'home';
 
@@ -72,27 +73,50 @@ export function OrderForm({ dndFile, delivery, updateCart, history, notification
     fields[field] = e.target.value;
     setFields(fields);
 
+    const validate = () => {
+      localStorage.setItem('catpart-user', JSON.stringify(fields));
+
+      setErrors(errors);
+
+      setValidForm(!Object.values(errors).filter(er => er === null || er.length).length);
+
+      setJustRedraw(justRedraw + 1);
+    };
+
     switch (field) {
-      case 'order-name':
       case 'order-inn':
+        if (e.target.value.length) {
+          innValidation(
+            e.target.value,
+            e => {
+              console.log(e.hasOwnProperty('suggestions'), e.suggestions);
+              errors[field] = e.hasOwnProperty('suggestions') && e.suggestions.length ? '' : 'Проверьте ИНН';
+              validate();
+            },
+            e => {
+              errors[field] = 'Не корректный ИНН';
+              validate();
+            },
+          );
+        } else {
+          errors[field] = 'Не может быть пустым';
+          validate();
+        }
+        break;
+      case 'order-name':
       case 'order-delivery':
         errors[field] = e.target.value.length ? '' : 'Не может быть пустым';
+        validate();
         break;
       case 'order-phone':
         errors[field] = e.target.value.length >= 8 ? '' : 'Минимум 8 символов';
+        validate();
         break;
       case 'order-email':
         errors[field] = e.target.value.length && validateEmail(e.target.value) ? '' : 'Проверьте формат e-mail';
+        validate();
         break;
     }
-
-    localStorage.setItem('catpart-user', JSON.stringify(fields));
-
-    setErrors(errors);
-
-    setValidForm(!Object.values(errors).filter(er => er === null || er.length).length);
-
-    setJustRedraw(justRedraw + 1);
   };
 
   const contactSubmit = e => {
@@ -179,7 +203,13 @@ export function OrderForm({ dndFile, delivery, updateCart, history, notification
       return /^\+?\d*$/.test(value); // Allow digits and '+' on beginning only, using a RegExp
     });
 
-    const deliveryList = [{ value: 'Самовывоз со склада в Новосибирске', label: 'Самовывоз со склада в Новосибирске' }, { value: 'Доставка курьерской службой', label: 'Доставка курьерской службой' }];
+    const deliveryList = [
+      {
+        value: 'Самовывоз со склада в Новосибирске',
+        label: 'Самовывоз со склада в Новосибирске',
+      },
+      { value: 'Доставка курьерской службой', label: 'Доставка курьерской службой' },
+    ];
 
     const user = localStorage.getItem('catpart-user');
 

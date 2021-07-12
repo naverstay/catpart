@@ -21,56 +21,58 @@ const OrderRow = props => {
     );
   };
 
-  const buildChronology = row => (
-  // let products = row.products.map((p, pi) => {
-  //  return <li className={pi % 2 === 0 ? ' __odd' : ' __even'} />;
-  // });
+  const buildChronology = row => {
+    // let products = row.products.map((p, pi) => {
+    //  return <li className={pi % 2 === 0 ? ' __odd' : ' __even'} />;
+    // });
 
-    (
+    return (
       <div className="orders-chronology__scroller">
-      <ul className="orders-chronology__list">
-        <li className="__odd">
-          <span>25.05.2021 — отгружено 20%</span>
-          <a className="orders-chronology__link __green" href="#">
-            упд xlsx
-          </a>
-        </li>
-        <li className="__even">
-          <span>25.05.2021 — на складе 10%</span>
-        </li>
-        <li className="__odd">
-          <span>07.06.2021 — товар заказан</span>
-        </li>
-        <li className="__even">
-          <span>26.05.2021 — оплачено 30%</span>
-        </li>
-        <li className="__odd">
-          <span>25.05.2021 — отгружено 20%</span>
-          <a className="orders-chronology__link __green" href="#">
-            упд xlsx
-          </a>
-        </li>
-        <li className="__even">
-          <span>25.05.2021 — на складе 10%</span>
-        </li>
-        <li className="__odd">
-          <span>07.06.2021 — товар заказан</span>
-        </li>
-        <li className="__even">
-          <span>26.05.2021 — оплачено 30%</span>
-        </li>
-        <li className="__odd">
-          <span>25.05.2021 — счёт выставлен</span>
-          <a className="orders-chronology__link __green" href="#">
-            xlsx
-          </a>
-          <a className="orders-chronology__link __red" href="#">
-            pdf
-          </a>
-        </li>
-      </ul>
-    </div>
-  );
+        <ul className="orders-chronology__list">
+          <li className="__odd">
+            <span>25.05.2021 — отгружено 20%</span>
+            <a className="orders-chronology__link __green" href="#">
+              упд xlsx
+            </a>
+          </li>
+          <li className="__even">
+            <span>25.05.2021 — на складе 10%</span>
+          </li>
+          <li className="__odd">
+            <span>07.06.2021 — товар заказан</span>
+          </li>
+          <li className="__even">
+            <span>26.05.2021 — оплачено 30%</span>
+          </li>
+          <li className="__odd">
+            <span>25.05.2021 — отгружено 20%</span>
+            <a className="orders-chronology__link __green" href="#">
+              упд xlsx
+            </a>
+          </li>
+          <li className="__even">
+            <span>25.05.2021 — на складе 10%</span>
+          </li>
+          <li className="__odd">
+            <span>07.06.2021 — товар заказан</span>
+          </li>
+          <li className="__even">
+            <span>26.05.2021 — оплачено 30%</span>
+          </li>
+          <li className="__odd">
+            <span>25.05.2021 — счёт выставлен</span>
+            <a className="orders-chronology__link __green" href="#">
+              xlsx
+            </a>
+            <a className="orders-chronology__link __red" href="#">
+              pdf
+            </a>
+          </li>
+        </ul>
+      </div>
+    );
+  };
+
   const buildChronologyHealth = row => (
     <ul className="orders-health__list">
       <li>
