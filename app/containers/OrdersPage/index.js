@@ -27,10 +27,25 @@ export function OrdersPage(props) {
   const defaultCount = count;
 
   const tableHead = useRef();
-  const requisitesSearchRef = useRef();
 
   const [ordersList, setOrdersList] = useState([]);
   const [requisitesList, setRequisitesList] = useState([]);
+  const [requisitesFilter, setRequisitesFilter] = useState('');
+  const [ordersFilter, setOrdersFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState([]);
+  const [statusOptions, setStatusOptions] = useState([]);
+
+  // const statusOptions = [
+  //  { value: 'Сделка', label: 'Сделка' },
+  //  { value: 'Заявка', label: 'Заявка' },
+  //  { value: 'Запрос отправлен', label: 'Запрос отправлен' },
+  //  { value: 'Есть условия поставки частично', label: 'Есть условия поставки частично' },
+  //  { value: 'Пришел ответ, надо посчитать', label: 'Пришел ответ, надо посчитать' },
+  //  { value: 'Есть условия поставки', label: 'Есть условия поставки' },
+  //  { value: 'Коммерческое предложение', label: 'Коммерческое предложение' },
+  //  { value: 'Счет выставлен', label: 'Счет выставлен' },
+  //  { value: 'Согласование заказа', label: 'Согласование заказа' },
+  // ];
 
   const tableHeaderOrders = {
     id: 'Заказ №',
@@ -109,6 +124,8 @@ export function OrdersPage(props) {
     // console.log('handleScroll', list, listCounter);
   };
 
+  const onlyUnique = (value, index, self) => self.indexOf(value) === index;
+
   const getOrders = () => {
     const requestURL = '/orders';
 
@@ -118,6 +135,11 @@ export function OrdersPage(props) {
       if (data.error) {
         needLogin();
       } else {
+        const statuses = data.reduce((all, d) => all.concat(d.products.reduce((ret, p) => ret.concat(p.statuses.map(s => s.name)), [])), []);
+        console.log('statuses', statuses, statuses.filter(onlyUnique));
+
+        setStatusOptions(statuses.filter(onlyUnique).map(u => ({ value: u, label: u })));
+
         setOrdersList(data);
       }
     });
@@ -168,20 +190,12 @@ export function OrdersPage(props) {
     };
   }, []);
 
-  const stateOptions = [
-    { value: 'Сделка', label: 'Сделка' },
-    { value: 'Заявка', label: 'Заявка' },
-    { value: 'Запрос отправлен', label: 'Запрос отправлен' },
-    { value: 'Есть условия поставки частично', label: 'Есть условия поставки частично' },
-    { value: 'Пришел ответ, надо посчитать', label: 'Пришел ответ, надо посчитать' },
-    { value: 'Есть условия поставки', label: 'Есть условия поставки' },
-    { value: 'Коммерческое предложение', label: 'Коммерческое предложение' },
-    { value: 'Счет выставлен', label: 'Счет выставлен' },
-    { value: 'Согласование заказа', label: 'Согласование заказа' },
-  ];
-
   const handleChange = (field, e) => {
     console.log('handleChange', field, e);
+
+    const filter = e.target.map(f => f.value);
+
+    setStatusFilter(filter);
   };
 
   return (
@@ -195,9 +209,8 @@ export function OrdersPage(props) {
               <div className="form-filter__controls_left">
                 <div className="form-filter__control __search">
                   <input
-                    ref={requisitesSearchRef}
                     onChange={e => {
-                      console.log('requisitesSearchRef', e.target.value);
+                      setOrdersFilter(e.target.value);
                     }}
                     // value={itemCount}
                     placeholder="Быстрый поиск"
@@ -212,7 +225,7 @@ export function OrdersPage(props) {
                   ref={stateInput || null}
                 />
 
-                {stateOptions.length ? <FormSelect onChange={handleChange} options={stateOptions} placeholder="Статус" name="order-state" error={null} preSelectedValue={preSelectedState} inputRef={stateInput} /> : null}
+                {statusOptions.length ? <FormSelect multi onChange={handleChange} options={statusOptions} placeholder="Статус" name="order-state" error={null} preSelectedValue={preSelectedState} inputRef={stateInput} /> : null}
               </div>
             </div>
           </div>
@@ -224,21 +237,52 @@ export function OrdersPage(props) {
                   {tHeadOrders}
                 </div>
 
-                {ordersList.map((row, ri) => (
-                  <OrderRow
-                    key={ri}
-                    rowClick={e => {
-                      setOpenDetails(e);
-                    }}
-                    updateCart={updateCart}
-                    tableHeader={tableHeaderOrders}
-                    defaultCount={defaultCount}
-                    currency={currency}
-                    notificationFunc={notificationFunc}
-                    row={row}
-                    rowIndex={ri}
-                  />
-                ))}
+                {ordersList.map((row, ri) => {
+                  let ret = (
+                    <OrderRow
+                      key={ri}
+                      rowClick={e => {
+                        setOpenDetails(e);
+                      }}
+                      updateCart={updateCart}
+                      tableHeader={tableHeaderOrders}
+                      defaultCount={defaultCount}
+                      currency={currency}
+                      notificationFunc={notificationFunc}
+                      row={row}
+                      rowIndex={ri}
+                    />
+                  );
+
+                  if (ordersFilter) {
+                    if (!(`${row.id}`.indexOf(ordersFilter) === 0)) {
+                      ret = null;
+                    }
+                  }
+
+                  if (statusFilter.length) {
+                    let count = 0;
+
+                    for (const product of row.products) {
+                      for (const status of product.statuses) {
+                        if (statusFilter.indexOf(status.name) > -1) {
+                          count++;
+                          break;
+                        }
+                      }
+
+                      if (count) {
+                        break;
+                      }
+                    }
+
+                    if (!count) {
+                      ret = null;
+                    }
+                  }
+
+                  return ret;
+                })}
               </>
             ) : null}
           </div>
@@ -250,9 +294,8 @@ export function OrdersPage(props) {
               <div className="form-filter__controls_left">
                 <div className="form-filter__control __search">
                   <input
-                    ref={requisitesSearchRef}
                     onChange={e => {
-                      console.log('requisitesSearchRef', e.target.value);
+                      setRequisitesFilter(e.target.value);
                     }}
                     // value={itemCount}
                     placeholder="Быстрый поиск"
@@ -284,21 +327,31 @@ export function OrdersPage(props) {
                   {tHeadRequisites}
                 </div>
 
-                {requisitesList.map((row, ri) => (
-                  <RequisitesRow
-                    key={ri}
-                    rowClick={e => {
-                      setOpenRequisites(e);
-                    }}
-                    updateCart={updateCart}
-                    tableHeader={tableHeaderRequisites}
-                    defaultCount={defaultCount}
-                    currency={currency}
-                    notificationFunc={notificationFunc}
-                    row={row}
-                    rowIndex={ri}
-                  />
-                ))}
+                {requisitesList.map((row, ri) => {
+                  let ret = (
+                    <RequisitesRow
+                      key={ri}
+                      rowClick={e => {
+                        setOpenRequisites(e);
+                      }}
+                      updateCart={updateCart}
+                      tableHeader={tableHeaderRequisites}
+                      defaultCount={defaultCount}
+                      currency={currency}
+                      notificationFunc={notificationFunc}
+                      row={row}
+                      rowIndex={ri}
+                    />
+                  );
+
+                  if (requisitesFilter) {
+                    if (!(`${row.company_name}`.toLowerCase().indexOf(requisitesFilter.toLowerCase()) === 0 || `${row.inn}`.indexOf(requisitesFilter) === 0)) {
+                      ret = null;
+                    }
+                  }
+
+                  return ret;
+                })}
               </>
             ) : null}
           </div>

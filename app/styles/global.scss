@@ -14,16 +14,22 @@
 * {
   outline: 0;
 
-  //&::-webkit-scrollbar {
-  //  background-color: $main_gray_light;
-  //  width: 7px;
-  //  height: 7px;
-  //}
-  //
-  //&::-webkit-scrollbar-thumb {
-  //  border-radius: 10px;
-  //  background-color: $main_blue_light;
-  //}
+  &::-webkit-scrollbar {
+    overflow-y: scroll;
+    background-color: white;
+    width: 5px;
+    height: 5px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    border-radius: 2px;
+    transition: background-color .3s;
+    background-color: $main_gray_hover;
+
+    &:hover {
+      background-color: $gray_border;
+    }
+  }
 }
 
 html {

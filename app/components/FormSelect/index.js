@@ -6,9 +6,9 @@
 
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import Select from 'react-select';
+import Select, { components } from 'react-select';
 
-const FormSelect = ({ id, preSelectedValue, disabled, onChange, onBlur, inputRef, options, name, className, error, placeholder }) => {
+const FormSelect = ({ id, preSelectedValue, multi, disabled, onChange, onBlur, inputRef, options, name, className, error, placeholder }) => {
   const [selectedOption, setSelectedOption] = useState(null);
 
   const handleChange = selectedOption => {
@@ -34,20 +34,50 @@ const FormSelect = ({ id, preSelectedValue, disabled, onChange, onBlur, inputRef
   };
 
   return (
-    <div className={'custom-select form-control'}>
+    <div className={`custom-select form-control${multi ? ' __multi' : ''}`}>
       <Select
         //
         styles={customStyles}
-        classNamePrefix={'select'}
-        //menuIsOpen={true}
-        isMulti={false}
+        classNamePrefix="select"
+        // menuIsOpen={true}
+        closeMenuOnSelect={!multi}
+        isClearable={multi}
+        isMulti={multi}
         isSearchable={false}
+        hideSelectedOptions={false}
         isDisabled={disabled || null}
         placeholder={placeholder || null}
         defaultValue={options.find(o => o.selected)}
-        className={'select ' + className + (error === null ? '' : error ? ' __error' : ' __success')}
+        className={`select ${className}${error === null ? '' : error ? ' __error' : ' __success'}`}
         onChange={handleChange}
         options={options}
+        components={{
+          ValueContainer: ({ children, ...props }) => {
+            let [values, input] = children;
+
+            if (Array.isArray(values)) {
+              const val = i => values[i].props.children;
+              const { length } = values;
+
+              switch (length) {
+                case 1:
+                  values = `Статус: ${val(0)}`;
+                  break;
+
+                default:
+                  values = `Статус: ${length}`;
+                  break;
+              }
+            }
+
+            return (
+              <components.ValueContainer {...props}>
+                {values}
+                {input}
+              </components.ValueContainer>
+            );
+          },
+        }}
       />
     </div>
   );

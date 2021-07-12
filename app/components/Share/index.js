@@ -1,6 +1,7 @@
 import React from 'react';
 import { useDetectClickOutside } from 'react-detect-click-outside';
 import Ripples from 'react-ripples';
+import copyTextToClipboard from '../../utils/clipboard';
 
 function Share({ setOpenFunc, notificationFunc, shareUrl, shareText }) {
   const shareRef = useDetectClickOutside({
@@ -17,55 +18,12 @@ function Share({ setOpenFunc, notificationFunc, shareUrl, shareText }) {
     notificationFunc('success', `Ошибка копирования в буфер обмена`, ':(');
   };
 
-  const fallbackCopyTextToClipboard = text => {
-    const textArea = document.createElement('textarea');
-    textArea.value = text;
-
-    // Avoid scrolling to bottom
-    textArea.style.top = '0';
-    textArea.style.left = '0';
-    textArea.style.position = 'fixed';
-
-    document.body.appendChild(textArea);
-    textArea.focus();
-    textArea.select();
-
-    try {
-      const successful = document.execCommand('copy');
-
-      if (successful) {
-        successCopy(text);
-      } else {
-        failCopy();
-      }
-    } catch (err) {
-      failCopy();
-    }
-
-    document.body.removeChild(textArea);
-  };
-
   const dropdownAction = action => {
     if (action === 'copy') {
-      copyTextToClipboard(window.location.href);
+      copyTextToClipboard(window.location.href, successCopy, failCopy);
     }
 
     setOpenFunc(false);
-  };
-
-  let copyTextToClipboard = text => {
-    if (!navigator.clipboard) {
-      fallbackCopyTextToClipboard(text);
-      return;
-    }
-    navigator.clipboard.writeText(text).then(
-      function() {
-        successCopy(text);
-      },
-      function(err) {
-        failCopy();
-      },
-    );
   };
 
   const links = [

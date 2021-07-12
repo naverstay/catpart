@@ -375,6 +375,22 @@
   .select {
 
     &__indicators {
+      position: absolute;
+      top: 50%;
+      right: 5px;
+      transform: translateY(-50%) scale(.8);
+    }
+
+    &__clear-indicator {
+      padding: 0;
+
+      svg {
+        fill: #7d7e7e;
+      }
+    }
+
+    &__indicator-separator,
+    &__dropdown-indicator {
       display: none !important;
     }
 
@@ -400,6 +416,8 @@
 
     &__menu-list {
       padding: 0;
+
+
     }
 
     &__option {
@@ -443,6 +461,12 @@
       transform: none;
       margin: 0;
       max-width: none;
+    }
+  }
+
+  &.__multi {
+    .select__control {
+      padding-right: 40px;
     }
   }
 

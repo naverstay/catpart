@@ -296,7 +296,7 @@ export default function App() {
   };
 
   useEffect(() => {
-    updateLocationParams(window.location.pathname);
+    updateLocationParams(window.location);
 
     const profileLS = localStorage.getItem('catpart-profile');
 
@@ -372,7 +372,7 @@ export default function App() {
   }, [openProfile]);
 
   useEffect(() => {
-    setAsideOpen(openRequisites && openRequisites.id);
+    setAsideOpen(openRequisites);
 
     updateAsideContent(openRequisites ? <ProfileRequisites notificationFunc={createNotification} requisitesId={openRequisites ? openRequisites.id : null} profile={profile} requisites={openRequisites} setProfileRequisites={setProfile} /> : null);
   }, [openRequisites]);

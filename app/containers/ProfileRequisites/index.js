@@ -5,11 +5,13 @@ import { setInputFilter } from '../../utils/inputFilter';
 import { validateEmail } from '../../utils/validateEmail';
 import apiPATCH from '../../utils/change';
 import apiPOST from '../../utils/upload';
+import copyTextToClipboard from '../../utils/clipboard';
 
 const ProfileRequisites = props => {
-  let { requisitesId, setProfileRequisites, requisites, notificationFunc } = props;
+  const { requisitesId, setProfileRequisites, requisites, notificationFunc } = props;
 
   const authRef = React.createRef();
+  const requisitesRef = React.createRef();
   const resetRef = React.createRef();
   const phoneInput = React.createRef();
   const commentInput = React.createRef();
@@ -44,7 +46,7 @@ const ProfileRequisites = props => {
 
   const requisitesSubmit = e => {
     e.preventDefault();
-    let requestURL = '/requisites';
+    const requestURL = '/requisites';
 
     const formData = new FormData();
     const options = {};
@@ -61,24 +63,24 @@ const ProfileRequisites = props => {
     console.log('requisitesSubmit');
 
     if (requisitesId) {
-      //address: "274 O'Keefe Camp Apt. 171"
-      //available: 69970
-      //bank_account: "4817744862"
-      //bank_name: "Zemlak, Turcotte and Conn"
-      //bic: "40936482"
-      //company_name: "Conroy, Parisian and Wintheiser"
-      //contact_email: "elenor91@example.com"
-      //contact_name: "Meaghan Torp"
-      //contact_phone: "79999999999"
-      //created_at: "2021-07-08T15:40:05.000000Z"
-      //id: 13
-      //inn: 77449659
-      //notes: "test"
-      //profile_id: 5
-      //undistributed_amount: 22198
-      //updated_at: "2021-07-08T15:40:05.000000Z"
+      // address: "274 O'Keefe Camp Apt. 171"
+      // available: 69970
+      // bank_account: "4817744862"
+      // bank_name: "Zemlak, Turcotte and Conn"
+      // bic: "40936482"
+      // company_name: "Conroy, Parisian and Wintheiser"
+      // contact_email: "elenor91@example.com"
+      // contact_name: "Meaghan Torp"
+      // contact_phone: "79999999999"
+      // created_at: "2021-07-08T15:40:05.000000Z"
+      // id: 13
+      // inn: 77449659
+      // notes: "test"
+      // profile_id: 5
+      // undistributed_amount: 22198
+      // updated_at: "2021-07-08T15:40:05.000000Z"
 
-      apiPATCH(requestURL + '/' + requisitesId, formData, options, data => {
+      apiPATCH(`${requestURL}/${requisitesId}`, formData, options, data => {
         if (data.error) {
           notificationFunc('success', `Ошибка при обновлении реквизитов`, ' ');
         } else {
@@ -95,20 +97,32 @@ const ProfileRequisites = props => {
       });
     }
 
-    //const url = '/set/deal';
+    // const url = '/set/deal';
     //
-    //let store = localStorage.getItem('catpart');
+    // let store = localStorage.getItem('catpart');
     //
-    //if (store) {
+    // if (store) {
     //  store = JSON.parse(store);
-    //} else {
+    // } else {
     //  store = {};
-    //}
+    // }
     //
-    //if (!store.hasOwnProperty('order')) {
+    // if (!store.hasOwnProperty('order')) {
     //  store.order = [];
     //  localStorage.setItem('catpart', JSON.stringify(store));
-    //}
+    // }
+  };
+
+  const successCopy = text => {
+    notificationFunc('success', `Реквизиты скопированы в буфер обмена`, ' ');
+  };
+
+  const failCopy = () => {
+    notificationFunc('success', `Ошибка копирования в буфер обмена`, ':(');
+  };
+
+  const copyRequisites = () => {
+    copyTextToClipboard(requisitesRef.current.innerText, successCopy, failCopy);
   };
 
   const handleChange = (field, e) => {
@@ -134,7 +148,7 @@ const ProfileRequisites = props => {
         break;
     }
 
-    //localStorage.setItem('catpart-user', JSON.stringify(fields));
+    // localStorage.setItem('catpart-user', JSON.stringify(fields));
 
     setErrors(errors);
 
@@ -153,14 +167,20 @@ const ProfileRequisites = props => {
     };
   }, []);
 
-  console.log('requisites', requisites);
+  console.log('requisites', requisites, requisitesId);
 
   return (
     <div className="profile __requisites">
       <div className="aside-title">{requisitesId ? 'Редактируем реквизиты' : 'Добавляем новые реквизиты'}</div>
 
       {requisitesId ? (
-        <div className="profile-info">
+        <div
+          ref={requisitesRef}
+          onClick={e => {
+            copyRequisites();
+          }}
+          className="profile-info"
+        >
           <ul>
             <li>
               <span>Компания:&nbsp;</span> <b>{requisites.company_name}</b>
