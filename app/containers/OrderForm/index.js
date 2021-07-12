@@ -94,7 +94,7 @@ export function OrderForm({ dndFile, delivery, updateCart, history, notification
               validate();
             },
             e => {
-              errors[field] = 'Не корректный ИНН';
+              errors[field] = 'Проверьте ИНН';
               validate();
             },
           );
@@ -150,8 +150,8 @@ export function OrderForm({ dndFile, delivery, updateCart, history, notification
         manufacturer: s.brand,
         packingRate: s.pack_quant,
         amount: s.cart,
-        pureprice: pureprice,
-        price: price,
+        pureprice,
+        price,
         priceSumm: `${priceFormatter(s.cart * (price / currency.exChange), currency.precision)} RUB на ${dateFormatter(now, true)}`,
         deliveryTime: s.delivery_period,
       };

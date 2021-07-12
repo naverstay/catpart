@@ -6,6 +6,7 @@ import { validateEmail } from '../../utils/validateEmail';
 import apiPATCH from '../../utils/change';
 import apiPOST from '../../utils/upload';
 import copyTextToClipboard from '../../utils/clipboard';
+import innValidation from '../../utils/innValidation';
 
 const ProfileRequisites = props => {
   const { requisitesId, setProfileRequisites, requisites, notificationFunc } = props;
@@ -130,31 +131,53 @@ const ProfileRequisites = props => {
     fields[field] = e.target.value;
     setFields(fields);
 
+    const validate = () => {
+      setErrors(errors);
+
+      setValidForm(!Object.values(errors).filter(er => er === null || er.length).length);
+
+      setJustRedraw(justRedraw + 1);
+    };
+
     switch (field) {
-      case 'requisites-bik':
       case 'requisites-inn':
+        if (e.target.value.length) {
+          innValidation(
+            e.target.value,
+            e => {
+              console.log(e.hasOwnProperty('suggestions'), e.suggestions);
+              errors[field] = e.hasOwnProperty('suggestions') && e.suggestions.length ? '' : 'Проверьте ИНН';
+              validate();
+            },
+            e => {
+              errors[field] = 'Проверьте ИНН';
+              validate();
+            },
+          );
+        } else {
+          errors[field] = 'Не может быть пустым';
+          validate();
+        }
+        break;
+      case 'requisites-bik':
       case 'requisites-address':
       case 'requisites-contact':
         errors[field] = e.target.value.length ? '' : 'Не может быть пустым';
+        validate();
         break;
       case 'requisites-account':
         errors[field] = e.target.value.length >= 8 ? '' : 'Минимум 8 символов';
+        validate();
         break;
       case 'requisites-phone':
         errors[field] = e.target.value.length >= 8 ? '' : 'Минимум 8 символов';
+        validate();
         break;
       case 'requisites-email':
         errors[field] = e.target.value.length && validateEmail(e.target.value) ? '' : 'Проверьте формат e-mail';
+        validate();
         break;
     }
-
-    // localStorage.setItem('catpart-user', JSON.stringify(fields));
-
-    setErrors(errors);
-
-    setValidForm(!Object.values(errors).filter(er => er === null || er.length).length);
-
-    setJustRedraw(justRedraw + 1);
   };
 
   useEffect(() => {
