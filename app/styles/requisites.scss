@@ -39,7 +39,6 @@
     }
 
     &__row {
-      cursor: pointer;
       padding: 16px 10px;
       border-radius: 4px;
       position: relative;
@@ -48,6 +47,10 @@
       justify-content: stretch;
       align-items: center;
       transition: background .3s;
+
+      &:not(.__head) {
+        cursor: pointer;
+      }
 
       &.__head {
         white-space: pre;

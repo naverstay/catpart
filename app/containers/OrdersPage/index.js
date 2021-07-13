@@ -290,7 +290,7 @@ export function OrdersPage(props) {
       ) : (
         <>
           <div className="form-filter">
-            <div className="form-filter__controls">
+            <div className="form-filter__controls __requisites">
               <div className="form-filter__controls_left">
                 <div className="form-filter__control __search">
                   <input

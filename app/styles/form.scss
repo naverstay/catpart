@@ -260,6 +260,12 @@
     }
 
     &__controls {
+      &.__requisites {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+      }
+
       &.__cart {
         @include respond-to-min($tablet) {
           display: flex;

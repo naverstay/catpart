@@ -60,6 +60,27 @@ const OrderRow = props => {
             <span>26.05.2021 — оплачено 30%</span>
           </li>
           <li className="__odd">
+            <span>07.06.2021 — товар заказан</span>
+          </li>
+          <li className="__even">
+            <span>26.05.2021 — оплачено 30%</span>
+          </li>
+          <li className="__odd">
+            <span>25.05.2021 — отгружено 20%</span>
+            <a className="orders-chronology__link __green" href="#">
+              упд xlsx
+            </a>
+          </li>
+          <li className="__even">
+            <span>25.05.2021 — на складе 10%</span>
+          </li>
+          <li className="__odd">
+            <span>07.06.2021 — товар заказан</span>
+          </li>
+          <li className="__even">
+            <span>26.05.2021 — оплачено 30%</span>
+          </li>
+          <li className="__odd">
             <span>25.05.2021 — счёт выставлен</span>
             <a className="orders-chronology__link __green" href="#">
               xlsx
