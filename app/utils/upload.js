@@ -56,7 +56,7 @@ export default function apiPOST(url, data, options, cb) {
       headers: {
         //'Content-Type': 'application/json',
         'Content-Type': 'multipart/form-data',
-        Authorization: `Bearer ${localStorage.getItem('access_token') || ''}`,
+        //Authorization: `Bearer ${localStorage.getItem('access_token') || ''}`,
       },
       data: data,
       params: options,

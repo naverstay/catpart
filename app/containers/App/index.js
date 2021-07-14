@@ -202,7 +202,7 @@ export default function App() {
         if (storeItem) {
           createNotification('success', `Удален: ${storeItem.name}`, `Количество: ${storeItem.cart}`);
 
-          if (ym) {
+          if (typeof ym === 'function') {
             ym(81774553, 'reachGoal', 'removedfromcart');
           }
 
@@ -222,7 +222,7 @@ export default function App() {
           if (item) {
             createNotification('success', `Добавлен: ${item.name}`, `Количество: ${count}`);
 
-            if (ym) {
+            if (typeof ym === 'function') {
               ym(81774553, 'reachGoal', 'addtocart');
             }
 
@@ -243,7 +243,7 @@ export default function App() {
 
     if (store.length) {
       setTotalCart(store.reduce((total, c) => total + c.cart * c.pricebreaks[findPriceIndex(c.pricebreaks, c.cart)].price, 0));
-    } else if (window.location.pathname === '/order') {
+    } else if (window.location.pathname === '/order' && !clear) {
       history.push('/');
     }
   };
@@ -275,7 +275,7 @@ export default function App() {
           c: quantity.value || 1,
         };
 
-        if (ym) {
+        if (typeof ym === 'function') {
           ym(81774553, 'reachGoal', 'usedsearch');
         }
 

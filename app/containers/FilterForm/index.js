@@ -78,10 +78,6 @@ export function FilterForm({ props, cart, RUB, busy, currency, history, setCurre
     if (store) {
       setCartData([...JSON.parse(store)]);
     }
-
-    () => {
-      console.log('update link');
-    };
   }, []);
 
   const scrollTriggerHandler = goto => {
@@ -150,7 +146,7 @@ export function FilterForm({ props, cart, RUB, busy, currency, history, setCurre
 
   if (!cart && searchData && searchData.hasOwnProperty('res')) {
     totalData = searchData.res.reduce((total, c) => total + (c.hasOwnProperty('data') ? c.data.length : 0), 0);
-    searchInfo = (searchData.bom ? 'BOM-поиск. Н' : `По запросу «${query.get('art') || ''}» н`) + (searchData.res.length ? `айдено ${plural(totalData, 'наименование', 'наименования', 'наименований')}.` : 'ичего не найдено :(');
+    searchInfo = (searchData.bom ? 'BOM-поиск. Н' : `По запросу «${query.get('art') || ''}» `) + (searchData.res.length ? `найдено ${plural(totalData, 'наименование', 'наименования', 'наименований')}.` : 'ничего не найдено :(');
   }
 
   return (
@@ -250,7 +246,7 @@ export function FilterForm({ props, cart, RUB, busy, currency, history, setCurre
                   </Ripples>
                 </div>
               </div>
-            ) : (
+            ) : totalData ? (
               <div className="form-filter__controls_left">
                 <div className="form-filter__control">
                   <Ripples
@@ -281,30 +277,32 @@ export function FilterForm({ props, cart, RUB, busy, currency, history, setCurre
                   {openShare && <Share shareUrl={encodeURIComponent(window.location.href)} shareText={encodeURIComponent(searchInfo)} notificationFunc={notificationFunc} setOpenFunc={setOpenShare} />}
                 </div>
               </div>
-            )}
+            ) : null}
 
-            <div onChange={onChangeSwitch} className="form-filter__controls_right">
-              {currencyList.length > 1 &&
-                currencyList.map((cur, ind) => (
-                  <Ripples key={ind} className="form-filter__control" during={1000}>
-                    <label className="form-radio__btn">
-                      <input
-                        name="currency"
-                        className="hide"
-                        // checked={}
-                        defaultChecked={currency.name === cur.name}
-                        data-currency={cur.name}
-                        type="radio"
-                        value={cur.exChange}
-                      />
-                      <span className="btn __gray">
-                        <b>{cur.name}</b>
-                        {cur.name !== 'RUB' && <span>{priceFormatter(cur.exChange)}</span>}
-                      </span>
-                    </label>
-                  </Ripples>
-                ))}
-            </div>
+            {cart || totalData ? (
+              <div onChange={onChangeSwitch} className="form-filter__controls_right">
+                {currencyList.length > 1 &&
+                  currencyList.map((cur, ind) => (
+                    <Ripples key={ind} className="form-filter__control" during={1000}>
+                      <label className="form-radio__btn">
+                        <input
+                          name="currency"
+                          className="hide"
+                          // checked={}
+                          defaultChecked={currency.name === cur.name}
+                          data-currency={cur.name}
+                          type="radio"
+                          value={cur.exChange}
+                        />
+                        <span className="btn __gray">
+                          <b>{cur.name}</b>
+                          {cur.name !== 'RUB' && <span>{priceFormatter(cur.exChange)}</span>}
+                        </span>
+                      </label>
+                    </Ripples>
+                  ))}
+              </div>
+            ) : null}
           </div>
         )}
       </div>

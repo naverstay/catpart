@@ -30,9 +30,9 @@ export function SearchResults(props) {
   const [hasMore, setHasMore] = useState(true);
 
   const tableHeader = {
-    manufacturer: 'Поставщик',
+    supplier: 'Поставщик',
     name: 'Наименование',
-    brand: 'Бренд',
+    manufacturer: 'Бренд',
     quantity: 'Доступно',
     price_unit: 'Кратность',
     moq: 'MIN',
@@ -54,7 +54,9 @@ export function SearchResults(props) {
   );
 
   const handleScroll = event => {
-    tableHead.current.closest('.main').classList[tableHead.current.getBoundingClientRect().y <= 0 ? 'add' : 'remove']('__stick');
+    if (tableHead.current) {
+      tableHead.current.closest('.main').classList[tableHead.current.getBoundingClientRect().y <= 0 ? 'add' : 'remove']('__stick');
+    }
 
     // console.log('handleScroll', list, listCounter);
   };
@@ -66,7 +68,7 @@ export function SearchResults(props) {
 
     console.log('search mount');
 
-    if (window.innerWidth < 1200) {
+    if (window.innerWidth < 1200 && tableHead.current) {
       setTimeout(() => {
         smoothScrollTo(document.body, document.body.scrollTop, tableHead.current.getBoundingClientRect().top - 10, 600);
       }, 200);
@@ -127,6 +129,8 @@ export function SearchResults(props) {
   // };
   //  }
   // }, [list]);
+
+  console.log('list', list.length ? list[0].data : '0');
 
   return (
     <div className="search-results">

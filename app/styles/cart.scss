@@ -95,7 +95,7 @@
       padding-bottom: 2px;
       padding-left: 10px;
 
-      &.__manufacturer {
+      &.__supplier {
 
       }
 
@@ -144,12 +144,12 @@
       @include respond-to-max($wide) {
 
         &.__name,
-        &.__manufacturer {
+        &.__supplier {
           grid-column: 1;
           //align-self: baseline;
         }
 
-        &.__manufacturer {
+        &.__supplier {
           grid-row: 2 / 4;
         }
 
@@ -240,7 +240,7 @@
         }
 
         &.__name,
-        &.__manufacturer {
+        &.__supplier {
           padding-right: 40px;
         }
 
@@ -278,7 +278,7 @@
 
       @include respond-to-min($wide) {
 
-        &.__manufacturer {
+        &.__supplier {
           width: 23.5%;
         }
 

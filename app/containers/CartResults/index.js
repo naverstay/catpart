@@ -30,8 +30,8 @@ export function CartResults(props) {
 
   let tableHeader = {
     name: 'Компонент',
-    manufacturer: 'Поставщик',
-    brand: 'Бренд',
+    supplier: 'Поставщик',
+    manufacturer: 'Бренд',
     pack_quant: 'Норма уп.',
     quantity: 'Количество',
     pricebreaks: 'Цена за ед.',
@@ -42,9 +42,9 @@ export function CartResults(props) {
   let tHead = (
     <div className="cart-results__row __even __head">
       {Object.keys(tableHeader).map((head, hi) =>
-        head === 'brand' ? null : (
+        head === 'manufacturer' ? null : (
           <div key={hi} className={`cart-results__cell __${head}`}>
-            {head === 'manufacturer' ? <>&nbsp;</> : tableHeader[head]}
+            {head === 'supplier' ? <>&nbsp;</> : tableHeader[head]}
           </div>
         ),
       )}
@@ -53,7 +53,9 @@ export function CartResults(props) {
   );
 
   const handleScroll = event => {
-    tableHead.current.closest('.main').classList[tableHead.current.getBoundingClientRect().y <= 0 ? 'add' : 'remove']('__stick');
+    if (tableHead.current) {
+      tableHead.current.closest('.main').classList[tableHead.current.getBoundingClientRect().y <= 0 ? 'add' : 'remove']('__stick');
+    }
   };
 
   useEffect(() => {
@@ -61,7 +63,7 @@ export function CartResults(props) {
 
     document.body.addEventListener('scroll', handleScroll);
 
-    if (window.innerWidth < 1200) {
+    if (window.innerWidth < 1200 && tableHead.current) {
       setTimeout(() => {
         smoothScrollTo(document.body, document.body.scrollTop, tableHead.current.getBoundingClientRect().top - 10, 600);
       }, 200);

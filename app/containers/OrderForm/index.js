@@ -144,8 +144,8 @@ export function OrderForm({ dndFile, delivery, updateCart, history, notification
 
       return {
         name: s.name,
+        supplier: s.supplier,
         manufacturer: s.manufacturer,
-        brand: s.brand,
         pack_quant: s.pack_quant,
         quantity: s.cart,
         price,
@@ -215,7 +215,7 @@ export function OrderForm({ dndFile, delivery, updateCart, history, notification
         contact_phone: fields['order-phone'],
         delivery_type: fields['order-delivery'],
         comment: commentInput.current.value || '',
-        amount: (totalCart / currency.exChange).toFixed(2),
+        amount: parseFloat((totalCart / currency.exChange).toFixed(2)),
         products,
       };
 
@@ -231,10 +231,14 @@ export function OrderForm({ dndFile, delivery, updateCart, history, notification
       // });
 
       apiORDERDB(url, orderDB, {}, respData => {
-        if (respData && respData.hasOwnProperty('status') && respData.status === 'ok') {
-          setOrderSent(true);
-          // ym && ym(81774553, 'reachGoal', 'senttheorder');
+        console.log('respData', respData);
+        if (respData && respData.hasOwnProperty('status') && respData.status === 200) {
+          if (typeof ym === 'function') {
+            ym(81774553, 'reachGoal', 'senttheorder');
+          }
+
           notificationFunc('success', 'Заказ доставлен!', 'И уже обрабатывается ;)');
+          setOrderSent(true);
           updateCart(null, 0, {}, true);
         } else {
           notificationFunc('success', 'Ошибка обработки заказа.', 'Повторите позже.');

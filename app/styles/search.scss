@@ -165,7 +165,7 @@
       padding-bottom: 2px;
       padding-left: 10px;
 
-      &.__manufacturer {
+      &.__supplier {
 
       }
 
@@ -173,7 +173,7 @@
 
       }
 
-      &.__brand {
+      &.__manufacturer {
 
       }
 
@@ -218,13 +218,13 @@
       @include respond-to-max($wide) {
 
         &.__name,
-        &.__manufacturer,
-        &.__brand {
+        &.__supplier,
+        &.__manufacturer {
           grid-column: 1;
           //align-self: baseline;
         }
 
-        &.__manufacturer {
+        &.__supplier {
           grid-row: 2 / 4;
         }
 
@@ -237,7 +237,7 @@
           }
         }
 
-        &.__brand {
+        &.__manufacturer {
           grid-row: 2 / 4;
           transform: translateY(100%);
         }
@@ -314,7 +314,7 @@
       }
 
       @include respond-to-max($dt) {
-        &.__manufacturer {
+        &.__supplier {
           grid-row: 2;
         }
 
@@ -323,7 +323,7 @@
           transform: none;
         }
 
-        &.__brand {
+        &.__manufacturer {
           grid-row: 3;
           transform: none;
         }
@@ -396,8 +396,8 @@
         }
 
         &.__name,
-        &.__manufacturer,
-        &.__brand {
+        &.__supplier,
+        &.__manufacturer {
           margin-bottom: 3px;
         }
 
@@ -454,7 +454,7 @@
 
       @include respond-to-min($wide) {
 
-        &.__manufacturer {
+        &.__supplier {
           width: 12%;
         }
 
@@ -462,7 +462,7 @@
           width: 15.2%;
         }
 
-        &.__brand {
+        &.__manufacturer {
           width: 11%;
         }
 

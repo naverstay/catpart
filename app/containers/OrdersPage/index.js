@@ -119,7 +119,9 @@ export function OrdersPage(props) {
   };
 
   const handleScroll = event => {
-    tableHead.current.closest('.main').classList[tableHead.current.getBoundingClientRect().y <= 0 ? 'add' : 'remove']('__stick');
+    if (tableHead.current) {
+      tableHead.current.closest('.main').classList[tableHead.current.getBoundingClientRect().y <= 0 ? 'add' : 'remove']('__stick');
+    }
 
     // console.log('handleScroll', list, listCounter);
   };
@@ -179,7 +181,7 @@ export function OrdersPage(props) {
 
     document.body.addEventListener('scroll', handleScroll);
 
-    if (window.innerWidth < 1200) {
+    if (window.innerWidth < 1200 && tableHead.current) {
       setTimeout(() => {
         smoothScrollTo(document.body, document.body.scrollTop, tableHead.current.getBoundingClientRect().top - 10, 600);
       }, 200);

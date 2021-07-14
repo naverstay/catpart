@@ -66,7 +66,7 @@ export const xlsDownload = (data, currency, mode) => {
   if (data && data.length) {
     let fileName = mode === MODE_CART ? 'cart' : 'search';
 
-    let tableHeader = ['manufacturer', 'name', 'brand', 'quantity', 'pack_quant', 'price_unit', 'moq', 'delivery_period'];
+    let tableHeader = ['supplier', 'name', 'manufacturer', 'quantity', 'pack_quant', 'price_unit', 'moq', 'delivery_period'];
 
     if (mode === MODE_CART) {
       tableHeader.push('cart');

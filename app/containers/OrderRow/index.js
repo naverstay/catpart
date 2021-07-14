@@ -94,22 +94,24 @@ const OrderRow = props => {
     );
   };
 
-  const buildChronologyHealth = row => (
-    <ul className="orders-health__list">
-      <li>
-        <span>Оплачено</span>
-        {healthGradient(parseInt(100 * Math.random()))}
-      </li>
-      <li>
-        <span>На складе</span>
-        {healthGradient(parseInt(100 * Math.random()))}
-      </li>
-      <li>
-        <span>Отгружено</span>
-        {healthGradient(parseInt(100 * Math.random()))}
-      </li>
-    </ul>
-  );
+  const buildChronologyHealth = row => {
+    return (
+      <ul className="orders-health__list">
+        <li>
+          <span>Оплачено</span>
+          {healthGradient(parseInt(100 * Math.random()))}
+        </li>
+        <li>
+          <span>На складе</span>
+          {healthGradient(parseInt(100 * Math.random()))}
+        </li>
+        <li>
+          <span>Отгружено</span>
+          {healthGradient(parseInt(100 * Math.random()))}
+        </li>
+      </ul>
+    );
+  };
 
   return (
     <div
@@ -121,7 +123,13 @@ const OrderRow = props => {
       {Object.keys(tableHeader).map((cell, ci) => (
         <div key={ci} className={`orders-results__cell __${cell}`}>
           <span className="orders-results__label">{tableHeader[cell]}</span>
-          {cell === 'chronology' ? (
+          {cell === 'requisites' ? (
+            typeof row[cell] === 'string' ? (
+              <span className="orders-results__value">{row[cell]}</span>
+            ) : (
+              <span className="orders-results__value">{row[cell].company_name}</span>
+            )
+          ) : cell === 'chronology' ? (
             buildChronology(row)
           ) : cell === 'chronology_health' ? (
             buildChronologyHealth(row)

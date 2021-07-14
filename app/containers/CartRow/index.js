@@ -29,17 +29,17 @@ const CartRow = props => {
   return (
     <div className={`cart-results__row${rowIndex % 2 === 0 ? ' __odd' : ' __even'}`}>
       {Object.keys(tableHeader).map((cell, ci) =>
-        cell === 'brand' ? null : (
+        cell === 'manufacturer' ? null : (
           <div key={ci} className={`cart-results__cell __${cell}`}>
-            {cell === 'manufacturer' ? (
+            {cell === 'supplier' ? (
               <>
                 <p>
                   <span className="cart-results__label __show">{tableHeader[cell]}:</span>
                   <span className="cart-results__value">{row[cell]}</span>
                 </p>
                 <p>
-                  <span className="cart-results__label __show">{tableHeader.brand}:</span>
-                  <span className="cart-results__value">{row.brand}</span>
+                  <span className="cart-results__label __show">{tableHeader.manufacturer}:</span>
+                  <span className="cart-results__value">{row.manufacturer}</span>
                 </p>
               </>
             ) : (

@@ -174,19 +174,19 @@ const OrderDetails = props => {
 
           <ul className="orders-info">
             <li>
-              <span>Заказчик:&nbsp;</span> <b>{`${order.contact_name}, ИНН ${order.inn || ''}`}</b>
+              <span>Заказчик:&nbsp;</span> <b>{`${order.requisites.company_name}, ИНН ${order.requisites.inn || ''}`}</b>
             </li>
             <li>
-              <span>Заказал:&nbsp;</span> <b>{order.contact_name}</b>
+              <span>Заказал:&nbsp;</span> <b>{order.requisites.contact_name}</b>
             </li>
             <li>
-              <span>Доставка:&nbsp;</span> <b>курьерская доставка</b>
+              <span>Доставка:&nbsp;</span> <b>{order.delivery_type}</b>
             </li>
             <li>
               <span>Адрес доставки:&nbsp;</span> <b>630005, г. Новосибирск, ул. Достоевского 58, 605</b>
             </li>
             <li>
-              <span>Получатель заказа:&nbsp;</span> <b>Телков Вячеслав Алексеевич</b>
+              <span>Получатель заказа:&nbsp;</span> <b>{order.contact_name}</b>
             </li>
           </ul>
         </div>
