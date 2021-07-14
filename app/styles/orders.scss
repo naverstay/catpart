@@ -145,7 +145,15 @@
       display: flex;
 
       @include respond-to-max($wide) {
-        margin: 0
+        margin: 0;
+
+        .aside-inner & {
+          width: 100%;
+
+          .orders-chronology__list {
+            width: 100%;
+          }
+        }
       }
 
       @include respond-to-min($wide) {
@@ -160,9 +168,10 @@
       overflow-y: auto;
 
       &:not(:hover) {
-        &::-webkit-scrollbar-thumb {
-          background-color: transparent;
-        }
+        //&::-webkit-scrollbar,
+        //&::-webkit-scrollbar-thumb {
+        //  background-color: transparent;
+        //}
       }
 
       li {
@@ -176,7 +185,7 @@
         }
 
         &.__even {
-          background: #f7f8fd;
+          background: $main_gray_light;
         }
 
         &:hover {
@@ -296,7 +305,7 @@
           "item_7 price_7"
           "item_8 price_8";
         grid-template-columns: 1fr 1fr;
-
+        padding-bottom: 0;
       }
 
       @include respond-to-max($tablet) {
@@ -484,12 +493,8 @@
           }
 
           .orders-chronology__list {
-            position: relative;
-            max-height: 148px;
+            max-height: calc(100% + 36px);
             width: calc(100% + 30px);
-            top: unset;
-            bottom: unset;
-            right: unset;
             left: -20px;
           }
         }
@@ -535,12 +540,20 @@
           text-align: left;
         }
 
-        &.__cart {
-          position: absolute;
-          top: 10px;
-          right: 10px;
-          padding: 0;
-          width: auto;
+        &.__chronology {
+          .orders-chronology__list {
+            position: relative;
+            max-height: 148px;
+            width: calc(100% + 30px);
+            top: unset;
+            bottom: unset;
+            right: unset;
+            left: -20px;
+
+            li {
+              padding-left: 20px;
+            }
+          }
         }
       }
 

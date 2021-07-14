@@ -202,7 +202,7 @@ const ProfileRequisites = props => {
           onClick={e => {
             copyRequisites();
           }}
-          className="profile-info"
+          className="profile-info __cp"
         >
           <ul>
             <li>

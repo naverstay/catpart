@@ -393,15 +393,32 @@
       svg {
         fill: #7d7e7e;
       }
+
+      ~ .select__dropdown-indicator {
+        display: none;
+      }
     }
 
-    &__indicator-separator,
-    &__dropdown-indicator {
+    &__indicator-separator {
       display: none !important;
+    }
+
+    &__dropdown-indicator {
+      padding: 0;
+      position: absolute;
+      top: 50%;
+      right: 5px;
+      transform: translateY(-50%);
+
+      svg {
+        fill: #7d7e7e;
+      }
     }
 
     &__control {
       @extend .input;
+      transition: background .3s;
+      cursor: pointer;
     }
 
     &.__lg .select__control {
@@ -422,8 +439,6 @@
 
     &__menu-list {
       padding: 0;
-
-
     }
 
     &__option {
@@ -441,13 +456,13 @@
       transition: border .3s, box-shadow .3s;
 
       &:hover {
-        background: $main_gray_hover;
+        background: $main_gray_light;
       }
 
       &.select__option--is-selected {
         cursor: default;
         color: $main_gray;
-        background: $main_gray_light;
+        background: $main_gray_hover;
       }
     }
 
@@ -471,8 +486,20 @@
   }
 
   &.__multi {
+
     .select__control {
+      border-color: transparent;
+      border-radius: 5px;
+      background-color: $main_gray_light;
       padding-right: 40px;
+
+      &.select__control--menu-is-open {
+        background: $main_gray_hover;
+
+        .select__dropdown-indicator {
+          transform: translateY(-50%) rotate(180deg);
+        }
+      }
     }
   }
 

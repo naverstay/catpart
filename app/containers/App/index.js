@@ -202,7 +202,9 @@ export default function App() {
         if (storeItem) {
           createNotification('success', `Удален: ${storeItem.name}`, `Количество: ${storeItem.cart}`);
 
-          ym && ym(81774553, 'reachGoal', 'removedfromcart');
+          if (ym) {
+            ym(81774553, 'reachGoal', 'removedfromcart');
+          }
 
           store = [...store.filter(f => f.id !== id)];
         }
@@ -220,7 +222,9 @@ export default function App() {
           if (item) {
             createNotification('success', `Добавлен: ${item.name}`, `Количество: ${count}`);
 
-            ym && ym(81774553, 'reachGoal', 'addtocart');
+            if (ym) {
+              ym(81774553, 'reachGoal', 'addtocart');
+            }
 
             item.cart = count;
             item.cur = cur;
@@ -271,7 +275,9 @@ export default function App() {
           c: quantity.value || 1,
         };
 
-        ym && ym(81774553, 'reachGoal', 'usedsearch');
+        if (ym) {
+          ym(81774553, 'reachGoal', 'usedsearch');
+        }
 
         apiGET(requestURL, options, data => {
           setFormBusy(false);

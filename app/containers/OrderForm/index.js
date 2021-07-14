@@ -24,7 +24,7 @@ import saga from './saga';
 import FormInput from '../../components/FormInput';
 import priceFormatter from '../../utils/priceFormatter';
 import { counterEffect } from '../../utils/counterEffect';
-import apiORDER from '../../utils/order';
+import apiORDER, { apiORDERDB } from '../../utils/order';
 import { findPriceIndex } from '../../utils/findPriceIndex';
 import FormSelect from '../../components/FormSelect';
 import { validateEmail } from '../../utils/validateEmail';
@@ -122,7 +122,8 @@ export function OrderForm({ dndFile, delivery, updateCart, history, notification
   const contactSubmit = e => {
     e.preventDefault();
 
-    const url = '/set/deal';
+    // const url = '/set/deal';
+    const url = '/orders';
 
     let store = localStorage.getItem('catpart');
 
@@ -140,21 +141,27 @@ export function OrderForm({ dndFile, delivery, updateCart, history, notification
     const products = store.map(s => {
       const priceIndex = findPriceIndex(s.pricebreaks, s.cart);
       const { price } = s.pricebreaks[priceIndex];
-      const { pureprice } = s.pricebreaks[priceIndex];
-
-      const now = new Date();
 
       return {
-        partNo: s.name,
-        supllier: s.manufacturer,
-        manufacturer: s.brand,
-        packingRate: s.pack_quant,
-        amount: s.cart,
-        pureprice,
+        name: s.name,
+        manufacturer: s.manufacturer,
+        brand: s.brand,
+        pack_quant: s.pack_quant,
+        quantity: s.cart,
         price,
-        priceSumm: `${priceFormatter(s.cart * (price / currency.exChange), currency.precision)} RUB на ${dateFormatter(now, true)}`,
-        deliveryTime: s.delivery_period,
       };
+
+      // return {
+      //  partNo: s.name,
+      //  supllier: s.manufacturer,
+      //  manufacturer: s.brand,
+      //  packingRate: s.pack_quant,
+      //  amount: s.cart,
+      //  pureprice,
+      //  price,
+      //  priceSumm: `${priceFormatter(s.cart * (price / currency.exChange), currency.precision)} RUB на ${dateFormatter(now, true)}`,
+      //  deliveryTime: s.delivery_period,
+      // };
     });
 
     if (products.length) {
@@ -173,12 +180,60 @@ export function OrderForm({ dndFile, delivery, updateCart, history, notification
         products,
       };
 
-      apiORDER(url, order, {}, respData => {
-        setOrderSent(true);
+      const r = {
+        contact_email: 'test@test.ru',
+        contact_phone: '79999999999',
+        inn: 123456789,
+        contact_name: 'Antwon Gulgowski DVM',
+        delivery_type: 'test',
+        amount: 7634.19,
+        comment: '',
+        products: [
+          {
+            name: '3128919224',
+            supplier: 'Kuhic Inc',
+            manufacturer: 'Keeling Inc',
+            packingrate: 2000,
+            quantity: 629,
+            price: 55.38,
+          },
+          {
+            name: '9181399170',
+            supplier: 'Leuschke PLC',
+            manufacturer: "Jacobs, O'Conner and Frami",
+            packingrate: 1000,
+            quantity: 881,
+            price: 44.02,
+          },
+        ],
+      };
 
-        ym && ym(81774553, 'reachGoal', 'senttheorder');
+      const orderDB = {
+        inn: parseInt(fields['order-inn']),
+        contact_name: fields['order-name'],
+        contact_email: fields['order-email'],
+        contact_phone: fields['order-phone'],
+        delivery_type: fields['order-delivery'],
+        comment: commentInput.current.value || '',
+        amount: (totalCart / currency.exChange).toFixed(2),
+        products,
+      };
 
+      // apiORDER(url, order, {}, respData => {
+      //  if (respData && respData.hasOwnProperty('status') && respData.status === 'ok') {
+      //    setOrderSent(true);
+      //    ym && ym(81774553, 'reachGoal', 'senttheorder');
+      //    notificationFunc('success', 'Заказ доставлен!', 'И уже обрабатывается ;)');
+      //    updateCart(null, 0, {}, true);
+      //  } else {
+      //    notificationFunc('success', 'Ошибка обработки заказа.', 'Повторите позже.');
+      //  }
+      // });
+
+      apiORDERDB(url, orderDB, {}, respData => {
         if (respData && respData.hasOwnProperty('status') && respData.status === 'ok') {
+          setOrderSent(true);
+          // ym && ym(81774553, 'reachGoal', 'senttheorder');
           notificationFunc('success', 'Заказ доставлен!', 'И уже обрабатывается ;)');
           updateCart(null, 0, {}, true);
         } else {

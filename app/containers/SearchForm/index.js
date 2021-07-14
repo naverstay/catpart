@@ -142,7 +142,7 @@ export function SearchForm({ dndFile, notificationFunc, busy, setFormBusy, histo
             </div>
           </div>
 
-          <div className="form-cell column sm-col-12 md-col-3 lg-col-2">
+          <div className="form-cell column sm-col-12 md-col-3 lg-col-2_5 xl-col-2">
             <label className="form-label" htmlFor="quantity">
               Количество
             </label>
@@ -196,7 +196,7 @@ export function SearchForm({ dndFile, notificationFunc, busy, setFormBusy, histo
             </div>
           </div>
 
-          <div className="form-cell form-cell__search column sm-col-12 md-col-4 lg-col-2">
+          <div className="form-cell form-cell__search column sm-col-12 md-col-4 lg-col-2_5 xl-col-2">
             <span className="form-label">&nbsp;</span>
             <div className="form-control">
               <Ripples className="__w-100p btn __blue __lg" during={1000}>
@@ -207,7 +207,7 @@ export function SearchForm({ dndFile, notificationFunc, busy, setFormBusy, histo
             </div>
           </div>
 
-          <div className="form-cell column form-cell__or sm-col-12 md-col-4 lg-col-2">
+          <div className="form-cell column form-cell__or sm-col-12 md-col-4 lg-col-2_5 xl-col-2">
             <span className="form-label">&nbsp;</span>
             <div data-or="или" className="form-control">
               <Ripples className="__w-100p btn __lg __gray-dash" during={1000}>

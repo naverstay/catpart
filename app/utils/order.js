@@ -1,7 +1,8 @@
 import axios from 'axios';
 
-const CancelToken = axios.CancelToken;
-const API = 'https://dev.sibelcom.tech/apiv2';
+const { CancelToken } = axios;
+const API = 'https://dev.catpart.ru/api';
+const API2 = 'https://dev.sibelcom.tech/apiv2';
 let cancel;
 
 /**
@@ -51,7 +52,7 @@ function checkStatus(response) {
  */
 
 export default function apiORDER(url, data, options, cb) {
-  //if (typeof cancel === 'function' && url.indexOf('search') > -1) {
+  // if (typeof cancel === 'function' && url.indexOf('search') > -1) {
   //  cancel();
   //  cancel = null;
   //
@@ -60,14 +61,57 @@ export default function apiORDER(url, data, options, cb) {
   //  }
   //
   //  console.log('canceled', cancel);
-  //}
+  // }
 
   console.log('apiORDER', data);
 
   return axios({
     method: 'post',
+    url: API2 + url,
+    data,
+    headers: {
+      'Content-type': 'application/json; charset=UTF-8',
+    },
+    params: options,
+    cancelToken: new CancelToken(function executor(c) {
+      // An executor function receives a cancel function as a parameter
+      cancel = c;
+    }),
+  })
+    .then(checkStatus)
+    .then(parseJSON)
+    .then(data => {
+      cancel = null;
+
+      if (typeof cb === 'function') {
+        cb(data);
+      }
+    })
+    .catch(e => {
+      if (typeof cb === 'function') {
+        cb({ error: e });
+      }
+    });
+}
+
+export function apiORDERDB(url, data, options, cb) {
+  // if (typeof cancel === 'function' && url.indexOf('search') > -1) {
+  //  cancel();
+  //  cancel = null;
+  //
+  //  if (typeof cb === 'function') {
+  //    cb([]);
+  //  }
+  //
+  //  console.log('canceled', cancel);
+  // }
+
+  console.log('apiORDERDB', data);
+
+  return axios({
+    method: 'post',
     url: API + url,
-    data: data,
+    data,
     headers: {
       'Content-type': 'application/json; charset=UTF-8',
     },

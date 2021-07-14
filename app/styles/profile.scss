@@ -54,11 +54,17 @@
   }
 
   &-info {
+    transition: background-color .3s;
     border-radius: 5px;
-    background-color: #f7f8fd;
+    background-color: $main_gray_light;
     padding: 15px 20px;
     font-size: 12px;
     margin-bottom: 18px;
+
+    &.__cp:hover {
+      background: $main_gray_hover;
+    }
+
 
     ul {
 

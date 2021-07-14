@@ -170,6 +170,12 @@ $gutter-size: 15px !default;
   }
 }
 
+@media screen and (min-width: $dt) {
+  .lg-col-2_5 {
+    flex: 0 0 20.6%;
+    min-width: 20.6%;
+  }
+}
 
 // Make some base columns for large
 @for $i from 1 through 12 {
