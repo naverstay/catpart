@@ -7,7 +7,7 @@ import { validateEmail } from '../../utils/validateEmail';
 import apiPOST from '../../utils/upload';
 import apiGET from '../../utils/search';
 
-function Header({ history, notificationFunc, openMobMenu, cartCount, profile, setProfile, setOpenMobMenu }) {
+function Header({ history, notificationFunc, openMobMenu, cartCount, profile, setProfile, setOpenMobMenu, showCabinet }) {
   const headerRef = useDetectClickOutside({
     onTriggered: () => {
       setOpenMobMenu(false);
@@ -239,19 +239,21 @@ function Header({ history, notificationFunc, openMobMenu, cartCount, profile, se
         ) : (
           <div ref={popupRef} className={'header-popup__holder'}>
             {/* preprod */}
-            <Ripples
-              onClick={() => {
-                setOpenAuthPopup(!openAuthPopup);
+            {showCabinet ? (
+              <Ripples
+                onClick={() => {
+                  setOpenAuthPopup(!openAuthPopup);
 
-                console.log('open', openAuthPopup);
-              }}
-              during={1000}
-              className={'btn __blue'}
-            >
-              <span className="btn-inner">
-                <span className={'__dotted'}>Личный кабинет</span>
-              </span>
-            </Ripples>
+                  console.log('open', openAuthPopup);
+                }}
+                during={1000}
+                className={'btn __blue'}
+              >
+                <span className="btn-inner">
+                  <span className={'__dotted'}>Личный кабинет</span>
+                </span>
+              </Ripples>
+            ) : null}
             {/* preprod */}
 
             {openAuthPopup || openResetPassword ? (

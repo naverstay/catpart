@@ -87,7 +87,7 @@ const SearchRow = props => {
       ))}
 
       <div className="search-results__cell __cart">
-        <div className="search-results__cart">
+        <label className="search-results__cart">
           <input
             ref={inputRef}
             onChange={e => {
@@ -130,7 +130,7 @@ const SearchRow = props => {
               </button>
             </Ripples>
           </div>
-        </div>
+        </label>
       </div>
     </div>
   );

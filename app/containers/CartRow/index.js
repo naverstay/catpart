@@ -44,13 +44,20 @@ const CartRow = props => {
               </>
             ) : (
               <>
-                {cell === 'name' ? null : <span className="cart-results__label">{tableHeader[cell]}</span>}
+                {cell === 'name' ? null : cell === 'quantity' ? (
+                  <label className="cart-results__label" htmlFor={'cart-row-' + rowIndex}>
+                    {tableHeader[cell]}
+                  </label>
+                ) : (
+                  <span className="cart-results__label">{tableHeader[cell]}</span>
+                )}
                 <span className="cart-results__value">
                   {cell === 'pricebreaks' ? (
                     <span className="cart-results__item">{priceFormatter(parseFloat(row.pricebreaks[priceMatch].price / currency.exChange).toFixed(currency.precision), currency.precision)}</span>
                   ) : cell === 'quantity' ? (
                     <div className="cart-results__count">
                       <input
+                        id={'cart-row-' + rowIndex}
                         ref={inputRef}
                         onChange={e => {
                           const val = +e.target.value;
