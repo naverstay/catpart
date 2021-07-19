@@ -8,13 +8,15 @@ const MODE_BOM = 1;
 const MODE_DETAILS = 2;
 const MODE_SEARCH = -1;
 
-const transformSearchData = data =>
+const transformSearchData = (data, query) =>
   data.reduce(
     (arr, c) =>
       arr.concat(
         c.hasOwnProperty('data')
           ? c.data.map(d => {
-              d.query = c.q;
+              if (query) {
+                d.query = c.q;
+              }
               return d;
             })
           : [],
@@ -24,7 +26,7 @@ const transformSearchData = data =>
 
 const prepareJSON = (data, mode, currency) => {
   if (mode !== MODE_CART && mode !== MODE_DETAILS) {
-    data = transformSearchData(data);
+    data = transformSearchData(data, mode === MODE_BOM);
   }
 
   console.log('prepareJSON', data);

@@ -302,6 +302,14 @@ export default function App() {
   };
 
   useEffect(() => {
+    // preprod
+
+    //localStorage.removeItem('access_token');
+    //localStorage.removeItem('catpart-profile');
+    //setProfile({});
+
+    // preprod
+
     updateLocationParams(window.location);
 
     const profileLS = localStorage.getItem('catpart-profile');

@@ -238,6 +238,7 @@ function Header({ history, notificationFunc, openMobMenu, cartCount, profile, se
           </Ripples>
         ) : (
           <div ref={popupRef} className={'header-popup__holder'}>
+            {/* preprod */}
             <Ripples
               onClick={() => {
                 setOpenAuthPopup(!openAuthPopup);
@@ -251,6 +252,7 @@ function Header({ history, notificationFunc, openMobMenu, cartCount, profile, se
                 <span className={'__dotted'}>Личный кабинет</span>
               </span>
             </Ripples>
+            {/* preprod */}
 
             {openAuthPopup || openResetPassword ? (
               <div className="header-popup">
