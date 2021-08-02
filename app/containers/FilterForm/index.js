@@ -296,7 +296,7 @@ export function FilterForm({ props, cart, RUB, busy, currency, history, setCurre
                         />
                         <span className="btn __gray">
                           <b>{cur.name}</b>
-                          {cur.name !== 'RUB' && <span>{priceFormatter(cur.exChange)}</span>}
+                          {cur.name !== 'RUB' && <span>{priceFormatter(cur.exChange, cur.precision)}</span>}
                         </span>
                       </label>
                     </Ripples>
