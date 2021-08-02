@@ -383,6 +383,10 @@ export default function App() {
   };
 
   useEffect(() => {
+    document.body.classList[formBusy ? 'add' : 'remove']('__busy');
+  }, [formBusy]);
+
+  useEffect(() => {
     setAsideOpen(openProfile);
     updateAsideContent(openProfile ? <Profile notificationFunc={createNotification} logOut={logOut} profile={profile} setProfile={setProfile} /> : null);
   }, [openProfile]);

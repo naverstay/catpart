@@ -49,6 +49,14 @@ body {
 body {
   overflow-y: scroll;
   font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+
+  &.__busy {
+    cursor: not-allowed;
+
+    * {
+      pointer-events: none;
+    }
+  }
 }
 
 #app {
