@@ -53,7 +53,7 @@ const CartRow = props => {
                 )}
                 <span className="cart-results__value">
                   {cell === 'pricebreaks' ? (
-                    <span className="cart-results__item">{priceFormatter(parseFloat(row.pricebreaks[priceMatch].price / currency.exChange).toFixedCustom(currency.precision), currency.precision)}</span>
+                    <span className="cart-results__item">{priceFormatter(parseFloat(row.pricebreaks[priceMatch].price / currency.exChange), currency.precision)}</span>
                   ) : cell === 'quantity' ? (
                     <div className="cart-results__count">
                       <input
@@ -97,7 +97,7 @@ const CartRow = props => {
                       />
                     </div>
                   ) : cell === 'total' ? (
-                    <span className="cart-results__item">{priceFormatter((cartCount * parseFloat(row.pricebreaks[priceMatch].price / currency.exChange)).toFixedCustom(currency.precision), currency.precision)}</span>
+                    <span className="cart-results__item">{priceFormatter(cartCount * parseFloat(row.pricebreaks[priceMatch].price / currency.exChange), currency.precision)}</span>
                   ) : (
                     row[cell] || `!${cell}!`
                   )}

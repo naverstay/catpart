@@ -37,7 +37,7 @@ const prepareJSON = (data, mode, currency) => {
 
     if (mode === MODE_CART) {
       priceMatch = findPriceIndex(row.pricebreaks, row.cart);
-      price = priceFormatter((row.cart * parseFloat(row.pricebreaks[priceMatch].price / currency.exChange)).toFixedCustom(currency.precision), currency.precision);
+      price = priceFormatter(row.cart * parseFloat(row.pricebreaks[priceMatch].price / currency.exChange), currency.precision);
       row.price = `${priceMatch}#${price}`;
     } else {
       delete row.cart;
