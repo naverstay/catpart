@@ -24,6 +24,7 @@ const SearchRow = props => {
   const inputRef = createRef();
   const [disableAddBtn, setDisableAddBtn] = useState(false);
   const [itemCount, setItemCount] = useState(defaultCount || 1);
+  const extraSymbols = [',', '.', '-', ' ', '#', '_', '+', ')', '(', '[', ']'];
   let priceMatch = defaultCount ? row.pricebreaks.length - 1 : -1;
 
   const textHighlighter = txt => {
@@ -32,10 +33,18 @@ const SearchRow = props => {
     if (highlight && highlight.length) {
       // let rx = new RegExp(escapeRegExp(highlight), 'i');
 
+      let extraCounter = 0;
+
+      highlight.split('').forEach(l => {
+        if (extraSymbols.indexOf(l) > -1) {
+          extraCounter++;
+        }
+      });
+
       ret = (
         <>
-          <b>{highlight}</b>
-          {txt.slice(highlight.length)}
+          <b>{txt.slice(0, highlight.length + extraCounter)}</b>
+          {txt.slice(highlight.length + extraCounter)}
         </>
       );
     }
