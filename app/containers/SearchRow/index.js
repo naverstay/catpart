@@ -27,24 +27,16 @@ const SearchRow = props => {
   const extraSymbols = [',', '.', '-', ' ', '#', '_', '+', ')', '(', '[', ']'];
   let priceMatch = defaultCount ? row.pricebreaks.length - 1 : -1;
 
-  const textHighlighter = txt => {
+  const textHighlighter = (txt, bold) => {
     let ret = <>{txt}</>;
 
-    if (highlight && highlight.length) {
+    if (bold && bold.length) {
       // let rx = new RegExp(escapeRegExp(highlight), 'i');
-
-      let extraCounter = 0;
-
-      highlight.split('').forEach(l => {
-        if (extraSymbols.indexOf(l) > -1) {
-          extraCounter++;
-        }
-      });
 
       ret = (
         <>
-          <b>{txt.slice(0, highlight.length + extraCounter)}</b>
-          {txt.slice(highlight.length + extraCounter)}
+          <b>{bold}</b>
+          {txt.slice(bold.length)}
         </>
       );
     }
@@ -88,7 +80,7 @@ const SearchRow = props => {
                 ))
               : row[cell]
               ? cell === 'name'
-                ? textHighlighter(row[cell])
+                ? textHighlighter(row[cell], row.bold)
                 : row[cell]
               : `!${cell}!`}
           </span>
