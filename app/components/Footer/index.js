@@ -8,7 +8,7 @@ function Footer() {
       <div className="column lg-col-8">
         <div className="footer-content">
           <div className="footer-copyright">
-            2012-2021 © ООО «Сибэлком-Логистик», ИНН&nbsp;5404462899 <br />
+            2012-2021 © ООО «Катпарт», ИНН&nbsp;5406814289 <br />
             Для повышения удобства сайт использует cookies. Оставаясь на сайте, вы соглашаетесь с{' '}
             <Link className="footer-link" to="/privacy-policy">
               политикой конфиденциальности
@@ -23,8 +23,8 @@ function Footer() {
           </div>
 
           <div className="footer-sales">
-            <a className="footer-link" href="mailto:sales@sibelcom54.com">
-              sales@sibelcom54.com
+            <a className="footer-link" href="mailto:sales@catpart.ru">
+              sales@catpart.ru
             </a>
           </div>
         </div>

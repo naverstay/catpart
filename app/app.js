@@ -18,7 +18,8 @@ import history from 'utils/history';
 import './styles/app.scss';
 
 Number.prototype.toFixedCustom = function(decimals) {
-  return this.toFixed(decimals + 1).replace(/.$/, '');
+  let base = Math.pow(10, decimals);
+  return Math.round((this + Number.EPSILON) * base) / base;
 };
 
 // Import root app
