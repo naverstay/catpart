@@ -176,7 +176,7 @@ export function OrderForm({ dndFile, delivery, updateCart, history, notification
         delivery: fields['order-delivery'],
         comment: commentInput.current.value || '',
         maxDeliveryTime: 'Максимальный срок',
-        summ: (totalCart / currency.exChange).toFixedCustom(2),
+        summ: (totalCart / currency.exChange).toFixed(2),
         products,
       };
 
@@ -215,7 +215,7 @@ export function OrderForm({ dndFile, delivery, updateCart, history, notification
         contact_phone: fields['order-phone'],
         delivery_type: fields['order-delivery'],
         comment: commentInput.current.value || '',
-        amount: parseFloat((totalCart / currency.exChange).toFixedCustom(2)),
+        amount: parseFloat((totalCart / currency.exChange).toFixed(2)),
         products,
       };
 
