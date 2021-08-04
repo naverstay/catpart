@@ -215,7 +215,7 @@ export function OrderForm({ dndFile, delivery, updateCart, history, notification
         contact_phone: fields['order-phone'],
         delivery_type: fields['order-delivery'],
         comment: commentInput.current.value || '',
-        amount: parseFloat((totalCart / currency.exChange).toFixedCustom(2)),
+        amount: (totalCart / currency.exChange).toFixedCustom(2),
         products,
       };
 

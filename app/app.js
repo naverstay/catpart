@@ -19,6 +19,7 @@ import './styles/app.scss';
 
 Number.prototype.toFixedCustom = function(decimals) {
   let base = Math.pow(10, decimals);
+  //console.log('toFixedCustom', this, decimals, Math.round((this + Number.EPSILON) * base) / base);
   return Math.round((this + Number.EPSILON) * base) / base;
 };
 

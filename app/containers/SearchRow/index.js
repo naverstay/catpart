@@ -75,7 +75,7 @@ const SearchRow = props => {
               : cell === 'total'
               ? row.pricebreaks.map((p, pi) => (
                   <span key={pi} className="search-results__item">
-                    {priceHighlighter(pi, `x${pi === priceMatch ? itemCount : p.quant}=${priceFormatter((parseFloat(pi === priceMatch ? itemCount : p.quant) * parseFloat(p.price / currency.exChange)).toFixedCustom(currency.precision), currency.precision)}`)}
+                    {priceHighlighter(pi, `x${pi === priceMatch ? itemCount : p.quant}=${priceFormatter(parseFloat(pi === priceMatch ? itemCount : p.quant) * parseFloat(p.price / currency.exChange).toFixedCustom(currency.precision), currency.precision)}`)}
                   </span>
                 ))
               : row[cell]
