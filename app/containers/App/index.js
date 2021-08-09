@@ -18,15 +18,16 @@ import Header from 'components/Header';
 import Footer from 'components/Footer';
 
 import apiGET from '../../utils/search';
-import PolicyPage from '../PolicyPage';
+//import PolicyPage from '../PolicyPage';
 import { findPriceIndex } from '../../utils/findPriceIndex';
-import DeliveryPage from '../DeliveryPage';
+//import DeliveryPage from '../DeliveryPage';
 import AsideContainer from '../AsideContainer';
 import Profile from '../Profile';
 import ProfileRequisites from '../ProfileRequisites';
 import { validateJSON } from '../../utils/validateJSON';
 import OrderDetails from '../OrderDetails';
 import { OrdersPage } from '../OrdersPage';
+//import ContactsPage from '../ContactsPage';
 
 export default function App() {
   const history = useHistory();
@@ -449,9 +450,18 @@ export default function App() {
                   )}
                 />
 
-                <Route path="/about" render={routeProps => <FeaturePage updateCart={updateCart} notificationFunc={createNotification} setOrderSent={setOrderSent} totalCart={totalCart} currency={currency} setOpenMobMenu={setOpenMobMenu} {...routeProps} />} />
+                {/*<Route path="/about" render={routeProps => <FeaturePage updateCart={updateCart} notificationFunc={createNotification} setOrderSent={setOrderSent} totalCart={totalCart} currency={currency} setOpenMobMenu={setOpenMobMenu} {...routeProps} />} />*/}
 
-                <Route path="/delivery" render={routeProps => <DeliveryPage setOpenMobMenu={setOpenMobMenu} {...routeProps} />} />
+                {/*<Route path="/delivery" render={routeProps => <DeliveryPage setOpenMobMenu={setOpenMobMenu} {...routeProps} />} />*/}
+
+                {/*<Route path="/contacts" render={routeProps => <ContactsPage setOpenMobMenu={setOpenMobMenu} {...routeProps} />} />*/}
+
+                {/*<Route path="/privacy-policy" render={routeProps => <PolicyPage setOpenMobMenu={setOpenMobMenu} {...routeProps} />} />*/}
+
+                <Route
+                  path={['/contacts', '/about', '/test', '/delivery', '/privacy-policy']}
+                  render={routeProps => <FeaturePage updateCart={updateCart} notificationFunc={createNotification} setOrderSent={setOrderSent} totalCart={totalCart} currency={currency} setOpenMobMenu={setOpenMobMenu} {...routeProps} />}
+                />
 
                 <Route
                   path="/orders"
@@ -493,8 +503,6 @@ export default function App() {
                     />
                   )}
                 />
-
-                <Route path="/privacy-policy" render={routeProps => <PolicyPage setOpenMobMenu={setOpenMobMenu} {...routeProps} />} />
 
                 <Route
                   path="/search"

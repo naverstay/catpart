@@ -3,51 +3,48 @@
  *
  * List all the features
  */
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet';
 import { OrderForm } from '../OrderForm';
+import apiGET from '../../utils/search';
 
 export default function FeaturePage(props) {
+  const [page, setPage] = useState(null);
+
   useEffect(() => {
     props.setOpenMobMenu(false);
-  }, []);
 
-  return (
+    const requestURL = '/pages?url=' + props.match.path;
+
+    apiGET(requestURL, {}, data => {
+      console.log('apiGET', data);
+
+      if (data.error) {
+        setPage({ title: 'Ошибка', content: '' });
+      } else {
+        setPage(data);
+      }
+    });
+  }, [props]);
+
+  return page ? (
     <>
       <div className="row">
         <Helmet>
-          <title>О компании - CATPART.RU</title>
-          <meta name="description" content="О компании - CATPART.RU" />
-          <meta name="keywords" content="О компании - CATPART.RU" />
-          <link rel="canonical" href="https://catpart.ru/about/" />
+          <title>{page.title + ' - CATPART.RU'}</title>
+          <meta name="description" content={page.title + ' - CATPART.RU'} />
+          <meta name="keywords" content={page.title + ' - CATPART.RU'} />
+          <link rel="canonical" href={'https://catpart.ru' + props.match.path + '/'} />
         </Helmet>
 
         <div className="column sm-col-12 xl-col-9">
           <article className="article">
-            <h1 className="article-title">О компании</h1>
+            <h1 className="article-title">{page.title}</h1>
 
-            <p>
-              ООО «СибЭлКом-Логистик» основана в 2012-м году в Новосибирске как ответ на потребность рынка необходимого уровня сервиса и автоматизации. Забюрокративанность процессов как крупных компаний, так и рядовых снижает доступность электронных компонентов. Цена при этом
-              растет, а срок увеличивается.
-            </p>
-
-            <p>
-              Заводы, производящие электронные приборы в России, ориентирующиеся как на Российских, так и на зарубежных заказчиков, нуждаются в ускорении и облегчении процессов, связанных с быстрым подбором и комплектацией необходимых электронных компонентов. При этом важно
-              выбрать наиболее приемлемый вариант как по цене, так и по сроку поставки.
-            </p>
-
-            <p>
-              ООО «СибЭлКом-Логистик» решает эти задачи путем глубокой проработки запросов. Мы используем широкую наработанную сеть поставщиков путем online запросов, а также взаимодействуем с десятками поставщиков в Юго-Восточной Азии, общаясь с ними напрямую через наш офис в
-              г.Шэньчжэнь. Так становится возможным решение задач заказчиков в быстрые сроки и по приемлемым ценам.
-            </p>
-
-            <p>
-              Особое внимание мы уделяем дефицитным и трудным по тем или иным причинам позициям. Наша инфраструктура позволяет оперативно закупать товар в условиях постоянных изменений рынка и требований к конечному электронному продукту. Благодаря высокой
-              клиентоориентированности наша компания позволяет сохранять репутацию заказчика любого размера, доверие которых подтверждается ежегодным увеличением годового оборота компании, который составил более 235 млн.рублей в 2020-м году.
-            </p>
+            <div dangerouslySetInnerHTML={{ __html: page.content }} />
           </article>
         </div>
       </div>
     </>
-  );
+  ) : null;
 }

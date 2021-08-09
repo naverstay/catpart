@@ -211,6 +211,11 @@ function Header({ history, notificationFunc, openMobMenu, cartCount, profile, se
               Доставка
             </Link>
           </li>
+          <li>
+            <Link className="header-navbar__link" to="/contacts">
+              Контакты
+            </Link>
+          </li>
           {/*<li>*/}
           {/*  <Link className="header-navbar__link" to="/conditions">*/}
           {/*    Условия*/}
