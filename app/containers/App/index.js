@@ -460,7 +460,7 @@ export default function App() {
 
                 <Route
                   path={['/contacts', '/about', '/test', '/delivery', '/privacy-policy']}
-                  render={routeProps => <FeaturePage updateCart={updateCart} notificationFunc={createNotification} setOrderSent={setOrderSent} totalCart={totalCart} currency={currency} setOpenMobMenu={setOpenMobMenu} {...routeProps} />}
+                  render={routeProps => <FeaturePage setTableHeadFixed={setTableHeadFixed} updateCart={updateCart} notificationFunc={createNotification} setOrderSent={setOrderSent} totalCart={totalCart} currency={currency} setOpenMobMenu={setOpenMobMenu} {...routeProps} />}
                 />
 
                 <Route
@@ -509,6 +509,7 @@ export default function App() {
                   render={routeProps => (
                     <FilterForm
                       history={history}
+                      busy={formBusy}
                       setBusyOrder={setBusyOrder}
                       currency={currency}
                       setCurrency={setCurrency}
@@ -533,6 +534,7 @@ export default function App() {
                   render={routeProps => (
                     <FilterForm
                       history={history}
+                      busy={formBusy}
                       setBusyOrder={setBusyOrder}
                       currency={currency}
                       setCurrency={setCurrency}

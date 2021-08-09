@@ -55,6 +55,7 @@ const prepareJSON = (data, mode, currency) => {
 
     delete row.id;
     delete row.cur;
+    delete row.bold;
     delete row.request;
     delete row.currentPricebreak;
 

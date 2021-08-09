@@ -13,18 +13,19 @@ export default function FeaturePage(props) {
 
   useEffect(() => {
     props.setOpenMobMenu(false);
+    props.setTableHeadFixed(null);
 
-    const requestURL = '/pages?url=' + props.match.path;
+    if (!page || page.url !== props.match.path) {
+      const requestURL = '/pages?url=' + props.match.path;
 
-    apiGET(requestURL, {}, data => {
-      console.log('apiGET', data);
-
-      if (data.error) {
-        setPage({ title: 'Ошибка', content: '' });
-      } else {
-        setPage(data);
-      }
-    });
+      apiGET(requestURL, {}, data => {
+        if (data.error) {
+          setPage({ title: 'Ошибка', content: '' });
+        } else {
+          setPage(data);
+        }
+      });
+    }
   }, [props]);
 
   return page ? (
