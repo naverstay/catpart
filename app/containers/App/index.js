@@ -49,6 +49,7 @@ export default function App() {
   const [pageY, setPageY] = useState(0);
   const [centeredForm, setCenteredForm] = useState(true);
   const [formBusy, setFormBusy] = useState(false);
+  const [busyOrder, setBusyOrder] = useState(false);
   const [formDrag, setFormDrag] = useState(false);
 
   const [profile, setProfile] = useState({});
@@ -383,8 +384,8 @@ export default function App() {
   };
 
   useEffect(() => {
-    document.body.classList[formBusy ? 'add' : 'remove']('__busy');
-  }, [formBusy]);
+    document.body.classList[formBusy || busyOrder ? 'add' : 'remove']('__busy');
+  }, [formBusy, busyOrder]);
 
   useEffect(() => {
     setAsideOpen(openProfile);
@@ -425,7 +426,7 @@ export default function App() {
         <Header showCabinet={showCabinet} notificationFunc={createNotification} setProfile={setProfile} history={history} profile={profile} cartCount={cartCount} openMobMenu={openMobMenu} setOpenMobMenu={setOpenMobMenu} />
 
         <main className={`main${centeredForm ? ' __center' : ''}`}>
-          <SearchForm setFormBusy={setFormBusy} history={history} setSearchData={setSearchData} setOpenMobMenu={setOpenMobMenu} busy={formBusy} onSubmitForm={onSubmitSearchForm} notificationFunc={createNotification} />
+          <SearchForm setFormBusy={setFormBusy} history={history} setSearchData={setSearchData} setOpenMobMenu={setOpenMobMenu} busyOrder={busyOrder} busy={formBusy} onSubmitForm={onSubmitSearchForm} notificationFunc={createNotification} />
 
           <div className="main-content">
             {orderSent ? (
@@ -500,7 +501,7 @@ export default function App() {
                   render={routeProps => (
                     <FilterForm
                       history={history}
-                      busy={formBusy}
+                      setBusyOrder={setBusyOrder}
                       currency={currency}
                       setCurrency={setCurrency}
                       RUB={RUB}
@@ -524,7 +525,7 @@ export default function App() {
                   render={routeProps => (
                     <FilterForm
                       history={history}
-                      busy={formBusy}
+                      setBusyOrder={setBusyOrder}
                       currency={currency}
                       setCurrency={setCurrency}
                       RUB={RUB}

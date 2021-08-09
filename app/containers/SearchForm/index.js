@@ -28,7 +28,7 @@ import FormInput from '../../components/FormInput';
 
 // const key = 'home';
 
-export function SearchForm({ dndFile, notificationFunc, busy, setFormBusy, history, setSearchData, location, onSubmitForm, artNumber, loading, error, repos, onChangeUsername }) {
+export function SearchForm({ dndFile, notificationFunc, busy, busyOrder, setFormBusy, history, setSearchData, location, onSubmitForm, artNumber, loading, error, repos, onChangeUsername }) {
   // useInjectReducer({ key, reducer });
   // useInjectSaga({ key, saga });
 
@@ -199,8 +199,8 @@ export function SearchForm({ dndFile, notificationFunc, busy, setFormBusy, histo
           <div className="form-cell form-cell__search column sm-col-12 md-col-4 lg-col-2_5 xl-col-2">
             <span className="form-label">&nbsp;</span>
             <div className="form-control">
-              <Ripples className="__w-100p btn __blue __lg" during={1000}>
-                <button name="search-submit" className="btn-inner __abs">
+              <Ripples className={'__w-100p btn __blue __lg' + (busy ? ' __loader' : '')} during={1000}>
+                <button name="search-submit" disabled={busy} className={'btn-inner __abs'}>
                   <span>{searchBtnText}</span>
                 </button>
               </Ripples>

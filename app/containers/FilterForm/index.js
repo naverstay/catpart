@@ -38,7 +38,7 @@ import { smoothScrollTo } from '../../utils/smoothScrollTo';
 // const key = 'home';
 const TRIGGER_DROPDOWN_LIMIT = 11;
 
-export function FilterForm({ props, cart, RUB, busy, currency, history, setCurrency, setOrderSent, setShowTableHeadFixed, setTableHeadFixed, showResults, totalCart, notificationFunc, updateCart, setOpenMobMenu, searchData, loading, error, onChangeCurrency }) {
+export function FilterForm({ props, cart, RUB, busy, setBusyOrder, currency, history, setCurrency, setOrderSent, setShowTableHeadFixed, setTableHeadFixed, showResults, totalCart, notificationFunc, updateCart, setOpenMobMenu, searchData, loading, error, onChangeCurrency }) {
   // useInjectReducer({ key, reducer });
   // useInjectSaga({ key, saga });
 
@@ -311,7 +311,7 @@ export function FilterForm({ props, cart, RUB, busy, currency, history, setCurre
         <>
           <CartResults setTableHeadFixed={setTableHeadFixed} setShowTableHeadFixed={setShowTableHeadFixed} updateCart={updateCart} list={cartData} notificationFunc={notificationFunc} showResults={showResults} count={count} currency={currency} />
 
-          <OrderForm history={history} updateCart={updateCart} notificationFunc={notificationFunc} setOrderSent={setOrderSent} totalCart={totalCart} currency={currency} delivery />
+          <OrderForm history={history} setBusyOrder={setBusyOrder} updateCart={updateCart} notificationFunc={notificationFunc} setOrderSent={setOrderSent} totalCart={totalCart} currency={currency} delivery />
         </>
       ) : busy || !totalData ? null : (
         <SearchResults

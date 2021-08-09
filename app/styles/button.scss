@@ -5,6 +5,22 @@
   .btn > & {
     margin: 0 17px 0 -17px !important;
   }
+
+  &.__loader {
+    pointer-events: none !important;
+    font-size: 0 !important;
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 60%;
+      height: 60%;
+      background: url(../images/loader.svg) no-repeat 50% 50%;
+    }
+  }
 }
 
 .__w-100p {

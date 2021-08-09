@@ -33,7 +33,7 @@ import innValidation from '../../utils/innValidation';
 
 const key = 'home';
 
-export function OrderForm({ dndFile, delivery, updateCart, history, notificationFunc, setOrderSent, currency, totalCart, onSubmitForm, loading, error, repos, onChangeUsername }) {
+export function OrderForm({ dndFile, delivery, updateCart, history, notificationFunc, setOrderSent, currency, totalCart, onSubmitForm, loading, setBusyOrder, onChangeUsername }) {
   useInjectReducer({ key, reducer });
   useInjectSaga({ key, saga });
 
@@ -60,6 +60,8 @@ export function OrderForm({ dndFile, delivery, updateCart, history, notification
     'order-inn': null,
     'order-delivery': null,
   });
+
+  const [busy, setBusy] = useState(false);
   const [validForm, setValidForm] = useState(false);
   const [deliveryOptions, setDeliveryOptions] = useState([]);
   const [preSelectedDelivery, setPreSelectedDelivery] = useState(-1);
@@ -132,6 +134,9 @@ export function OrderForm({ dndFile, delivery, updateCart, history, notification
     } else {
       store = {};
     }
+
+    setBusy(true);
+    setBusyOrder(true);
 
     if (!store.hasOwnProperty('order')) {
       store.order = [];
@@ -243,9 +248,14 @@ export function OrderForm({ dndFile, delivery, updateCart, history, notification
         } else {
           notificationFunc('success', 'Ошибка обработки заказа.', 'Повторите позже.');
         }
+
+        setBusy(false);
+        setBusyOrder(false);
       });
     } else {
       notificationFunc('success', 'В заказе нет товаров.', `Заказ не отправлен.`);
+      setBusy(false);
+      setBusyOrder(false);
     }
   };
 
@@ -396,7 +406,7 @@ export function OrderForm({ dndFile, delivery, updateCart, history, notification
         <FormInput textarea placeholder="Комментарий" name="order-comment" error={null} className="__lg" inputRef={commentInput} />
 
         <div className="form-control">
-          <Ripples className={`__w-100p btn __blue __lg${!validForm ? ' __disabled' : ''}`} during={1000}>
+          <Ripples className={`__w-100p btn __blue __lg${!validForm ? ' __disabled' : ''}` + (busy ? ' __loader' : '')} during={1000}>
             <button name="order-submit" className="btn-inner">
               <span>Оформить заказ</span>
             </button>
