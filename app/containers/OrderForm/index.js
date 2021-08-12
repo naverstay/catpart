@@ -76,7 +76,14 @@ export function OrderForm({ dndFile, delivery, updateCart, history, notification
     setFields(fields);
 
     const validate = () => {
-      localStorage.setItem('catpart-user', JSON.stringify(fields));
+      const user = localStorage.getItem('catpart-user');
+      let userFields = {};
+
+      if (user) {
+        userFields = JSON.parse(user);
+      }
+
+      localStorage.setItem('catpart-user', JSON.stringify(Object.assign(userFields, fields)));
 
       setErrors(errors);
 
@@ -406,7 +413,7 @@ export function OrderForm({ dndFile, delivery, updateCart, history, notification
         <FormInput textarea placeholder="Комментарий" name="order-comment" error={null} className="__lg" inputRef={commentInput} />
 
         <div className="form-control">
-          <Ripples className={`__w-100p btn __blue __lg${!validForm ? ' __disabled' : ''}` + (busy ? ' __loader' : '')} during={1000}>
+          <Ripples className={`__w-100p btn __blue __lg${!validForm ? ' __disabled' : ''}${busy ? ' __loader' : ''}`} during={1000}>
             <button name="order-submit" className="btn-inner">
               <span>Оформить заказ</span>
             </button>

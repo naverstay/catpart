@@ -58,6 +58,22 @@ export function FilterForm({ props, cart, RUB, busy, setBusyOrder, currency, his
   });
 
   useEffect(() => {
+    const user = localStorage.getItem('catpart-user');
+    let userFields = {};
+
+    if (user) {
+      userFields = JSON.parse(user);
+
+      if (userFields.hasOwnProperty('currency')) {
+        const userCurrency = currencyList.find(c => c.name === userFields.currency);
+        if (userCurrency) {
+          setCurrency(userCurrency);
+        }
+      }
+    }
+  }, [currencyList]);
+
+  useEffect(() => {
     setOpenMobMenu(false);
 
     const requestURL = '/currencies';
@@ -68,7 +84,7 @@ export function FilterForm({ props, cart, RUB, busy, setBusyOrder, currency, his
           .map(c => ({
             name: c,
             precision: 4,
-            exChange: data[c],
+            exChange: parseFloat(data[c]),
           }))
           .concat(RUB),
       );
@@ -130,6 +146,16 @@ export function FilterForm({ props, cart, RUB, busy, setBusyOrder, currency, his
   };
 
   const onChangeSwitch = evt => {
+    const user = localStorage.getItem('catpart-user');
+    let userFields = { currency: evt.target.dataset.currency };
+
+    if (user) {
+      userFields = JSON.parse(user);
+      userFields.currency = evt.target.dataset.currency;
+    }
+
+    localStorage.setItem('catpart-user', JSON.stringify(userFields));
+
     // console.log('onChangeSwitch', currency, evt.target);
     // onChangeCurrency(evt.target.value, evt.target.dataset.currency);
     setCurrency({
