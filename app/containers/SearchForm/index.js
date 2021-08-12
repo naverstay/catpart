@@ -133,11 +133,11 @@ export function SearchForm({ dndFile, notificationFunc, busy, busyOrder, setForm
               <span
                 className="form-tip__example"
                 onClick={() => {
-                  formArtNumber.current.value = 'MAX34';
+                  formArtNumber.current.value = '15C01M';
                   handleChange('art-number', { target: formArtNumber.current });
                 }}
               >
-                MAX34
+                15C01M
               </span>
             </div>
           </div>
