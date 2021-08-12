@@ -16,13 +16,13 @@ export const readFile = (file, cb) => {
   };
 
   txtReader.onload = function() {
-    console.log('readFile', txtReader, txtReader.result);
+    window.log && console.log('readFile', txtReader, txtReader.result);
 
     if (xlsFile) {
       const data = new Uint8Array(txtReader.result);
       const workbook = XLSX.read(data, { type: 'array' });
 
-      console.log('workbook', workbook);
+      window.log && console.log('workbook', workbook);
 
       if (workbook.SheetNames.length) {
         const sheet = workbook.Sheets[workbook.SheetNames[0]];
@@ -36,7 +36,7 @@ export const readFile = (file, cb) => {
       let ret = txtReader.result;
 
       if (file.name.match(/\.tsv$/)) {
-        console.log('TSV');
+        window.log && console.log('TSV');
         ret = tsv2json(ret);
       }
 
@@ -45,7 +45,7 @@ export const readFile = (file, cb) => {
   };
 
   txtReader.onerror = function() {
-    console.log('readFile', txtReader.error);
+    window.log && console.log('readFile', txtReader.error);
 
     response({ success: false, text: '' });
   };

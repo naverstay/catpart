@@ -140,7 +140,7 @@ export default function App() {
   ];
 
   const logOut = () => {
-    console.log('logOut');
+    window.log && console.log('logOut');
     localStorage.removeItem('access_token');
     localStorage.removeItem('catpart-profile');
     history.push('/');
@@ -148,14 +148,14 @@ export default function App() {
   };
 
   const needLogin = () => {
-    console.log('needLogin', profile);
+    window.log && console.log('needLogin', profile);
 
     logOut();
     createNotification('success', `Требуется авторизация`, ' ');
   };
 
   const createNotification = (type, title, text) => {
-    console.log('createNotification', type, text);
+    window.log && console.log('createNotification', type, text);
 
     switch (type) {
       case 'info':
@@ -185,7 +185,7 @@ export default function App() {
   };
 
   const updateCart = (id = null, count = 0, cur = {}, clear = false) => {
-    console.log('updateCart', id, count);
+    window.log && console.log('updateCart', id, count);
 
     let store = localStorage.getItem('catpart');
 
@@ -259,7 +259,7 @@ export default function App() {
       const art = form.querySelector('#art-number');
       const quantity = form.querySelector('#quantity');
 
-      console.log('onSubmitSearchForm', art.value);
+      window.log && console.log('onSubmitSearchForm', art.value);
 
       if (art.value.length) {
         const requestURL = '/search';
@@ -420,6 +420,8 @@ export default function App() {
   }, [asideOpen]);
 
   let showCabinet = ['localhost', 'html'].indexOf(location.hostname.split('.')[0]) > -1;
+
+  window.log = showCabinet;
 
   return (
     <>

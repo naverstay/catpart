@@ -60,7 +60,7 @@ function Header({ history, notificationFunc, openMobMenu, cartCount, profile, se
   };
 
   const handleChange = (field, e) => {
-    console.log('handleChange', field, e);
+    window.log && console.log('handleChange', field, e);
     fields[field] = e.target.value;
     setFields(fields);
 
@@ -83,7 +83,7 @@ function Header({ history, notificationFunc, openMobMenu, cartCount, profile, se
   };
 
   const handleResetChange = (field, e) => {
-    console.log('handleResetChange', field, e);
+    window.log && console.log('handleResetChange', field, e);
     resetFields[field] = e.target.value;
     setResetFields(resetFields);
 
@@ -103,7 +103,7 @@ function Header({ history, notificationFunc, openMobMenu, cartCount, profile, se
   const authSubmit = e => {
     e.preventDefault();
 
-    console.log('authSubmit');
+    window.log && console.log('authSubmit');
 
     const requestURL = '/auth/login';
 
@@ -114,7 +114,7 @@ function Header({ history, notificationFunc, openMobMenu, cartCount, profile, se
     formData.append('password', passwordInput.current.value);
 
     apiPOST(requestURL, formData, options, data => {
-      console.log('data', data);
+      window.log && console.log('data', data);
 
       if (data.error) {
         notificationFunc('success', `Авторизация не удалась. `, 'Проверьте логин/пароль.');
@@ -145,7 +145,7 @@ function Header({ history, notificationFunc, openMobMenu, cartCount, profile, se
   const resetSubmit = e => {
     e.preventDefault();
 
-    console.log('resetSubmit');
+    window.log && console.log('resetSubmit');
 
     setOpenResetPassword(false);
 
@@ -249,7 +249,7 @@ function Header({ history, notificationFunc, openMobMenu, cartCount, profile, se
                 onClick={() => {
                   setOpenAuthPopup(!openAuthPopup);
 
-                  console.log('open', openAuthPopup);
+                  window.log && console.log('open', openAuthPopup);
                 }}
                 during={1000}
                 className={'btn __blue'}

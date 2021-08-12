@@ -45,7 +45,7 @@ const OrderDetails = props => {
   const changeSubmit = e => {
     e.preventDefault();
 
-    console.log('changeSubmit');
+    window.log && console.log('changeSubmit');
 
     //const url = '/set/deal';
     //
@@ -64,7 +64,7 @@ const OrderDetails = props => {
   };
 
   const handleChange = (field, e) => {
-    console.log('handleChange', field, e);
+    window.log && console.log('handleChange', field, e);
     fields[field] = e.target.value;
     setFields(fields);
 
@@ -128,7 +128,7 @@ const OrderDetails = props => {
     const requestURL = '/orders/' + detailsId;
 
     apiGET(requestURL, {}, data => {
-      console.log('OrderDetails', detailsId, data);
+      window.log && console.log('OrderDetails', detailsId, data);
     });
 
     return () => {

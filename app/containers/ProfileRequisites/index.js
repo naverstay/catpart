@@ -61,7 +61,7 @@ const ProfileRequisites = props => {
     formData.append('contact_phone', phoneInput.current.value);
     formData.append('notes', commentInput.current.value);
 
-    console.log('requisitesSubmit');
+    window.log && console.log('requisitesSubmit');
 
     if (requisitesId) {
       // address: "274 O'Keefe Camp Apt. 171"
@@ -127,7 +127,7 @@ const ProfileRequisites = props => {
   };
 
   const handleChange = (field, e) => {
-    console.log('handleChange', field, e);
+    window.log && console.log('handleChange', field, e);
     fields[field] = e.target.value;
     setFields(fields);
 
@@ -145,7 +145,7 @@ const ProfileRequisites = props => {
           innValidation(
             e.target.value,
             e => {
-              console.log(e.hasOwnProperty('suggestions'), e.suggestions);
+              window.log && console.log(e.hasOwnProperty('suggestions'), e.suggestions);
               errors[field] = e.hasOwnProperty('suggestions') && e.suggestions.length ? '' : 'Проверьте ИНН';
               validate();
             },

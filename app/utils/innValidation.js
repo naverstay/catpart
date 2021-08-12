@@ -28,11 +28,11 @@ export default function innValidation(query, successCallback, failCallback) {
   fetch(url, options)
     .then(response => response.text())
     .then(result => {
-      console.log('innValidation', result);
+      window.log && console.log('innValidation', result);
       successCallback(JSON.parse(result));
     })
     .catch(error => {
-      console.log('innValidation error', error);
+      window.log && console.log('innValidation error', error);
       failCallback(error);
     });
 }

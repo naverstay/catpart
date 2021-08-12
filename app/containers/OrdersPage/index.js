@@ -132,13 +132,13 @@ export function OrdersPage(props) {
     const requestURL = '/orders';
 
     apiGET(requestURL, {}, data => {
-      console.log('getOrders', data);
+      window.log && console.log('getOrders', data);
 
       if (data.error) {
         needLogin();
       } else {
         const statuses = data.reduce((all, d) => all.concat(d.products.reduce((ret, p) => ret.concat(p.statuses.map(s => s.name)), [])), []);
-        console.log('statuses', statuses, statuses.filter(onlyUnique));
+        window.log && console.log('statuses', statuses, statuses.filter(onlyUnique));
 
         setStatusOptions(statuses.filter(onlyUnique).map(u => ({ value: u, label: u })));
 
@@ -151,7 +151,7 @@ export function OrdersPage(props) {
     const requestURL = '/requisites';
 
     apiGET(requestURL, {}, data => {
-      console.log('getRequisites', data);
+      window.log && console.log('getRequisites', data);
 
       if (data.error) {
         needLogin();
@@ -193,7 +193,7 @@ export function OrdersPage(props) {
   }, []);
 
   const handleChange = (field, e) => {
-    console.log('handleChange', field, e);
+    window.log && console.log('handleChange', field, e);
 
     const filter = e.target.map(f => f.value);
 

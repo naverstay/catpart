@@ -64,7 +64,7 @@ export function SearchResults(props) {
 
     document.body.addEventListener('scroll', handleScroll);
 
-    console.log('search mount');
+    window.log && console.log('search mount');
 
     if (window.innerWidth < 1200 && tableHead.current) {
       setTimeout(() => {
@@ -78,7 +78,7 @@ export function SearchResults(props) {
   }, []);
 
   const getMoreData = (newList, step) => {
-    console.log('newList', newList);
+    window.log && console.log('newList', newList);
 
     setRowCount(prevState => {
       if (!newList) {
@@ -89,7 +89,7 @@ export function SearchResults(props) {
 
       let rowCounter = newRows.length;
 
-      console.log('prevState', prevState, rowCounter, newList, newRows);
+      window.log && console.log('prevState', prevState, rowCounter, newList, newRows);
 
       if (rowCounter === newList[listCounter].data.length) {
         listCounter++;
@@ -128,7 +128,7 @@ export function SearchResults(props) {
   //  }
   // }, [list]);
 
-  console.log('list', list.length ? list[0].data : '0');
+  window.log && console.log('list', list.length ? list[0].data : '0');
 
   return (
     <div className="search-results">

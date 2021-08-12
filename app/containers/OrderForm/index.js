@@ -71,7 +71,7 @@ export function OrderForm({ dndFile, delivery, updateCart, history, notification
   const requiredFields = ['order-email', 'order-name', 'order-phone', 'order-inn', 'order-delivery'];
 
   const handleChange = (field, e) => {
-    console.log('handleChange', field, e);
+    window.log && console.log('handleChange', field, e);
     fields[field] = e.target.value;
     setFields(fields);
 
@@ -91,7 +91,7 @@ export function OrderForm({ dndFile, delivery, updateCart, history, notification
           innValidation(
             e.target.value,
             e => {
-              console.log(e.hasOwnProperty('suggestions'), e.suggestions);
+              window.log && console.log(e.hasOwnProperty('suggestions'), e.suggestions);
               errors[field] = e.hasOwnProperty('suggestions') && e.suggestions.length ? '' : 'Проверьте ИНН';
               validate();
             },
@@ -236,7 +236,7 @@ export function OrderForm({ dndFile, delivery, updateCart, history, notification
       // });
 
       apiORDERDB(url, orderDB, {}, respData => {
-        console.log('respData', respData);
+        window.log && console.log('respData', respData);
         if (respData && respData.hasOwnProperty('status') && respData.status === 200) {
           if (typeof ym === 'function') {
             ym(81774553, 'reachGoal', 'senttheorder');

@@ -27,7 +27,7 @@ const Profile = props => {
   const profileSubmit = e => {
     e.preventDefault();
 
-    console.log('profileSubmit');
+    window.log && console.log('profileSubmit');
 
     const requestURL = '/profiles/' + profile.id;
     const password = passwordInput.current.value;
@@ -62,7 +62,7 @@ const Profile = props => {
   };
 
   const handleChange = (field, e) => {
-    console.log('handleChange', field, e);
+    window.log && console.log('handleChange', field, e);
     fields[field] = e.target.value;
     setFields(fields);
 

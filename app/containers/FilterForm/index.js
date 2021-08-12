@@ -146,7 +146,7 @@ export function FilterForm({ props, cart, RUB, busy, setBusyOrder, currency, his
 
   if (!cart && searchData && searchData.hasOwnProperty('res')) {
     totalData = searchData.res.reduce((total, c) => total + (c.hasOwnProperty('data') ? c.data.length : 0), 0);
-    searchInfo = (searchData.bom ? 'BOM-поиск. ' : `По запросу «${query.get('art') || ''}» `) + (searchData.res.length ? `найдено ${plural(totalData, 'наименование', 'наименования', 'наименований')}.` : 'ничего не найдено :(');
+    searchInfo = (searchData.bom ? 'BOM-поиск. ' : `По запросу «${query.get('art') || ''}» `) + (totalData ? `найдено ${plural(totalData, 'наименование', 'наименования', 'наименований')}.` : 'ничего не найдено :(');
   }
 
   return (
