@@ -27,6 +27,8 @@
   }
 
   @include respond-to-max($tablet) {
+    padding-top: 50px;
+
     &-phone {
       padding-right: 45px;
     }
