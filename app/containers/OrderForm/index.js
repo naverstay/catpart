@@ -249,6 +249,15 @@ export function OrderForm({ dndFile, delivery, updateCart, history, notification
             ym(81774553, 'reachGoal', 'senttheorder');
           }
 
+          window.gTag({
+            ecommerce: {
+              detail: {
+                amount: (totalCart / currency.exChange).toFixedCustom(2),
+                products: products,
+              },
+            },
+          });
+
           notificationFunc('success', 'Заказ доставлен!', 'И уже обрабатывается ;)');
           setOrderSent(true);
           updateCart(null, 0, {}, true);

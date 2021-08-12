@@ -4,8 +4,7 @@
 <head>
   <script>
     window.dataLayer = window.dataLayer || [];
-    function gTag(dl) {
-      window.log && console.log("gtag", arguments);
+    window.gTag = (dl) => {
       window.dataLayer.push(dl);
     }
   </script>
