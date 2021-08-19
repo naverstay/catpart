@@ -123,6 +123,33 @@
   &-control {
     position: relative;
     margin-bottom: 8px;
+
+    &__clear {
+      display: none;
+      position: absolute;
+      top: 50%;
+      margin-top: -8px;
+      cursor: pointer;
+      right: 10px;
+      width: 16px;
+      height: 16px;
+      border-radius: 100%;
+      background: #c6c6c6;
+      color: #fff;
+      font-size: 9px;
+      line-height: 17px;
+      text-align: center;
+
+      + * {
+        padding-right: 30px !important;
+      }
+    }
+
+    &:hover {
+      .form-control__clear {
+        display: block;
+      }
+    }
   }
 
   &-content {
@@ -507,4 +534,8 @@
     height: 50px;
     padding: 15px 20px;
   }
+}
+
+#art-number {
+  text-transform: uppercase;
 }

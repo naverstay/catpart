@@ -24,6 +24,9 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.icon-chevron-up:before {
+  content: "\e904";
+}
 .icon-close:before {
   content: "\e903";
 }

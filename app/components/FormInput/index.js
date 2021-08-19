@@ -7,42 +7,49 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-const FormInput = ({ id, type, value, defaultValue, disabled, error, onChange, onBlur, inputRef, placeholder, name, textarea, className, intl }) => {
-  return (
-    <div className={'custom-input form-control' + (textarea ? ' __ta' : '')}>
-      {textarea ? (
-        <textarea
-          //
-          onChange={onChange || null}
-          onBlur={onBlur || null}
-          ref={inputRef || null}
-          name={name || null}
-          placeholder={placeholder || null}
-          className={'input ' + className + (error === null ? '' : error ? ' __error' : ' __success')}
-          defaultValue={defaultValue || null}
-          disabled={disabled || null}
-          value={value}
-          id={id}
-        />
-      ) : (
-        <input
-          //
-          onChange={onChange || null}
-          onBlur={onBlur || null}
-          ref={inputRef || null}
-          name={name || null}
-          placeholder={placeholder || null}
-          className={'input ' + className + (error === null ? '' : error ? ' __error' : ' __success')}
-          defaultValue={defaultValue || null}
-          disabled={disabled || null}
-          value={value}
-          type={type}
-          id={id}
-        />
-      )}
-    </div>
-  );
-};
+const FormInput = ({ id, type, clear, value, defaultValue, disabled, error, onChange, onBlur, inputRef, placeholder, name, textarea, className, intl }) => (
+  <div className={`custom-input form-control${textarea ? ' __ta' : ''}`}>
+    {typeof clear === 'function' ? (
+      <span
+        className="form-control__clear icon icon-close"
+        onClick={() => {
+          clear();
+        }}
+      />
+    ) : null}
+
+    {textarea ? (
+      <textarea
+        //
+        onChange={onChange || null}
+        onBlur={onBlur || null}
+        ref={inputRef || null}
+        name={name || null}
+        placeholder={placeholder || null}
+        className={`input ${className}${error === null ? '' : error ? ' __error' : ' __success'}`}
+        defaultValue={defaultValue || null}
+        disabled={disabled || null}
+        value={value}
+        id={id}
+      />
+    ) : (
+      <input
+        //
+        onChange={onChange || null}
+        onBlur={onBlur || null}
+        ref={inputRef || null}
+        name={name || null}
+        placeholder={placeholder || null}
+        className={`input ${className}${error === null ? '' : error ? ' __error' : ' __success'}`}
+        defaultValue={defaultValue || null}
+        disabled={disabled || null}
+        value={value}
+        type={type}
+        id={id}
+      />
+    )}
+  </div>
+);
 
 FormInput.propTypes = {
   id: PropTypes.string,

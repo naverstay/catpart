@@ -70,6 +70,11 @@ export function OrderForm({ dndFile, delivery, updateCart, history, notification
 
   const requiredFields = ['order-email', 'order-name', 'order-phone', 'order-inn', 'order-delivery'];
 
+  const handleClear = field => {
+    console.log('handleClear', field);
+    fields[field] = '';
+  };
+
   const handleChange = (field, e) => {
     window.log && console.log('handleChange', field, e);
     fields[field] = e.target.value;
@@ -247,13 +252,25 @@ export function OrderForm({ dndFile, delivery, updateCart, history, notification
         if (respData && respData.hasOwnProperty('status') && respData.status === 200) {
           if (typeof ym === 'function') {
             ym(81774553, 'reachGoal', 'senttheorder');
+
+            ym(81774553, 'params', {
+              purchase: {
+                amount: (totalCart / currency.exChange).toFixedCustom(2),
+                products,
+              },
+            });
           }
 
           window.gTag({
+            event: 'order',
             ecommerce: {
-              detail: {
+              currencyCode: 'RUB',
+              purchase: {
+                actionField: {
+                  id: new Date().getTime(),
+                },
                 amount: (totalCart / currency.exChange).toFixedCustom(2),
-                products: products,
+                products,
               },
             },
           });
@@ -362,6 +379,15 @@ export function OrderForm({ dndFile, delivery, updateCart, history, notification
         )}
 
         <FormInput
+          clear={
+            fields['order-email'].length
+              ? () => {
+                  emailInput.current.value = '';
+                  handleChange('order-email', { target: emailInput.current });
+                  // handleClear('order-email');
+                }
+              : null
+          }
           onChange={handleChange.bind(this, 'order-email')}
           placeholder="Ваш email"
           name="order-email"
@@ -372,6 +398,15 @@ export function OrderForm({ dndFile, delivery, updateCart, history, notification
         />
 
         <FormInput
+          clear={
+            fields['order-name'].length
+              ? () => {
+                  nameInput.current.value = '';
+                  handleChange('order-name', { target: nameInput.current });
+                  // handleClear('order-name');
+                }
+              : null
+          }
           onChange={handleChange.bind(this, 'order-name')}
           placeholder="ФИО"
           name="order-name"
@@ -382,6 +417,15 @@ export function OrderForm({ dndFile, delivery, updateCart, history, notification
         />
 
         <FormInput
+          clear={
+            fields['order-phone'].length
+              ? () => {
+                  phoneInput.current.value = '';
+                  handleChange('order-phone', { target: phoneInput.current });
+                  // handleClear('order-phone');
+                }
+              : null
+          }
           onChange={handleChange.bind(this, 'order-phone')}
           placeholder="Телефон"
           name="order-phone"
@@ -392,6 +436,15 @@ export function OrderForm({ dndFile, delivery, updateCart, history, notification
         />
 
         <FormInput
+          clear={
+            fields['order-inn'].length
+              ? () => {
+                  innInput.current.value = '';
+                  handleChange('order-inn', { target: innInput.current });
+                  // handleClear('order-inn');
+                }
+              : null
+          }
           onChange={handleChange.bind(this, 'order-inn')}
           placeholder="ИНН"
           name="order-inn"
@@ -401,7 +454,7 @@ export function OrderForm({ dndFile, delivery, updateCart, history, notification
           inputRef={innInput}
         />
 
-        {/* <FormInput */}
+        {/* <FormInput clear=true */}
         {/*  onChange={handleChange.bind(this, 'order-delivery')} */}
         {/*  placeholder={'Доставка'} */}
         {/*  name="order-delivery" */}
@@ -419,7 +472,7 @@ export function OrderForm({ dndFile, delivery, updateCart, history, notification
 
         {deliveryOptions.length ? <FormSelect onChange={handleChange} options={deliveryOptions} placeholder="Доставка" name="order-delivery" error={errors['order-delivery']} preSelectedValue={preSelectedDelivery} className="__lg" inputRef={deliveryInput} /> : null}
 
-        <FormInput textarea placeholder="Комментарий" name="order-comment" error={null} className="__lg" inputRef={commentInput} />
+        <FormInput clear textarea placeholder="Комментарий" name="order-comment" error={null} className="__lg" inputRef={commentInput} />
 
         <div className="form-control">
           <Ripples className={`__w-100p btn __blue __lg${!validForm ? ' __disabled' : ''}${busy ? ' __loader' : ''}`} during={1000}>

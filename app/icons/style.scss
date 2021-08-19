@@ -26,6 +26,11 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.icon-chevron-up {
+  &:before {
+    content: $icon-chevron-up;
+  }
+}
 .icon-close {
   &:before {
     content: $icon-close;
