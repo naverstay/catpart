@@ -155,9 +155,20 @@ export function OrderForm({ dndFile, delivery, updateCart, history, notification
       localStorage.setItem('catpart', JSON.stringify(store));
     }
 
+    let ymproducts = [];
+
     const products = store.map(s => {
       const priceIndex = findPriceIndex(s.pricebreaks, s.cart);
       const { price } = s.pricebreaks[priceIndex];
+
+      ymproducts.push({
+        id: s.id,
+        name: s.name,
+        quantity: s.cart,
+        category: s.supplier,
+        brand: s.manufacturer,
+        price,
+      });
 
       return {
         name: s.name,
@@ -254,12 +265,18 @@ export function OrderForm({ dndFile, delivery, updateCart, history, notification
             ym(81774553, 'reachGoal', 'senttheorder');
 
             ym(81774553, 'params', {
+              currencyCode: 'RUB',
               purchase: {
-                amount: (totalCart / currency.exChange).toFixedCustom(2),
-                products,
+                actionField: {
+                  id: 'params_' + new Date().getTime(),
+                },
+                //amount: (totalCart / currency.exChange).toFixedCustom(2),
+                ymproducts,
               },
             });
           }
+
+          console.log('ymproducts', ymproducts);
 
           window.gTag({
             event: 'order',
@@ -267,10 +284,10 @@ export function OrderForm({ dndFile, delivery, updateCart, history, notification
               currencyCode: 'RUB',
               purchase: {
                 actionField: {
-                  id: new Date().getTime(),
+                  id: 'gtm_' + new Date().getTime(),
                 },
-                amount: (totalCart / currency.exChange).toFixedCustom(2),
-                products,
+                //amount: (totalCart / currency.exChange).toFixedCustom(2),
+                products: ymproducts,
               },
             },
           });
