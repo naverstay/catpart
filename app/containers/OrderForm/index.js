@@ -155,7 +155,7 @@ export function OrderForm({ dndFile, delivery, updateCart, history, notification
       localStorage.setItem('catpart', JSON.stringify(store));
     }
 
-    let ymproducts = [];
+    const ymproducts = [];
 
     const products = store.map(s => {
       const priceIndex = findPriceIndex(s.pricebreaks, s.cart);
@@ -263,20 +263,7 @@ export function OrderForm({ dndFile, delivery, updateCart, history, notification
         if (respData && respData.hasOwnProperty('status') && respData.status === 200) {
           if (typeof ym === 'function') {
             ym(81774553, 'reachGoal', 'senttheorder');
-
-            ym(81774553, 'params', {
-              currencyCode: 'RUB',
-              purchase: {
-                actionField: {
-                  id: 'params_' + new Date().getTime(),
-                },
-                //amount: (totalCart / currency.exChange).toFixedCustom(2),
-                ymproducts,
-              },
-            });
           }
-
-          console.log('ymproducts', ymproducts);
 
           window.gTag({
             event: 'order',
@@ -284,9 +271,9 @@ export function OrderForm({ dndFile, delivery, updateCart, history, notification
               currencyCode: 'RUB',
               purchase: {
                 actionField: {
-                  id: 'gtm_' + new Date().getTime(),
+                  id: `gtm_${new Date().getTime()}`,
                 },
-                //amount: (totalCart / currency.exChange).toFixedCustom(2),
+                // amount: (totalCart / currency.exChange).toFixedCustom(2),
                 products: ymproducts,
               },
             },
