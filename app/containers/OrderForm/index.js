@@ -172,6 +172,7 @@ export function OrderForm({ dndFile, delivery, updateCart, history, notification
 
       return {
         name: s.name,
+        delivery_period: s.delivery_period,
         supplier: s.supplier,
         manufacturer: s.manufacturer,
         pack_quant: s.pack_quant,
@@ -277,6 +278,7 @@ export function OrderForm({ dndFile, delivery, updateCart, history, notification
                 products: ymproducts,
               },
             },
+            counterEffect,
           });
 
           notificationFunc('success', 'Заказ доставлен!', 'И уже обрабатывается ;)');
