@@ -39,6 +39,9 @@ export function SearchForm({ dndFile, notificationFunc, busy, busyOrder, setForm
 
   const query = new URLSearchParams(useLocation().search);
 
+  const searchArt = decodeURIComponent(query.get('art') || '');
+  const searchQ = (decodeURIComponent(query.get('q')) || '1').replace(/\D/g, '');
+
   const [fields, setFields] = useState({
     quantity: '',
     'art-number': '',
@@ -101,8 +104,10 @@ export function SearchForm({ dndFile, notificationFunc, busy, busyOrder, setForm
   };
 
   return (
-    <div className="form-search">
+    <div className="form-search" itemscope itemtype="https://schema.org/WebSite">
+      <meta itemProp="url" content="https://catpart.ru/" />
       <form ref={formRef} className="form-content" onSubmit={handleSubmit}>
+        <meta itemProp="target" content={'https://catpart.ru/search/?art={art-number}&q={quantity}'} />
         <div className="form-search__title">
           Поиск электронных <br /> компонентов
         </div>
@@ -118,10 +123,11 @@ export function SearchForm({ dndFile, notificationFunc, busy, busyOrder, setForm
               onBlur={e => {
                 e.target.value = e.target.value.trim();
               }}
+              itemprop="query-input"
               name="art-number"
               //
               disabled={busy}
-              defaultValue={decodeURIComponent(query.get('art') || '')}
+              defaultValue={searchArt}
               className={`__lg${errors['art-number'] === null ? '' : errors['art-number'] ? ' __error' : ''}`}
               error={null}
               id="art-number"
@@ -155,10 +161,11 @@ export function SearchForm({ dndFile, notificationFunc, busy, busyOrder, setForm
                   handleChange('quantity', e);
                 }
               }}
+              itemprop="query-input"
               name="quantity"
               //
               disabled={busy}
-              defaultValue={(decodeURIComponent(query.get('q')) || '1').replace(/\D/g, '')}
+              defaultValue={searchQ}
               className={`__lg${errors.quantity === null ? '' : errors.quantity ? ' __error' : ''}`}
               error={null}
               id="quantity"
