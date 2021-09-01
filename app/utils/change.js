@@ -52,7 +52,7 @@ function checkStatus(response) {
 
 export default function apiPATCH(url, data, options, cb) {
   return axios
-    .patch(API + url, data, {
+    .post(API + url, data, {
       headers: {
         //'Content-Type': 'application/json',
         'Content-Type': 'multipart/form-data',
