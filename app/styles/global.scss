@@ -49,7 +49,7 @@ body {
 body {
   overflow-y: scroll;
   font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  touch-action: pan-y;
+  touch-action: pan-y pan-x;
 
   &.__busy {
     cursor: not-allowed;

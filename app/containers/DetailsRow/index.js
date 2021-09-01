@@ -28,7 +28,7 @@ const DetailsRow = props => {
           ) : cell === 'sum' ? (
             <span className="details-results__value">{priceFormatter(row.quantity * row.price)}</span>
           ) : cell === 'statuses' ? (
-            <span className="details-results__value">{row[cell][0].name}</span>
+            <span className="details-results__value">{row[cell] && row[cell].length ? [0].name : '!statuses!'}</span>
           ) : (
             <span className="details-results__value">{row[cell] ? row[cell] : `!${cell}!`}</span>
           )}
