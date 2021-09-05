@@ -2,6 +2,7 @@ import React, { createRef, useEffect, useState } from 'react';
 import Ripples from 'react-ripples';
 import priceFormatter from '../../utils/priceFormatter';
 import dateFormatter from '../../utils/dateFormatter';
+import { formatDate } from 'react-intl/src/format';
 
 const OrderRow = props => {
   const { rowIndex, tableHeader, rowClick, row, updateCart, notificationFunc } = props;
@@ -28,8 +29,20 @@ const OrderRow = props => {
 
     return (
       <div className="orders-chronology__scroller">
-        <ul className="orders-chronology__list">
-          <li className="__odd">
+        {row.chronology && row.chronology.length ? (
+          <ul className="orders-chronology__list">
+            {row.chronology.map((c, ci) => (
+              <li key={ci}>
+                {c.datetime ? <span>{dateFormatter(c.datetime)} — </span> : null}
+                <span>{c.name}</span>
+                {c.file ? (
+                  <a className="orders-chronology__link __green" href={c.file}>
+                    упд xlsx
+                  </a>
+                ) : null}
+              </li>
+            ))}
+            {/*<li className="__odd">
             <span>25.05.2021 — отгружено 20%</span>
             <a className="orders-chronology__link __green" href="#">
               упд xlsx
@@ -88,26 +101,29 @@ const OrderRow = props => {
             <a className="orders-chronology__link __red" href="#">
               pdf
             </a>
-          </li>
-        </ul>
+          </li>*/}
+          </ul>
+        ) : (
+          '!chronology!'
+        )}
       </div>
     );
   };
 
-  const buildChronologyHealth = row => {
+  const buildStatusHealth = row => {
     return (
       <ul className="orders-health__list">
         <li>
           <span>Оплачено</span>
-          {healthGradient(parseInt(100 * Math.random()))}
+          {healthGradient(parseInt(row.statuses && row.statuses.hasOwnProperty('pay') ? row.statuses.pay : 0))}
         </li>
         <li>
           <span>На складе</span>
-          {healthGradient(parseInt(100 * Math.random()))}
+          {healthGradient(parseInt(row.statuses && row.statuses.hasOwnProperty('stock') ? row.statuses.stock : 0))}
         </li>
         <li>
           <span>Отгружено</span>
-          {healthGradient(parseInt(100 * Math.random()))}
+          {healthGradient(parseInt(row.statuses && row.statuses.hasOwnProperty('ship') ? row.statuses.ship : 0))}
         </li>
       </ul>
     );
@@ -115,8 +131,10 @@ const OrderRow = props => {
 
   return (
     <div
-      onClick={() => {
-        rowClick(row);
+      onClick={e => {
+        if (e.target.tagName !== 'A') {
+          rowClick(row);
+        }
       }}
       className={`orders-results__row${rowIndex % 2 === 0 ? ' __odd' : ' __even'}`}
     >
@@ -129,14 +147,16 @@ const OrderRow = props => {
             ) : (
               <span className="orders-results__value">{row[cell].company_name}</span>
             )
+          ) : cell === 'statuses' ? (
+            buildStatusHealth(row)
           ) : cell === 'chronology' ? (
             buildChronology(row)
-          ) : cell === 'chronology_health' ? (
-            buildChronologyHealth(row)
           ) : cell === 'created_at' || cell === 'delivery_date' ? (
-            <span className="orders-results__value">{dateFormatter(new Date(row[cell]))}</span>
-          ) : cell === 'payed' || cell === 'in_stock' ? (
+            <span className="orders-results__value">{dateFormatter(row[cell])}</span>
+          ) : cell === 'amount' ? (
             <span className="orders-results__value">{priceFormatter(row[cell])}</span>
+          ) : cell === 'left' ? (
+            <span className="orders-results__value">{priceFormatter(row.amount - row.payed)}</span>
           ) : (
             <span className="orders-results__value">{row[cell] ? row[cell] : `!${cell}!`}</span>
           )}

@@ -19,6 +19,12 @@ function join(t, a, s) {
 }
 
 export default function dateFormatter(val, time) {
+  if (!val) {
+    return '--.--.----';
+  }
+
+  val = new Date(val);
+
   const date = join(val, [{ day: '2-digit' }, { month: '2-digit' }, { year: 'numeric' }], '.');
 
   return date + (time ? ` ${leadingZero(val.getHours())}:${leadingZero(val.getMinutes())}` : '');

@@ -325,6 +325,20 @@
         white-space: nowrap;
         height: 30px;
         margin: 0 5px 10px;
+
+        &.__order-sort {
+          @include respond-to-min($wide) {
+            display: none;
+          }
+        }
+
+        .btn-inner {
+          .icon {
+            &.__desc {
+              transform: rotate(180deg);
+            }
+          }
+        }
       }
 
       &.__wide {

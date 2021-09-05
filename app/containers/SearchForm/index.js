@@ -104,7 +104,7 @@ export function SearchForm({ dndFile, notificationFunc, busy, busyOrder, setForm
   };
 
   return (
-    <div className="form-search" itemscope itemtype="https://schema.org/WebSite">
+    <div className="form-search" itemScope itemType="https://schema.org/WebSite">
       <meta itemProp="url" content="https://catpart.ru/" />
       <form ref={formRef} className="form-content" onSubmit={handleSubmit}>
         <meta itemProp="target" content={'https://catpart.ru/search/?art={art-number}&q={quantity}'} />

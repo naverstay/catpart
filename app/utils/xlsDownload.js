@@ -44,10 +44,10 @@ const prepareJSON = (data, mode, currency) => {
     }
 
     if (mode === MODE_DETAILS) {
-      row.calculated_delivery_date = dateFormatter(new Date(row.calculated_delivery_date));
-      row.real_delivery_date = dateFormatter(new Date(row.real_delivery_date));
+      row.calculated_delivery_date = dateFormatter(row.calculated_delivery_date);
+      row.real_delivery_date = dateFormatter(row.real_delivery_date);
       row.sum = priceFormatter(row.quantity * row.price);
-      row.statuses = row.statuses.map(p => `${p.name} - ${dateFormatter(new Date(p.updated_at))}`).join('\n');
+      row.statuses = row.statuses.map(p => `${p.name} - ${dateFormatter(p.updated_at)}`).join('\n');
     } else {
       row.pricebreaks = row.pricebreaks.map(p => `${p.quant} - ${priceFormatter(p.price / currency.exChange, currency.precision)}`).join('\n');
       row.currency = currency.name;

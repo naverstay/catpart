@@ -117,7 +117,7 @@ const Profile = props => {
         </div>
       </form>
 
-      <div className="profile-info">
+      {/*      <div className="profile-info">
         <ul>
           <li>
             <span>Сумма заказов:&nbsp;</span>
@@ -136,7 +136,7 @@ const Profile = props => {
             <b>100500</b>
           </li>
         </ul>
-      </div>
+      </div>*/}
 
       <div className="aside-caption">Ваш менеджер</div>
 

@@ -13,7 +13,9 @@ const FormSelect = ({ id, preSelectedValue, multi, disabled, onChange, onBlur, i
 
   const handleChange = selectedOption => {
     setSelectedOption({ selectedOption });
-    inputRef.current.value = selectedOption.value;
+    if (inputRef && inputRef.current) {
+      inputRef.current.value = selectedOption.value;
+    }
     onChange(name, { target: selectedOption });
   };
 

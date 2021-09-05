@@ -278,7 +278,6 @@ export function OrderForm({ dndFile, delivery, updateCart, history, notification
                 products: ymproducts,
               },
             },
-            counterEffect,
           });
 
           notificationFunc('success', 'Заказ доставлен!', 'И уже обрабатывается ;)');

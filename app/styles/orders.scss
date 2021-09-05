@@ -325,8 +325,24 @@
       padding-top: 2px;
       padding-bottom: 2px;
       padding-left: 10px;
+      position: relative;
 
-      &.__id {
+      &.__sort {
+        cursor: pointer;
+
+        &::before {
+          position: absolute;
+          left: -1px;
+          top: 50%;
+          transform: translateY(-50%);
+        }
+
+        &.__desc::before {
+          transform: translateY(-50%) rotate(180deg);
+        }
+      }
+
+      &.__title {
 
       }
 
@@ -338,7 +354,7 @@
 
       }
 
-      &.__in_stock {
+      &.__left {
         white-space: nowrap;
       }
 
@@ -354,7 +370,7 @@
         }
       }
 
-      &.__payed {
+      &.__amount {
         text-align: left;
       }
 
@@ -371,12 +387,12 @@
       @include respond-to-max($wide) {
 
         &.__requisites,
-        &.__id {
+        &.__title {
           grid-column: 1;
           //align-self: baseline;
         }
 
-        &.__id {
+        &.__title {
           grid-row: 1;
         }
 
@@ -388,7 +404,7 @@
           }
         }
 
-        &.__chronology_health {
+        &.__statuses {
           grid-row: 1 / 8;
           grid-column: 2;
 
@@ -422,7 +438,7 @@
           }
         }
 
-        &.__in_stock {
+        &.__left {
           grid-row: 5;
           grid-column: 1;
         }
@@ -437,7 +453,7 @@
           grid-column: 1;
         }
 
-        &.__payed {
+        &.__amount {
           grid-row: 4;
           grid-column: 1;
         }
@@ -461,7 +477,7 @@
         }
 
         &.__requisites,
-        &.__id {
+        &.__title {
           padding-right: 40px;
         }
 
@@ -469,7 +485,7 @@
 
         }
 
-        &.__payed {
+        &.__amount {
 
         }
 
@@ -478,8 +494,8 @@
         }
 
         &.__requisites,
-        &.__id,
-        &.__payed {
+        &.__title,
+        &.__amount {
           grid-column: 1;
         }
 
@@ -515,7 +531,7 @@
           text-align: left;
         }
 
-        &.__chronology_health {
+        &.__statuses {
           grid-row: 8;
           grid-column: 1;
         }
@@ -559,7 +575,7 @@
 
       @include respond-to-min($wide) {
 
-        &.__id {
+        &.__title {
           width: 6.5%;
         }
 
@@ -571,7 +587,7 @@
           width: 10.5%;
         }
 
-        &.__chronology_health {
+        &.__statuses {
           width: 16%;
         }
 
@@ -583,7 +599,7 @@
           }
         }
 
-        &.__in_stock {
+        &.__left {
           text-align: center;
           width: 7.5%;
         }
@@ -603,7 +619,7 @@
           text-align: center;
         }
 
-        &.__payed {
+        &.__amount {
           width: 7%;
         }
 

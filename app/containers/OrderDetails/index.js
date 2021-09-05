@@ -151,42 +151,45 @@ const OrderDetails = props => {
     );
   };
 
+  console.log('order', order);
+
   return order.hasOwnProperty('id') ? (
     <div className="profile __details">
-      <div className="aside-title">{`Заказ №${order.id} от ${dateFormatter(new Date(order.created_at))}`}</div>
+      <div className="aside-title">{`${order.title || '!title!'} от ${order.created_at ? dateFormatter(order.created_at) : ''}`}</div>
 
       <div className="orders-details">
         <div className="orders-details__left">
           <ul className={'orders-health__list'}>
             <li>
               <span>Оплачено</span>
-              {healthGradient(parseInt(100 * Math.random()))}
+              {healthGradient(parseInt(order.statuses && order.statuses.hasOwnProperty('pay') ? order.statuses.pay : 0))}
             </li>
             <li>
               <span>На складе</span>
-              {healthGradient(parseInt(100 * Math.random()))}
+              {healthGradient(parseInt(order.statuses && order.statuses.hasOwnProperty('stock') ? order.statuses.stock : 0))}
             </li>
             <li>
               <span>Отгружено</span>
-              {healthGradient(parseInt(100 * Math.random()))}
+              {healthGradient(parseInt(order.statuses && order.statuses.hasOwnProperty('ship') ? order.statuses.ship : 0))}
             </li>
           </ul>
 
           <ul className="orders-info">
             <li>
-              <span>Заказчик:&nbsp;</span> <b>{`${order.requisites.company_name}, ИНН ${order.requisites.inn || ''}`}</b>
+              <span>Заказчик:&nbsp;</span>
+              <b>{`${order.requisites.company_name || '!company_name!'}, ИНН ${order.requisites.inn || '!inn!'}`}</b>
             </li>
             <li>
-              <span>Заказал:&nbsp;</span> <b>{order.requisites.contact_name}</b>
+              <span>Заказал:&nbsp;</span> <b>{order.requisites.contact_name || order.contact_name || '!requisites!'}</b>
             </li>
             <li>
-              <span>Доставка:&nbsp;</span> <b>{order.delivery_type}</b>
+              <span>Доставка:&nbsp;</span> <b>{order.delivery_type || 'еще не назначено'}</b>
             </li>
             <li>
-              <span>Адрес доставки:&nbsp;</span> <b>630005, г. Новосибирск, ул. Достоевского 58, 605</b>
+              <span>Адрес доставки:&nbsp;</span> <b>{order.requisites.address || '!address!'}</b>
             </li>
             <li>
-              <span>Получатель заказа:&nbsp;</span> <b>{order.contact_name}</b>
+              <span>Получатель заказа:&nbsp;</span> <b>{order.contact_name || ''}</b>
             </li>
           </ul>
         </div>
@@ -197,9 +200,9 @@ const OrderDetails = props => {
               <li>
                 <span>Сумма (RUB)&nbsp;</span>: <b>{priceFormatter(order.amount, 2)}</b>
               </li>
-              <li>
-                <span>НДС (RUB)&nbsp;</span>: <b>{priceFormatter(order.amount * 0.2, 2)}</b>
-              </li>
+              {/*<li>*/}
+              {/*  <span>НДС (RUB)&nbsp;</span>: <b>{priceFormatter(order.amount * 0.2, 2)}</b>*/}
+              {/*</li>*/}
               <li>
                 <span>Остаток (RUB)&nbsp;</span>: <b>{priceFormatter(order.amount - order.payed, 2)}</b>
               </li>
@@ -266,7 +269,6 @@ const OrderDetails = props => {
         <div className="search-results">
           <div className="search-results__table">
             <div className="search-results__head-wrapper">{tHead}</div>
-
             {order.products && order.products.length ? order.products.map((row, ri) => <DetailsRow key={ri} tableHeader={tableHeader} currency={RUB} notificationFunc={notificationFunc} row={row} rowIndex={ri} />) : null}
           </div>
         </div>

@@ -20,6 +20,7 @@ import FormSelect from '../../components/FormSelect';
 import { validateEmail } from '../../utils/validateEmail';
 import apiGET from '../../utils/search';
 import apiPOST from '../../utils/upload';
+import { useDetectClickOutside } from 'react-detect-click-outside';
 
 export function OrdersPage(props) {
   const { currency, history, activeTab, setTableHeadFixed, setOpenRequisites, needLogin, setOpenDetails, setOpenProfile, count, notificationFunc, updateCart } = props;
@@ -35,6 +36,16 @@ export function OrdersPage(props) {
   const [statusFilter, setStatusFilter] = useState([]);
   const [statusOptions, setStatusOptions] = useState([]);
 
+  const [sortCol, setSortCol] = useState('title');
+  const [sortAsc, setSortAsc] = useState(false);
+  const [openSort, setOpenSort] = useState(false);
+
+  const sortRef = useDetectClickOutside({
+    onTriggered: () => {
+      setOpenSort(false);
+    },
+  });
+
   // const statusOptions = [
   //  { value: 'Сделка', label: 'Сделка' },
   //  { value: 'Заявка', label: 'Заявка' },
@@ -48,14 +59,14 @@ export function OrdersPage(props) {
   // ];
 
   const tableHeaderOrders = {
-    id: 'Заказ №',
+    title: 'Заказ №',
     requisites: 'Реквизиты',
     contact_name: 'Заказал',
-    payed: 'Сумма',
-    in_stock: 'Остаток',
+    amount: 'Сумма',
+    left: 'Остаток',
     created_at: 'Дата\nсоздания',
     delivery_date: 'Дата\nпоставки',
-    chronology_health: ' ',
+    statuses: ' ',
     chronology: 'Хронология',
     //
     // amount: 7377,
@@ -68,6 +79,8 @@ export function OrdersPage(props) {
     // unloaded: 19,
     // updated_at: '2021-07-08T15:40:06.000000Z',
   };
+
+  const tableHeaderSort = ['title', 'requisites', 'contact_name', 'amount', 'left', 'created_at', 'delivery_date'];
 
   const tableHeaderRequisites = {
     // address: '39846 Demetris Fords',
@@ -90,13 +103,19 @@ export function OrdersPage(props) {
     contact_name: 'Контактное\nлицо',
   };
 
-  const [preSelectedState, setPreSelectedDelivery] = useState(-1);
-  const stateInput = React.createRef();
-
   const tHeadOrders = (
     <div className="orders-results__row __even __head">
       {Object.keys(tableHeaderOrders).map((head, hi) => (
-        <div key={hi} className={`orders-results__cell __${head}`}>
+        <div
+          onClick={() => {
+            if (tableHeaderSort.indexOf(head) > -1) {
+              setSortCol(head);
+              setSortAsc(!sortAsc);
+            }
+          }}
+          key={hi}
+          className={`orders-results__cell __${head}${(tableHeaderSort.indexOf(head) > -1 ? ' __sort' : '') + (tableHeaderSort.indexOf(head) > -1 && head === sortCol ? ' icon icon-chevron-up' + (sortAsc ? ' __asc' : ' __desc') : '')}`}
+        >
           <span>{tableHeaderOrders[head]}</span>
         </div>
       ))}
@@ -106,7 +125,16 @@ export function OrdersPage(props) {
   const tHeadRequisites = (
     <div className="requisites-results__row __even __head">
       {Object.keys(tableHeaderRequisites).map((head, hi) => (
-        <div key={hi} className={`requisites-results__cell __${head}`}>
+        <div
+          onClick={() => {
+            if (tableHeaderSort.indexOf(head) > -1) {
+              setSortCol(head);
+              setSortAsc(!sortAsc);
+            }
+          }}
+          key={hi}
+          className={`requisites-results__cell __${head}${(tableHeaderSort.indexOf(head) > -1 ? ' __sort' : '') + (tableHeaderSort.indexOf(head) > -1 && head === sortCol ? ' icon icon-chevron-up' + (sortAsc ? ' __asc' : ' __desc') : '')}`}
+        >
           <span>{tableHeaderRequisites[head]}</span>
         </div>
       ))}
@@ -192,12 +220,16 @@ export function OrdersPage(props) {
     };
   }, []);
 
-  const handleChange = (field, e) => {
-    window.log && console.log('handleChange', field, e);
+  const handleChangeStatus = (field, e) => {
+    window.log && console.log('handleChangeStatus', field, e);
 
     const filter = e.target.map(f => f.value);
 
     setStatusFilter(filter);
+  };
+
+  const handleChangeSort = (field, e) => {
+    window.log && console.log('handleChangeSort', field, e);
   };
 
   return (
@@ -221,13 +253,44 @@ export function OrdersPage(props) {
                   />
                 </div>
 
-                <input
-                  //
-                  className="hide"
-                  ref={stateInput || null}
-                />
+                <div ref={sortRef} className="form-filter__control __order-sort">
+                  <Ripples
+                    onClick={() => {
+                      setOpenSort(true);
+                    }}
+                    className="btn __gray"
+                    during={1000}
+                  >
+                    <span className="btn-inner">
+                      <span className={'icon icon-chevron-up' + (sortAsc ? ' __asc' : ' __desc')} />
+                      <span>{tableHeaderOrders[sortCol]}</span>
+                    </span>
+                  </Ripples>
 
-                {statusOptions.length ? <FormSelect multi onChange={handleChange} options={statusOptions} placeholder="Статус" name="order-state" error={null} preSelectedValue={preSelectedState} inputRef={stateInput} /> : null}
+                  {openSort && (
+                    <div className="dropdown-container">
+                      <ul className="dropdown-list">
+                        {tableHeaderSort.map((t, ti) => (
+                          <li key={ti}>
+                            <Ripples
+                              onClick={() => {
+                                setSortCol(t);
+                                setSortAsc(!sortAsc);
+                                setOpenSort(false);
+                              }}
+                              className="dropdown-link"
+                              during={1000}
+                            >
+                              <span>{tableHeaderOrders[t]}</span>
+                            </Ripples>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+
+                {statusOptions.length ? <FormSelect multi onChange={handleChangeStatus} options={statusOptions} placeholder="Статус" name="order-state" error={null} /> : null}
               </div>
             </div>
           </div>
@@ -239,52 +302,56 @@ export function OrdersPage(props) {
                   {tHeadOrders}
                 </div>
 
-                {ordersList.map((row, ri) => {
-                  let ret = (
-                    <OrderRow
-                      key={ri}
-                      rowClick={e => {
-                        setOpenDetails(e);
-                      }}
-                      updateCart={updateCart}
-                      tableHeader={tableHeaderOrders}
-                      defaultCount={defaultCount}
-                      currency={currency}
-                      notificationFunc={notificationFunc}
-                      row={row}
-                      rowIndex={ri}
-                    />
-                  );
+                {ordersList
+                  .sort((a, b) => {
+                    return (a[sortCol] < b[sortCol] ? -1 : 1) * (sortAsc ? 1 : -1);
+                  })
+                  .map((row, ri) => {
+                    let ret = (
+                      <OrderRow
+                        key={ri}
+                        rowClick={e => {
+                          setOpenDetails(e);
+                        }}
+                        updateCart={updateCart}
+                        tableHeader={tableHeaderOrders}
+                        defaultCount={defaultCount}
+                        currency={currency}
+                        notificationFunc={notificationFunc}
+                        row={row}
+                        rowIndex={ri}
+                      />
+                    );
 
-                  if (ordersFilter) {
-                    if (!(`${row.id}`.indexOf(ordersFilter) === 0)) {
-                      ret = null;
+                    if (ordersFilter) {
+                      if (!(`${row.id}`.indexOf(ordersFilter) === 0)) {
+                        ret = null;
+                      }
                     }
-                  }
 
-                  if (statusFilter.length) {
-                    let count = 0;
+                    if (statusFilter.length) {
+                      let count = 0;
 
-                    for (const product of row.products) {
-                      for (const status of product.statuses) {
-                        if (statusFilter.indexOf(status.name) > -1) {
-                          count++;
+                      for (const product of row.products) {
+                        for (const status of product.statuses) {
+                          if (statusFilter.indexOf(status.name) > -1) {
+                            count++;
+                            break;
+                          }
+                        }
+
+                        if (count) {
                           break;
                         }
                       }
 
-                      if (count) {
-                        break;
+                      if (!count) {
+                        ret = null;
                       }
                     }
 
-                    if (!count) {
-                      ret = null;
-                    }
-                  }
-
-                  return ret;
-                })}
+                    return ret;
+                  })}
               </>
             ) : null}
           </div>
