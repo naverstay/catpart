@@ -330,6 +330,11 @@
       &.__sort {
         cursor: pointer;
 
+        &.__asc,
+        &.__desc {
+          font-weight: bold;
+        }
+
         &::before {
           position: absolute;
           left: -1px;

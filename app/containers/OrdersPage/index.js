@@ -36,7 +36,7 @@ export function OrdersPage(props) {
   const [statusFilter, setStatusFilter] = useState([]);
   const [statusOptions, setStatusOptions] = useState([]);
 
-  const [sortCol, setSortCol] = useState('title');
+  const [sortCol, setSortCol] = useState('');
   const [sortAsc, setSortAsc] = useState(false);
   const [openSort, setOpenSort] = useState(false);
 
@@ -114,7 +114,7 @@ export function OrdersPage(props) {
             }
           }}
           key={hi}
-          className={`orders-results__cell __${head}${(tableHeaderSort.indexOf(head) > -1 ? ' __sort' : '') + (tableHeaderSort.indexOf(head) > -1 && head === sortCol ? ' icon icon-chevron-up' + (sortAsc ? ' __asc' : ' __desc') : '')}`}
+          className={`orders-results__cell __${head}${(tableHeaderSort.indexOf(head) > -1 ? ' __sort' : '') + (tableHeaderSort.indexOf(head) > -1 && head === sortCol ? ' icon__ icon-chevron-up__' + (sortAsc ? ' __asc' : ' __desc') : '')}`}
         >
           <span>{tableHeaderOrders[head]}</span>
         </div>
@@ -133,7 +133,7 @@ export function OrdersPage(props) {
             }
           }}
           key={hi}
-          className={`requisites-results__cell __${head}${(tableHeaderSort.indexOf(head) > -1 ? ' __sort' : '') + (tableHeaderSort.indexOf(head) > -1 && head === sortCol ? ' icon icon-chevron-up' + (sortAsc ? ' __asc' : ' __desc') : '')}`}
+          className={`requisites-results__cell __${head}${(tableHeaderSort.indexOf(head) > -1 ? ' __sort' : '') + (tableHeaderSort.indexOf(head) > -1 && head === sortCol ? ' icon__ icon-chevron-up__' + (sortAsc ? ' __asc' : ' __desc') : '')}`}
         >
           <span>{tableHeaderRequisites[head]}</span>
         </div>
@@ -170,7 +170,7 @@ export function OrdersPage(props) {
 
         setStatusOptions(statuses.filter(onlyUnique).map(u => ({ value: u, label: u })));
 
-        setOrdersList(data);
+        setOrdersList(data.reverse());
       }
     });
   };
@@ -201,6 +201,10 @@ export function OrdersPage(props) {
     getData();
     updateTableHeader();
   }, [activeTab]);
+
+  useEffect(() => {
+    updateTableHeader();
+  }, [sortCol, sortAsc]);
 
   useEffect(() => {
     updateTableHeader();
@@ -253,7 +257,7 @@ export function OrdersPage(props) {
                   />
                 </div>
 
-                <div ref={sortRef} className="form-filter__control __order-sort">
+                {/*  <div ref={sortRef} className="form-filter__control __order-sort">
                   <Ripples
                     onClick={() => {
                       setOpenSort(true);
@@ -289,7 +293,7 @@ export function OrdersPage(props) {
                     </div>
                   )}
                 </div>
-
+*/}
                 {statusOptions.length ? <FormSelect multi onChange={handleChangeStatus} options={statusOptions} placeholder="Статус" name="order-state" error={null} /> : null}
               </div>
             </div>
@@ -304,7 +308,15 @@ export function OrdersPage(props) {
 
                 {ordersList
                   .sort((a, b) => {
-                    return (a[sortCol] < b[sortCol] ? -1 : 1) * (sortAsc ? 1 : -1);
+                    if (!sortCol) return 0;
+
+                    let ret = a[sortCol] < b[sortCol] ? -1 : 1;
+
+                    if (sortCol === 'left') {
+                      ret = a.amount - a.payed < b.amount - b.payed ? -1 : 1;
+                    }
+
+                    return ret * (sortAsc ? 1 : -1);
                   })
                   .map((row, ri) => {
                     let ret = (

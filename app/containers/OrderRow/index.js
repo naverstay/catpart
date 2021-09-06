@@ -37,7 +37,7 @@ const OrderRow = props => {
                 <span>{c.name}</span>
                 {c.file ? (
                   <a className="orders-chronology__link __green" href={c.file}>
-                    упд xlsx
+                    xlsx
                   </a>
                 ) : null}
               </li>
