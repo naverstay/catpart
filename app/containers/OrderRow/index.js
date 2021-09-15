@@ -129,7 +129,7 @@ const OrderRow = props => {
     );
   };
 
-  return row.documents.length ? (
+  return (
     <div
       onClick={e => {
         if (e.target.tagName !== 'A') {
@@ -163,7 +163,7 @@ const OrderRow = props => {
         </div>
       ))}
     </div>
-  ) : null;
+  );
 };
 
 export default OrderRow;
