@@ -190,7 +190,7 @@ const ProfileRequisites = props => {
     };
   }, []);
 
-  console.log('requisites', requisites, requisitesId);
+  window.log && console.log('requisites', requisites, requisitesId);
 
   return (
     <div className="profile __requisites">

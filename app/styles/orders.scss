@@ -5,9 +5,7 @@
     li {
       margin-bottom: 5px;
     }
-
   }
-
 
   &-details {
     font-size: 12px;
@@ -163,6 +161,7 @@
     }
 
     &__list {
+      width: 100%;
       max-height: 100%;
       overflow-x: hidden;
       overflow-y: auto;
@@ -194,6 +193,18 @@
 
         span {
           flex: 1 0 auto;
+
+          &.orders-chronology__date {
+            flex: 0 0 85px;
+            padding-right: 12px;
+            position: relative;
+
+            &::after {
+              content: '—';
+              position: absolute;
+              right: 4px;
+            }
+          }
         }
       }
     }
@@ -658,6 +669,14 @@
       }
     }
   }
-
 }
 
+.document-link {
+  text-decoration: underline;
+  color: $main_blue;
+  cursor: pointer;
+
+  &:hover {
+    color: $main_blue_light;
+  }
+}

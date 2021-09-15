@@ -27,7 +27,7 @@ import { CHANGE_CURRENCY } from './constants';
  */
 
 export function changeCurrency(exchangeRate, currency) {
-  console.log('changeCurrency', exchangeRate, currency);
+  window.log && console.log('changeCurrency', exchangeRate, currency);
 
   return {
     type: CHANGE_CURRENCY,

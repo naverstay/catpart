@@ -8,6 +8,7 @@ import apiGET from '../../utils/search';
 import { xlsDownload } from '../../utils/xlsDownload';
 import priceFormatter from '../../utils/priceFormatter';
 import DetailsRow from '../DetailsRow';
+import { API } from '../../utils/order';
 
 const OrderDetails = props => {
   let { detailsId, setOrderDetails, RUB, profile, order, notificationFunc } = props;
@@ -151,8 +152,6 @@ const OrderDetails = props => {
     );
   };
 
-  console.log('order', order);
-
   return order.hasOwnProperty('id') ? (
     <div className="profile __details">
       <div className="aside-title">{`${order.title || '!title!'} от ${order.created_at ? dateFormatter(order.created_at) : ''}`}</div>
@@ -191,6 +190,22 @@ const OrderDetails = props => {
             <li>
               <span>Получатель заказа:&nbsp;</span> <b>{order.contact_name || ''}</b>
             </li>
+
+            {order.hasOwnProperty('documents') && order.documents.length ? (
+              <li>
+                <span>Документы:&nbsp;</span>
+                <span>
+                  {order.documents.map((d, di) => (
+                    <React.Fragment key={di}>
+                      {di ? <>,&nbsp;</> : null}
+                      <a href={API + '/order/documents/' + d.id + '?token=' + localStorage.getItem('access_token') || ''} className="document-link">
+                        {d.title}
+                      </a>
+                    </React.Fragment>
+                  ))}
+                </span>
+              </li>
+            ) : null}
           </ul>
         </div>
 

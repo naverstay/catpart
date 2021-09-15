@@ -256,7 +256,7 @@ export function SearchForm({ dndFile, notificationFunc, busy, busyOrder, setForm
                       }
 
                       // readFile(formFile.current.files[0], ret => {
-                      //  console.log('readFile', ret);
+                      // window.log &&   console.log('readFile', ret);
                       //
                       //  if (ret.success) {
                       //    notificationFunc('success', `Файл: ${ret.name}`, `Размер: ${ret.size}`);
@@ -304,7 +304,7 @@ export function mapDispatchToProps(dispatch) {
   return {
     onChangeUsername: evt => dispatch(changeArtNumber(evt.target.value)),
     // onSubmitForm: evt => {
-    //  console.log('## dispatch onSubmitForm');
+    // window.log &&   console.log('## dispatch onSubmitForm');
     //  if (evt !== undefined && evt.preventDefault) evt.preventDefault();
     //  dispatch(loadRepos());
     // },

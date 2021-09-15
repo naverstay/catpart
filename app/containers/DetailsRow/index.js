@@ -9,7 +9,7 @@ import dateFormatter from '../../utils/dateFormatter';
 const DetailsRow = props => {
   let { rowIndex, tableHeader, currency, row, notificationFunc } = props;
 
-  console.log('DetailsRow', row);
+  window.log && console.log('DetailsRow', row);
 
   const buildChronology = row => {
     // let products = row.products.map((p, pi) => {

@@ -5,7 +5,7 @@ export const readFile = (file, cb) => {
   const txtReader = new FileReader();
   const xlsFile = file && file.name.match(/\.(xls[x]?)$/);
 
-  console.log('file', file);
+  window.log && console.log('file', file);
 
   const response = obj => {
     if (typeof cb === 'function') {

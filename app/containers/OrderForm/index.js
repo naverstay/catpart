@@ -71,7 +71,7 @@ export function OrderForm({ dndFile, delivery, updateCart, history, notification
   const requiredFields = ['order-email', 'order-name', 'order-phone', 'order-inn', 'order-delivery'];
 
   const handleClear = field => {
-    console.log('handleClear', field);
+    window.log && console.log('handleClear', field);
     fields[field] = '';
   };
 
@@ -514,7 +514,7 @@ export function mapDispatchToProps(dispatch) {
   return {
     onChangeUsername: evt => dispatch(changeArtNumber(evt.target.value)),
     // onSubmitForm: evt => {
-    //  console.log('## dispatch onSubmitForm');
+    // window.log &&   console.log('## dispatch onSubmitForm');
     //  if (evt !== undefined && evt.preventDefault) evt.preventDefault();
     //  dispatch(loadRepos());
     // },

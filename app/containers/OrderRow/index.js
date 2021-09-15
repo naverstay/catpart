@@ -33,7 +33,7 @@ const OrderRow = props => {
           <ul className="orders-chronology__list">
             {row.chronology.map((c, ci) => (
               <li key={ci}>
-                {c.datetime ? <span>{dateFormatter(c.datetime)} — </span> : null}
+                {c.datetime ? <span className="orders-chronology__date">{dateFormatter(c.datetime)}</span> : null}
                 <span>{c.name}</span>
                 {c.file ? (
                   <a className="orders-chronology__link __green" href={c.file}>
@@ -129,7 +129,7 @@ const OrderRow = props => {
     );
   };
 
-  return (
+  return row.documents.length ? (
     <div
       onClick={e => {
         if (e.target.tagName !== 'A') {
@@ -163,7 +163,7 @@ const OrderRow = props => {
         </div>
       ))}
     </div>
-  );
+  ) : null;
 };
 
 export default OrderRow;

@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const { CancelToken } = axios;
-const API = 'https://dev.catpart.ru/api';
+export const API = 'https://dev.catpart.ru/api';
 const API2 = 'https://dev.sibelcom.tech/apiv2';
 let cancel;
 
@@ -13,7 +13,7 @@ let cancel;
  * @return {object}          The parsed JSON from the request
  */
 function parseJSON(response) {
-  console.log('parseJSON', response);
+  window.log && console.log('parseJSON', response);
 
   if (response.status === 204 || response.status === 205) {
     return null;
@@ -29,7 +29,7 @@ function parseJSON(response) {
  * @return {object|undefined} Returns either the response, or throws an error
  */
 function checkStatus(response) {
-  console.log('checkStatus', response);
+  window.log && console.log('checkStatus', response);
 
   if (response.status >= 200 && response.status < 300) {
     return response;
@@ -60,10 +60,10 @@ export default function apiORDER(url, data, options, cb) {
   //    cb([]);
   //  }
   //
-  //  console.log('canceled', cancel);
+  // window.log &&   console.log('canceled', cancel);
   // }
 
-  console.log('apiORDER', data);
+  window.log && console.log('apiORDER', data);
 
   return axios({
     method: 'post',
@@ -103,10 +103,10 @@ export function apiORDERDB(url, data, options, cb) {
   //    cb([]);
   //  }
   //
-  //  console.log('canceled', cancel);
+  // window.log &&   console.log('canceled', cancel);
   // }
 
-  console.log('apiORDERDB', data);
+  window.log && console.log('apiORDERDB', data);
 
   return axios({
     method: 'post',
