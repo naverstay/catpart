@@ -149,20 +149,22 @@ function Header({ history, notificationFunc, openMobMenu, cartCount, profile, se
 
     setOpenResetPassword(false);
 
-    //const url = '/set/deal';
-    //
-    //let store = localStorage.getItem('catpart');
-    //
-    //if (store) {
-    //  store = JSON.parse(store);
-    //} else {
-    //  store = {};
-    //}
-    //
-    //if (!store.hasOwnProperty('order')) {
-    //  store.order = [];
-    //  localStorage.setItem('catpart', JSON.stringify(store));
-    //}
+    const requestURL = '/auth/restore';
+
+    const formData = new FormData();
+    const options = {};
+
+    formData.append('email', emailInput.current.value);
+
+    apiPOST(requestURL, formData, options, data => {
+      window.log && console.log('data', data);
+
+      if (data.error) {
+        notificationFunc('success', `Письмо не отправлено. `, 'Проверьте логин.');
+      } else {
+        notificationFunc('success', `Письмо отправлено. `, 'Проверьте почту.');
+      }
+    });
   };
 
   //useEffect(() => {

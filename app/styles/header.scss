@@ -12,6 +12,7 @@
     position: relative;
 
     &__link {
+      cursor: pointer;
       color: $gray_link;
       font-size: 12px;
       text-decoration: none;
