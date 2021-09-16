@@ -155,7 +155,7 @@
       }
 
       @include respond-to-min($wide) {
-        max-height: 148px;
+        height: 146px;
         margin: -18px -10px -18px 22px;
       }
     }
@@ -526,7 +526,7 @@
           }
 
           .orders-chronology__list {
-            max-height: calc(100% + 36px);
+            max-height: calc(100% + 18px);
             width: calc(100% + 30px);
             left: -20px;
           }

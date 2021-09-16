@@ -32,7 +32,7 @@ const OrderRow = props => {
         {row.chronology && row.chronology.length ? (
           <ul className="orders-chronology__list">
             {row.chronology.map((c, ci) => (
-              <li key={ci}>
+              <li key={ci} className={ci % 2 ? '__even' : '__odd'}>
                 {c.datetime ? <span className="orders-chronology__date">{dateFormatter(c.datetime)}</span> : null}
                 <span>{c.name}</span>
                 {c.file ? (
