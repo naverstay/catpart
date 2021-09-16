@@ -11,7 +11,7 @@ import DetailsRow from '../DetailsRow';
 import { API } from '../../utils/order';
 
 const OrderDetails = props => {
-  let { detailsId, setOrderDetails, RUB, profile, order, notificationFunc } = props;
+  const { detailsId, setOrderDetails, RUB, profile, order, notificationFunc } = props;
 
   const authRef = React.createRef();
   const phoneInput = React.createRef();
@@ -48,20 +48,20 @@ const OrderDetails = props => {
 
     window.log && console.log('changeSubmit');
 
-    //const url = '/set/deal';
+    // const url = '/set/deal';
     //
-    //let store = localStorage.getItem('catpart');
+    // let store = localStorage.getItem('catpart');
     //
-    //if (store) {
+    // if (store) {
     //  store = JSON.parse(store);
-    //} else {
+    // } else {
     //  store = {};
-    //}
+    // }
     //
-    //if (!store.hasOwnProperty('order')) {
+    // if (!store.hasOwnProperty('order')) {
     //  store.order = [];
     //  localStorage.setItem('catpart', JSON.stringify(store));
-    //}
+    // }
   };
 
   const handleChange = (field, e) => {
@@ -87,7 +87,7 @@ const OrderDetails = props => {
         break;
     }
 
-    //localStorage.setItem('catpart-user', JSON.stringify(fields));
+    // localStorage.setItem('catpart-user', JSON.stringify(fields));
 
     setErrors(errors);
 
@@ -96,7 +96,7 @@ const OrderDetails = props => {
     setJustRedraw(justRedraw + 1);
   };
 
-  let tableHeader = {
+  const tableHeader = {
     name: 'Компоненты',
     supplier: 'Поставщик',
     manufacturer: 'Бренд',
@@ -109,12 +109,12 @@ const OrderDetails = props => {
     comment: 'Комментарий менеджера',
   };
 
-  let tHead = (
+  const tHead = (
     <div className="details-results__row __even __head">
       {Object.keys(tableHeader).map((head, hi) =>
         ['real_delivery_date', 'manufacturer', 'supplier'].indexOf(head) > -1 ? null : (
           <div key={hi} className={`details-results__cell __${head}`}>
-            {head === 'calculated_delivery_date' ? tableHeader[head] + '/\n' + tableHeader.real_delivery_date : tableHeader[head]}
+            {head === 'calculated_delivery_date' ? `${tableHeader[head]}/\n${tableHeader.real_delivery_date}` : tableHeader[head]}
           </div>
         ),
       )}
@@ -122,11 +122,11 @@ const OrderDetails = props => {
   );
 
   useEffect(() => {
-    setInputFilter(phoneInput.current, function(value) {
-      return /^\+?\d*$/.test(value); // Allow digits and '+' on beginning only, using a RegExp
-    });
+    // setInputFilter(phoneInput.current, function(value) {
+    //  return /^\+?\d*$/.test(value); // Allow digits and '+' on beginning only, using a RegExp
+    // });
 
-    const requestURL = '/orders/' + detailsId;
+    const requestURL = `/orders/${detailsId}`;
 
     apiGET(requestURL, {}, data => {
       window.log && console.log('OrderDetails', detailsId, data);
@@ -138,19 +138,21 @@ const OrderDetails = props => {
   }, []);
 
   const healthGradient = percent => {
-    let start = Math.min(96, Math.max(0, percent - 2));
+    const start = Math.min(96, Math.max(0, percent - 2));
 
     return (
       <span
         style={{
           backgroundImage: `linear-gradient(to right, rgb(190, 243, 49) ${start}%, rgb(220, 247, 150) ${start + 4}%,  rgb(250, 250, 250) 100%)`,
         }}
-        className={'orders-health__bar'}
+        className="orders-health__bar"
       >
         <span>{percent}%</span>
       </span>
     );
   };
+
+  console.log('order', order);
 
   return order.hasOwnProperty('id') ? (
     <div className="profile __details">
@@ -158,7 +160,7 @@ const OrderDetails = props => {
 
       <div className="orders-details">
         <div className="orders-details__left">
-          <ul className={'orders-health__list'}>
+          <ul className="orders-health__list">
             <li>
               <span>Оплачено</span>
               {healthGradient(parseInt(order.statuses && order.statuses.hasOwnProperty('pay') ? order.statuses.pay : 0))}
@@ -198,7 +200,7 @@ const OrderDetails = props => {
                   {order.documents.map((d, di) => (
                     <React.Fragment key={di}>
                       {di ? <>,&nbsp;</> : null}
-                      <a href={API + '/order/documents/' + d.id + '?token=' + localStorage.getItem('access_token') || ''} className="document-link">
+                      <a href={`${API}/order/documents/${d.id}?token=${localStorage.getItem('access_token')}` || ''} className="document-link">
                         {d.title}
                       </a>
                     </React.Fragment>
@@ -215,48 +217,62 @@ const OrderDetails = props => {
               <li>
                 <span>Сумма (RUB)&nbsp;</span>: <b>{priceFormatter(order.amount, 2)}</b>
               </li>
-              {/*<li>*/}
-              {/*  <span>НДС (RUB)&nbsp;</span>: <b>{priceFormatter(order.amount * 0.2, 2)}</b>*/}
-              {/*</li>*/}
+              {/* <li> */}
+              {/*  <span>НДС (RUB)&nbsp;</span>: <b>{priceFormatter(order.amount * 0.2, 2)}</b> */}
+              {/* </li> */}
               <li>
                 <span>Остаток (RUB)&nbsp;</span>: <b>{priceFormatter(order.amount - order.payed, 2)}</b>
               </li>
             </ul>
           </div>
 
-          <div className={'orders-chronology__scroller'}>
-            <ul className={'orders-chronology__list'}>
-              <li className={'__odd'}>
-                <span>25.05.2021 — отгружено 20%</span>
-                <a className={'orders-chronology__link __green'} href="#">
-                  упд xlsx
-                </a>
-              </li>
-              <li className={'__even'}>
-                <span>25.05.2021 — на складе 10%</span>
-              </li>
-              <li className={'__odd'}>
-                <span>07.06.2021 — товар заказан</span>
-              </li>
-              <li className={'__even'}>
-                <span>26.05.2021 — оплачено 30%</span>
-              </li>
-              <li className={'__odd'}>
-                <span>25.05.2021 — счёт выставлен</span>
-                <a className={'orders-chronology__link __green'} href="#">
-                  xlsx
-                </a>
-                <a className={'orders-chronology__link __red'} href="#">
-                  pdf
-                </a>
-              </li>
-            </ul>
+          <div className="orders-chronology__scroller">
+            {order.chronology && order.chronology.length ? (
+              <ul className="orders-chronology__list">
+                {order.chronology.map((c, ci) => (
+                  <li key={ci} className={ci % 2 ? '__even' : '__odd'}>
+                    {c.datetime ? <span className="orders-chronology__date">{dateFormatter(c.datetime)}</span> : null}
+                    <span>{c.name}</span>
+                    {c.file ? (
+                      <a className="orders-chronology__link __green" href={c.file}>
+                        xlsx
+                      </a>
+                    ) : null}
+                  </li>
+                ))}
+
+                {/* <li className={'__odd'}> */}
+                {/*  <span>25.05.2021 — отгружено 20%</span> */}
+                {/*  <a className={'orders-chronology__link __green'} href="#"> */}
+                {/*    упд xlsx */}
+                {/*  </a> */}
+                {/* </li> */}
+                {/* <li className={'__even'}> */}
+                {/*  <span>25.05.2021 — на складе 10%</span> */}
+                {/* </li> */}
+                {/* <li className={'__odd'}> */}
+                {/*  <span>07.06.2021 — товар заказан</span> */}
+                {/* </li> */}
+                {/* <li className={'__even'}> */}
+                {/*  <span>26.05.2021 — оплачено 30%</span> */}
+                {/* </li> */}
+                {/* <li className={'__odd'}> */}
+                {/*  <span>25.05.2021 — счёт выставлен</span> */}
+                {/*  <a className={'orders-chronology__link __green'} href="#"> */}
+                {/*    xlsx */}
+                {/*  </a> */}
+                {/*  <a className={'orders-chronology__link __red'} href="#"> */}
+                {/*    pdf */}
+                {/*  </a> */}
+                {/* </li> */}
+              </ul>
+            ) : null}
           </div>
         </div>
       </div>
 
       <div className="aside-order">
-        <div className={`form-filter__controls`}>
+        <div className="form-filter__controls">
           <div className="form-filter__controls_left">
             <div className="form-filter__control">
               <Ripples
@@ -299,49 +315,49 @@ const OrderDetails = props => {
         </ul>
       </div>
 
-      <div className="aside-caption __mb-18">Нужно отправить сообщение менеджеру об этом заказе?</div>
+      {/* <div className="aside-caption __mb-18">Нужно отправить сообщение менеджеру об этом заказе?</div> */}
 
-      <form ref={authRef} className="form-content" onSubmit={changeSubmit}>
-        <FormInput
-          onChange={handleChange.bind(this, 'details-email')}
-          placeholder="Ваш email"
-          name="details-email"
-          //
-          error={errors['details-email']}
-          className="__lg"
-          inputRef={emailInput}
-        />
+      {/* <form ref={authRef} className="form-content" onSubmit={changeSubmit}> */}
+      {/*  <FormInput */}
+      {/*    onChange={handleChange.bind(this, 'details-email')} */}
+      {/*    placeholder="Ваш email" */}
+      {/*    name="details-email" */}
+      {/*    // */}
+      {/*    error={errors['details-email']} */}
+      {/*    className="__lg" */}
+      {/*    inputRef={emailInput} */}
+      {/*  /> */}
 
-        <FormInput
-          onChange={handleChange.bind(this, 'details-contact')}
-          placeholder="ФИО"
-          name="details-contact"
-          //
-          error={errors['details-contact']}
-          className="__lg"
-          inputRef={contactInput}
-        />
+      {/*  <FormInput */}
+      {/*    onChange={handleChange.bind(this, 'details-contact')} */}
+      {/*    placeholder="ФИО" */}
+      {/*    name="details-contact" */}
+      {/*    // */}
+      {/*    error={errors['details-contact']} */}
+      {/*    className="__lg" */}
+      {/*    inputRef={contactInput} */}
+      {/*  /> */}
 
-        <FormInput
-          onChange={handleChange.bind(this, 'details-phone')}
-          placeholder="Телефон"
-          name="details-phone"
-          //
-          error={errors['details-phone']}
-          className="__lg"
-          inputRef={phoneInput}
-        />
+      {/*  <FormInput */}
+      {/*    onChange={handleChange.bind(this, 'details-phone')} */}
+      {/*    placeholder="Телефон" */}
+      {/*    name="details-phone" */}
+      {/*    // */}
+      {/*    error={errors['details-phone']} */}
+      {/*    className="__lg" */}
+      {/*    inputRef={phoneInput} */}
+      {/*  /> */}
 
-        <FormInput textarea placeholder="Ваш вопрос, пожелание или другое сообщение менеджеру" name="details-delivery" error={null} className="__lg" inputRef={commentInput} />
+      {/*  <FormInput textarea placeholder="Ваш вопрос, пожелание или другое сообщение менеджеру" name="details-delivery" error={null} className="__lg" inputRef={commentInput} /> */}
 
-        <div className="form-control">
-          <Ripples className={`__w-100p btn __blue __lg${!validForm ? ' __disabled' : ''}`} during={1000}>
-            <button name="details-submit" className="btn-inner">
-              <span>Отправить</span>
-            </button>
-          </Ripples>
-        </div>
-      </form>
+      {/*  <div className="form-control"> */}
+      {/*    <Ripples className={`__w-100p btn __blue __lg${!validForm ? ' __disabled' : ''}`} during={1000}> */}
+      {/*      <button name="details-submit" className="btn-inner"> */}
+      {/*        <span>Отправить</span> */}
+      {/*      </button> */}
+      {/*    </Ripples> */}
+      {/*  </div> */}
+      {/* </form> */}
     </div>
   ) : null;
 };

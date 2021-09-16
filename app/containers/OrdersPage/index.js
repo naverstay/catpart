@@ -11,6 +11,7 @@ import { connect } from 'react-redux';
 
 import Ripples from 'react-ripples';
 import Collapsible from 'react-collapsible';
+import { useDetectClickOutside } from 'react-detect-click-outside';
 import { smoothScrollTo } from '../../utils/smoothScrollTo';
 import CabinetTabs from '../CabinetTabs';
 import SearchRow from '../SearchRow';
@@ -20,7 +21,6 @@ import FormSelect from '../../components/FormSelect';
 import { validateEmail } from '../../utils/validateEmail';
 import apiGET from '../../utils/search';
 import apiPOST from '../../utils/upload';
-import { useDetectClickOutside } from 'react-detect-click-outside';
 
 export function OrdersPage(props) {
   const { currency, history, activeTab, setTableHeadFixed, setOpenRequisites, needLogin, setOpenDetails, setOpenProfile, count, notificationFunc, updateCart } = props;
@@ -114,7 +114,7 @@ export function OrdersPage(props) {
             }
           }}
           key={hi}
-          className={`orders-results__cell __${head}${(tableHeaderSort.indexOf(head) > -1 ? ' __sort' : '') + (tableHeaderSort.indexOf(head) > -1 && head === sortCol ? ' icon__ icon-chevron-up__' + (sortAsc ? ' __asc' : ' __desc') : '')}`}
+          className={`orders-results__cell __${head}${(tableHeaderSort.indexOf(head) > -1 ? ' __sort' : '') + (tableHeaderSort.indexOf(head) > -1 && head === sortCol ? ` icon__ icon-chevron-up__${sortAsc ? ' __asc' : ' __desc'}` : '')}`}
         >
           <span>{tableHeaderOrders[head]}</span>
         </div>
@@ -133,7 +133,7 @@ export function OrdersPage(props) {
             }
           }}
           key={hi}
-          className={`requisites-results__cell __${head}${(tableHeaderSort.indexOf(head) > -1 ? ' __sort' : '') + (tableHeaderSort.indexOf(head) > -1 && head === sortCol ? ' icon__ icon-chevron-up__' + (sortAsc ? ' __asc' : ' __desc') : '')}`}
+          className={`requisites-results__cell __${head}${(tableHeaderSort.indexOf(head) > -1 ? ' __sort' : '') + (tableHeaderSort.indexOf(head) > -1 && head === sortCol ? ` icon__ icon-chevron-up__${sortAsc ? ' __asc' : ' __desc'}` : '')}`}
         >
           <span>{tableHeaderRequisites[head]}</span>
         </div>
@@ -165,7 +165,7 @@ export function OrdersPage(props) {
       if (data.error) {
         needLogin();
       } else {
-        const statuses = data.reduce((all, d) => all.concat(d.products.reduce((ret, p) => ret.concat(p.statuses.map(s => s.name)), [])), []);
+        const statuses = data.reduce((all, d) => all.concat(d.chronology.reduce((ret, p) => ret.concat(p.name), [])), []);
         window.log && console.log('statuses', statuses, statuses.filter(onlyUnique));
 
         setStatusOptions(statuses.filter(onlyUnique).map(u => ({ value: u, label: u })));
@@ -336,7 +336,7 @@ export function OrdersPage(props) {
                     );
 
                     if (ordersFilter) {
-                      if (!(`${row.id}`.indexOf(ordersFilter) === 0)) {
+                      if (!(`${row.title}`.indexOf(ordersFilter) === 0)) {
                         ret = null;
                       }
                     }
@@ -344,12 +344,10 @@ export function OrdersPage(props) {
                     if (statusFilter.length) {
                       let count = 0;
 
-                      for (const product of row.products) {
-                        for (const status of product.statuses) {
-                          if (statusFilter.indexOf(status.name) > -1) {
-                            count++;
-                            break;
-                          }
+                      for (const chrono of row.chronology) {
+                        if (statusFilter.indexOf(chrono.name) > -1) {
+                          count++;
+                          break;
                         }
 
                         if (count) {
