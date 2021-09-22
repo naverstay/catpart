@@ -42,6 +42,7 @@ export default function App() {
   const [searchCount, setSearchCount] = useState(1);
   const [cartCount, setCartCount] = useState(0);
   const [totalCart, setTotalCart] = useState(0);
+  const [openAuthPopup, setOpenAuthPopup] = useState(false);
 
   const [searchResult, setSearchResult] = useState(false);
   const [appDrag, setAppDrag] = useState(false);
@@ -426,7 +427,18 @@ export default function App() {
   return (
     <>
       <div className={`app-wrapper${appDrag ? ' __over' : ''}`}>
-        <Header showCabinet={showCabinet} notificationFunc={createNotification} setProfile={setProfile} history={history} profile={profile} cartCount={cartCount} openMobMenu={openMobMenu} setOpenMobMenu={setOpenMobMenu} />
+        <Header
+          showCabinet={showCabinet}
+          setOpenAuthPopup={setOpenAuthPopup}
+          openAuthPopup={openAuthPopup}
+          notificationFunc={createNotification}
+          setProfile={setProfile}
+          history={history}
+          profile={profile}
+          cartCount={cartCount}
+          openMobMenu={openMobMenu}
+          setOpenMobMenu={setOpenMobMenu}
+        />
 
         <main className={`main${centeredForm ? ' __center' : ''}`}>
           <SearchForm setFormBusy={setFormBusy} history={history} setSearchData={setSearchData} setOpenMobMenu={setOpenMobMenu} busyOrder={busyOrder} busy={formBusy} onSubmitForm={onSubmitSearchForm} notificationFunc={createNotification} />
@@ -543,6 +555,7 @@ export default function App() {
                       RUB={RUB}
                       setShowTableHeadFixed={setShowTableHeadFixed}
                       setTableHeadFixed={setTableHeadFixed}
+                      setOpenAuthPopup={setOpenAuthPopup}
                       setOrderSent={setOrderSent}
                       totalCart={totalCart}
                       updateCart={updateCart}

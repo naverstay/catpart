@@ -30,10 +30,12 @@ import FormSelect from '../../components/FormSelect';
 import { validateEmail } from '../../utils/validateEmail';
 import dateFormatter from '../../utils/dateFormatter';
 import innValidation from '../../utils/innValidation';
+import checkEmailExist from '../../utils/checkEmailExist';
+import FormCheck from '../../components/FormCheck';
 
 const key = 'home';
 
-export function OrderForm({ dndFile, delivery, updateCart, history, notificationFunc, setOrderSent, currency, totalCart, onSubmitForm, loading, setBusyOrder, onChangeUsername }) {
+export function OrderForm({ dndFile, delivery, updateCart, history, setOpenAuthPopup, notificationFunc, setOrderSent, currency, totalCart, onSubmitForm, loading, setBusyOrder, onChangeUsername }) {
   useInjectReducer({ key, reducer });
   useInjectSaga({ key, saga });
 
@@ -44,12 +46,14 @@ export function OrderForm({ dndFile, delivery, updateCart, history, notification
   const deliveryInput = React.createRef();
   const phoneInput = React.createRef();
   const totalPriceRef = React.createRef();
+  const agreementCheck = React.createRef();
   const [fields, setFields] = useState({
     'order-email': '',
     'order-name': '',
     'order-phone': '',
     'order-inn': '',
     'order-delivery': '',
+    'order-agreement': '',
   });
   const [justRedraw, setJustRedraw] = useState(0);
   const [totalPrice, setTotalPrice] = useState(0);
@@ -59,6 +63,7 @@ export function OrderForm({ dndFile, delivery, updateCart, history, notification
     'order-phone': null,
     'order-inn': null,
     'order-delivery': null,
+    'order-agreement': null,
   });
 
   const [busy, setBusy] = useState(false);
@@ -67,8 +72,6 @@ export function OrderForm({ dndFile, delivery, updateCart, history, notification
   const [preSelectedDelivery, setPreSelectedDelivery] = useState(-1);
 
   const formRef = React.createRef();
-
-  const requiredFields = ['order-email', 'order-name', 'order-phone', 'order-inn', 'order-delivery'];
 
   const handleClear = field => {
     window.log && console.log('handleClear', field);
@@ -103,7 +106,7 @@ export function OrderForm({ dndFile, delivery, updateCart, history, notification
           innValidation(
             e.target.value,
             e => {
-              window.log && console.log(e.hasOwnProperty('suggestions'), e.suggestions);
+              window.log && console.log(fields[field], 'inn', e.hasOwnProperty('suggestions'), e.suggestions);
               errors[field] = e.hasOwnProperty('suggestions') && e.suggestions.length ? '' : 'Проверьте ИНН';
               validate();
             },
@@ -117,18 +120,46 @@ export function OrderForm({ dndFile, delivery, updateCart, history, notification
           validate();
         }
         break;
+      case 'order-agreement':
+        errors[field] = fields[field] ? '' : 'Нужно принять условия';
+        validate();
+        break;
       case 'order-name':
       case 'order-delivery':
-        errors[field] = e.target.value.length ? '' : 'Не может быть пустым';
+        errors[field] = fields[field].length ? '' : 'Не может быть пустым';
         validate();
         break;
       case 'order-phone':
-        errors[field] = e.target.value.length >= 8 ? '' : 'Минимум 8 символов';
+        errors[field] = fields[field].length >= 8 ? '' : 'Минимум 8 символов';
         validate();
         break;
       case 'order-email':
-        errors[field] = e.target.value.length && validateEmail(e.target.value) ? '' : 'Проверьте формат e-mail';
-        validate();
+        const realEmail = fields[field].length && validateEmail(fields[field]);
+        errors[field] = realEmail ? '' : 'Проверьте формат e-mail';
+
+        if (realEmail) {
+          checkEmailExist(
+            fields[field],
+            e => {
+              window.log && console.log(fields[field], 'exists', e.hasOwnProperty('exists'), e.exists);
+              const emailExists = e.hasOwnProperty('exists') && e.exists;
+
+              errors[field] = emailExists ? 'Пользователь существует, авторизуйтесь для оформления заказа или измените контактные данные.' : '';
+
+              if (emailExists) {
+                setOpenAuthPopup(true);
+              }
+              validate();
+            },
+            e => {
+              errors[field] = 'Проверьте email';
+              validate();
+            },
+          );
+        } else {
+          validate();
+        }
+
         break;
     }
   };
@@ -478,6 +509,17 @@ export function OrderForm({ dndFile, delivery, updateCart, history, notification
         {deliveryOptions.length ? <FormSelect onChange={handleChange} options={deliveryOptions} placeholder="Доставка" name="order-delivery" error={errors['order-delivery']} preSelectedValue={preSelectedDelivery} className="__lg" inputRef={deliveryInput} /> : null}
 
         <FormInput clear textarea placeholder="Комментарий" name="order-comment" error={null} className="__lg" inputRef={commentInput} />
+
+        <FormCheck
+          onChange={handleChange.bind(this, 'order-agreement')}
+          defaultChecked={false}
+          //
+          name="order-agreement"
+          value="order-agreement"
+          error={errors['order-agreement']}
+          label={'Подтверждаю ознакомление с указанными в заказе сроками'}
+          inputRef={agreementCheck}
+        />
 
         <div className="form-control">
           <Ripples className={`__w-100p btn __blue __lg${!validForm ? ' __disabled' : ''}${busy ? ' __loader' : ''}`} during={1000}>

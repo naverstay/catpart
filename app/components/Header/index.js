@@ -7,7 +7,7 @@ import { validateEmail } from '../../utils/validateEmail';
 import apiPOST from '../../utils/upload';
 import apiGET from '../../utils/search';
 
-function Header({ history, notificationFunc, openMobMenu, cartCount, profile, setProfile, setOpenMobMenu, showCabinet }) {
+function Header({ history, notificationFunc, openAuthPopup, setOpenAuthPopup, openMobMenu, cartCount, profile, setProfile, setOpenMobMenu, showCabinet }) {
   const headerRef = useDetectClickOutside({
     onTriggered: () => {
       setOpenMobMenu(false);
@@ -38,7 +38,7 @@ function Header({ history, notificationFunc, openMobMenu, cartCount, profile, se
 
   const [validForm, setValidForm] = useState(false);
   const [openResetPassword, setOpenResetPassword] = useState(false);
-  const [openAuthPopup, setOpenAuthPopup] = useState(false);
+
   const [justRedraw, setJustRedraw] = useState(0);
   const [validResetForm, setValidResetForm] = useState(false);
 
@@ -250,7 +250,6 @@ function Header({ history, notificationFunc, openMobMenu, cartCount, profile, se
               <Ripples
                 onClick={() => {
                   setOpenAuthPopup(!openAuthPopup);
-
                   window.log && console.log('open', openAuthPopup);
                 }}
                 during={1000}
