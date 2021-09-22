@@ -53,7 +53,20 @@ function Header({ history, notificationFunc, openAuthPopup, setOpenAuthPopup, op
     const requestURL = '/auth/me';
 
     apiGET(requestURL, {}, data => {
+      const user = localStorage.getItem('catpart-user');
+      let userFields = {};
+
+      if (user) {
+        userFields = JSON.parse(user);
+      }
+
+      userFields['order-name'] = data.contact_name;
+      userFields['order-email'] = data.email;
+      userFields['order-phone'] = data.contact_phone;
+
+      localStorage.setItem('catpart-user', JSON.stringify(userFields));
       localStorage.setItem('catpart-profile', JSON.stringify(data));
+
       setProfile(data);
       history.push('/orders');
     });
@@ -114,7 +127,7 @@ function Header({ history, notificationFunc, openAuthPopup, setOpenAuthPopup, op
     formData.append('password', passwordInput.current.value);
 
     apiPOST(requestURL, formData, options, data => {
-      window.log && console.log('data', data);
+      window.log && console.log('access_token', data);
 
       if (data.error) {
         notificationFunc('success', `Авторизация не удалась. `, 'Проверьте логин/пароль.');

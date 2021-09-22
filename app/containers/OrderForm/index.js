@@ -35,7 +35,7 @@ import FormCheck from '../../components/FormCheck';
 
 const key = 'home';
 
-export function OrderForm({ dndFile, delivery, updateCart, history, setOpenAuthPopup, notificationFunc, setOrderSent, currency, totalCart, onSubmitForm, loading, setBusyOrder, onChangeUsername }) {
+export function OrderForm({ dndFile, delivery, updateCart, history, profile, setOpenAuthPopup, notificationFunc, setOrderSent, currency, totalCart, onSubmitForm, loading, setBusyOrder, onChangeUsername }) {
   useInjectReducer({ key, reducer });
   useInjectSaga({ key, saga });
 
@@ -91,7 +91,18 @@ export function OrderForm({ dndFile, delivery, updateCart, history, setOpenAuthP
         userFields = JSON.parse(user);
       }
 
-      localStorage.setItem('catpart-user', JSON.stringify(Object.assign(userFields, fields)));
+      userFields = Object.assign(userFields, fields);
+
+      if (profile.email) {
+        userFields['order-name'] = profile.contact_name;
+        userFields['order-email'] = profile.email;
+        userFields['order-phone'] = profile.contact_phone;
+      }
+
+      console.log('profile', profile);
+      console.log('userFields', userFields);
+
+      localStorage.setItem('catpart-user', JSON.stringify(userFields));
 
       setErrors(errors);
 
@@ -427,6 +438,7 @@ export function OrderForm({ dndFile, delivery, updateCart, history, setOpenAuthP
           onChange={handleChange.bind(this, 'order-email')}
           placeholder="Ваш email"
           name="order-email"
+          disabled={profile.email}
           //
           error={errors['order-email']}
           className="__lg"
@@ -446,6 +458,7 @@ export function OrderForm({ dndFile, delivery, updateCart, history, setOpenAuthP
           onChange={handleChange.bind(this, 'order-name')}
           placeholder="ФИО"
           name="order-name"
+          disabled={profile.email}
           //
           error={errors['order-name']}
           className="__lg"
@@ -465,6 +478,7 @@ export function OrderForm({ dndFile, delivery, updateCart, history, setOpenAuthP
           onChange={handleChange.bind(this, 'order-phone')}
           placeholder="Телефон"
           name="order-phone"
+          disabled={profile.email}
           //
           error={errors['order-phone']}
           className="__lg"

@@ -522,6 +522,7 @@ export default function App() {
                   path="/search"
                   render={routeProps => (
                     <FilterForm
+                      profile={profile}
                       history={history}
                       busy={formBusy}
                       setBusyOrder={setBusyOrder}
@@ -547,6 +548,7 @@ export default function App() {
                   path="/order"
                   render={routeProps => (
                     <FilterForm
+                      profile={profile}
                       history={history}
                       busy={formBusy}
                       setBusyOrder={setBusyOrder}

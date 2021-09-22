@@ -41,6 +41,7 @@ const TRIGGER_DROPDOWN_LIMIT = 11;
 export function FilterForm({
   props,
   cart,
+  profile,
   RUB,
   busy,
   setBusyOrder,
@@ -359,7 +360,7 @@ export function FilterForm({
         <>
           <CartResults setTableHeadFixed={setTableHeadFixed} setShowTableHeadFixed={setShowTableHeadFixed} updateCart={updateCart} list={cartData} notificationFunc={notificationFunc} showResults={showResults} count={count} currency={currency} />
 
-          <OrderForm history={history} setOpenAuthPopup={setOpenAuthPopup} setBusyOrder={setBusyOrder} updateCart={updateCart} notificationFunc={notificationFunc} setOrderSent={setOrderSent} totalCart={totalCart} currency={currency} delivery />
+          <OrderForm profile={profile} history={history} setOpenAuthPopup={setOpenAuthPopup} setBusyOrder={setBusyOrder} updateCart={updateCart} notificationFunc={notificationFunc} setOrderSent={setOrderSent} totalCart={totalCart} currency={currency} delivery />
         </>
       ) : busy || !totalData ? null : (
         <SearchResults
