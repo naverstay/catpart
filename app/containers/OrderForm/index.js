@@ -53,7 +53,7 @@ export function OrderForm({ dndFile, delivery, updateCart, history, profile, set
     'order-phone': '',
     'order-inn': '',
     'order-delivery': '',
-    'order-agreement': '',
+    'order-agreement': false,
   });
   const [justRedraw, setJustRedraw] = useState(0);
   const [totalPrice, setTotalPrice] = useState(0);
@@ -91,18 +91,7 @@ export function OrderForm({ dndFile, delivery, updateCart, history, profile, set
         userFields = JSON.parse(user);
       }
 
-      userFields = Object.assign(userFields, fields);
-
-      if (profile.email) {
-        userFields['order-name'] = profile.contact_name;
-        userFields['order-email'] = profile.email;
-        userFields['order-phone'] = profile.contact_phone;
-      }
-
-      console.log('profile', profile);
-      console.log('userFields', userFields);
-
-      localStorage.setItem('catpart-user', JSON.stringify(userFields));
+      localStorage.setItem('catpart-user', JSON.stringify(Object.assign(userFields, fields)));
 
       setErrors(errors);
 
@@ -136,19 +125,24 @@ export function OrderForm({ dndFile, delivery, updateCart, history, profile, set
         validate();
         break;
       case 'order-name':
+        errors[field] = profile.hasOwnProperty('email') || fields[field].length ? '' : 'Не может быть пустым';
+        validate();
+        break;
       case 'order-delivery':
         errors[field] = fields[field].length ? '' : 'Не может быть пустым';
         validate();
         break;
       case 'order-phone':
-        errors[field] = fields[field].length >= 8 ? '' : 'Минимум 8 символов';
+        errors[field] = profile.hasOwnProperty('email') || fields[field].length >= 8 ? '' : 'Минимум 8 символов';
         validate();
         break;
       case 'order-email':
         const realEmail = fields[field].length && validateEmail(fields[field]);
         errors[field] = realEmail ? '' : 'Проверьте формат e-mail';
 
-        if (realEmail) {
+        if (profile.hasOwnProperty('email') || !realEmail) {
+          validate();
+        } else {
           checkEmailExist(
             fields[field],
             e => {
@@ -167,8 +161,6 @@ export function OrderForm({ dndFile, delivery, updateCart, history, profile, set
               validate();
             },
           );
-        } else {
-          validate();
         }
 
         break;
@@ -363,8 +355,14 @@ export function OrderForm({ dndFile, delivery, updateCart, history, profile, set
     const user = localStorage.getItem('catpart-user');
 
     if (user) {
-      const userFields = JSON.parse(user);
+      let userFields = JSON.parse(user);
       setFields(userFields);
+
+      if (profile.hasOwnProperty('email') && profile.email) {
+        userFields['order-name'] = profile.contact_name;
+        userFields['order-email'] = profile.email;
+        userFields['order-phone'] = profile.contact_phone;
+      }
 
       if (userFields['order-email']) {
         emailInput.current.value = userFields['order-email'];
@@ -438,7 +436,7 @@ export function OrderForm({ dndFile, delivery, updateCart, history, profile, set
           onChange={handleChange.bind(this, 'order-email')}
           placeholder="Ваш email"
           name="order-email"
-          disabled={profile.email}
+          disabled={profile.hasOwnProperty('email')}
           //
           error={errors['order-email']}
           className="__lg"
@@ -458,7 +456,7 @@ export function OrderForm({ dndFile, delivery, updateCart, history, profile, set
           onChange={handleChange.bind(this, 'order-name')}
           placeholder="ФИО"
           name="order-name"
-          disabled={profile.email}
+          disabled={profile.hasOwnProperty('email')}
           //
           error={errors['order-name']}
           className="__lg"
@@ -478,7 +476,7 @@ export function OrderForm({ dndFile, delivery, updateCart, history, profile, set
           onChange={handleChange.bind(this, 'order-phone')}
           placeholder="Телефон"
           name="order-phone"
-          disabled={profile.email}
+          disabled={profile.hasOwnProperty('email')}
           //
           error={errors['order-phone']}
           className="__lg"
