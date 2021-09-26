@@ -41,6 +41,7 @@ function Header({ history, notificationFunc, openAuthPopup, setOpenAuthPopup, op
 
   const [justRedraw, setJustRedraw] = useState(0);
   const [validResetForm, setValidResetForm] = useState(false);
+  let userEmail = '';
 
   const popupRef = useDetectClickOutside({
     onTriggered: () => {
@@ -187,6 +188,29 @@ function Header({ history, notificationFunc, openAuthPopup, setOpenAuthPopup, op
   //  }
   //}, [openAuthPopup]);
 
+  useEffect(() => {
+    let userFields = {};
+
+    if (loginInput && loginInput.current) {
+      const user = localStorage.getItem('catpart-user');
+
+      if (history.location.pathname === '/order' && user) {
+        userFields = JSON.parse(user);
+
+        if (userFields.hasOwnProperty('order-email')) {
+          userEmail = userFields['order-email'];
+          loginInput.current.value = userEmail;
+          handleChange('auth-login', { target: loginInput.current });
+        }
+      } else {
+        setErrors({
+          'auth-login': null,
+          'auth-password': null,
+        });
+      }
+    }
+  }, [openAuthPopup]);
+
   return (
     <header ref={headerRef} className={`header${openMobMenu ? ' __open-mob-menu' : ''}`}>
       <div className="header-left">
@@ -288,7 +312,6 @@ function Header({ history, notificationFunc, openAuthPopup, setOpenAuthPopup, op
                       name="auth-login"
                       //
                       error={errors['auth-login']}
-                      //defaultValue={'test@test.ru'}
                       className="__lg"
                       inputRef={loginInput}
                     />

@@ -530,6 +530,7 @@ export default function App() {
                       setCurrency={setCurrency}
                       RUB={RUB}
                       setTableHeadFixed={setTableHeadFixed}
+                      setOpenAuthPopup={setOpenAuthPopup}
                       setShowTableHeadFixed={setShowTableHeadFixed}
                       setOrderSent={setOrderSent}
                       totalCart={totalCart}

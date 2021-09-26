@@ -78,27 +78,34 @@ export function OrderForm({ dndFile, delivery, updateCart, history, profile, set
     fields[field] = '';
   };
 
+  let emailExists = false;
+
+  const validate = () => {
+    const user = localStorage.getItem('catpart-user');
+    let userFields = {};
+
+    if (user) {
+      userFields = JSON.parse(user);
+    }
+
+    localStorage.setItem('catpart-user', JSON.stringify(Object.assign(userFields, fields)));
+
+    setErrors(errors);
+
+    setValidForm(!Object.values(errors).filter(er => er === null || er.length).length);
+
+    setJustRedraw(justRedraw + 1);
+
+    if (emailExists) {
+      setOpenAuthPopup(true);
+      notificationFunc('success', 'Пользователь существует.', 'Авторизуйтесь для оформления заказа или измените контактные данные.');
+    }
+  };
+
   const handleChange = (field, e) => {
     window.log && console.log('handleChange', field, e);
     fields[field] = e.target.value;
     setFields(fields);
-
-    const validate = () => {
-      const user = localStorage.getItem('catpart-user');
-      let userFields = {};
-
-      if (user) {
-        userFields = JSON.parse(user);
-      }
-
-      localStorage.setItem('catpart-user', JSON.stringify(Object.assign(userFields, fields)));
-
-      setErrors(errors);
-
-      setValidForm(!Object.values(errors).filter(er => er === null || er.length).length);
-
-      setJustRedraw(justRedraw + 1);
-    };
 
     switch (field) {
       case 'order-inn':
@@ -147,13 +154,9 @@ export function OrderForm({ dndFile, delivery, updateCart, history, profile, set
             fields[field],
             e => {
               window.log && console.log(fields[field], 'exists', e.hasOwnProperty('exists'), e.exists);
-              const emailExists = e.hasOwnProperty('exists') && e.exists;
+              emailExists = e.hasOwnProperty('exists') && e.exists;
 
-              errors[field] = emailExists ? 'Пользователь существует, авторизуйтесь для оформления заказа или измените контактные данные.' : '';
-
-              if (emailExists) {
-                setOpenAuthPopup(true);
-              }
+              errors[field] = emailExists ? 'Пользователь существует.' : '';
               validate();
             },
             e => {
@@ -162,7 +165,6 @@ export function OrderForm({ dndFile, delivery, updateCart, history, profile, set
             },
           );
         }
-
         break;
     }
   };
@@ -433,7 +435,7 @@ export function OrderForm({ dndFile, delivery, updateCart, history, profile, set
                 }
               : null
           }
-          onChange={handleChange.bind(this, 'order-email')}
+          onBlur={handleChange.bind(this, 'order-email')}
           placeholder="Ваш email"
           name="order-email"
           disabled={profile.hasOwnProperty('email')}
@@ -453,7 +455,7 @@ export function OrderForm({ dndFile, delivery, updateCart, history, profile, set
                 }
               : null
           }
-          onChange={handleChange.bind(this, 'order-name')}
+          onBlur={handleChange.bind(this, 'order-name')}
           placeholder="ФИО"
           name="order-name"
           disabled={profile.hasOwnProperty('email')}
@@ -473,7 +475,7 @@ export function OrderForm({ dndFile, delivery, updateCart, history, profile, set
                 }
               : null
           }
-          onChange={handleChange.bind(this, 'order-phone')}
+          onBlur={handleChange.bind(this, 'order-phone')}
           placeholder="Телефон"
           name="order-phone"
           disabled={profile.hasOwnProperty('email')}
@@ -493,7 +495,7 @@ export function OrderForm({ dndFile, delivery, updateCart, history, profile, set
                 }
               : null
           }
-          onChange={handleChange.bind(this, 'order-inn')}
+          onBlur={handleChange.bind(this, 'order-inn')}
           placeholder="ИНН"
           name="order-inn"
           //
@@ -503,7 +505,7 @@ export function OrderForm({ dndFile, delivery, updateCart, history, profile, set
         />
 
         {/* <FormInput clear=true */}
-        {/*  onChange={handleChange.bind(this, 'order-delivery')} */}
+        {/*  onBlur={handleChange.bind(this, 'order-delivery')} */}
         {/*  placeholder={'Доставка'} */}
         {/*  name="order-delivery" */}
         {/*  // */}
@@ -518,12 +520,12 @@ export function OrderForm({ dndFile, delivery, updateCart, history, profile, set
           ref={deliveryInput || null}
         />
 
-        {deliveryOptions.length ? <FormSelect onChange={handleChange} options={deliveryOptions} placeholder="Доставка" name="order-delivery" error={errors['order-delivery']} preSelectedValue={preSelectedDelivery} className="__lg" inputRef={deliveryInput} /> : null}
+        {deliveryOptions.length ? <FormSelect onBlur={handleChange} options={deliveryOptions} placeholder="Доставка" name="order-delivery" error={errors['order-delivery']} preSelectedValue={preSelectedDelivery} className="__lg" inputRef={deliveryInput} /> : null}
 
         <FormInput clear textarea placeholder="Комментарий" name="order-comment" error={null} className="__lg" inputRef={commentInput} />
 
         <FormCheck
-          onChange={handleChange.bind(this, 'order-agreement')}
+          onBlur={handleChange.bind(this, 'order-agreement')}
           defaultChecked={false}
           //
           name="order-agreement"
