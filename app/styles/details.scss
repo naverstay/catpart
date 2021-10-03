@@ -82,7 +82,7 @@
           "item_2 norm_2 term_2 price_2 total_2 cart_2 comment_2"
           "item_3 norm_3 term_3 price_3 total_3 cart_3 comment_3";
       grid-template-columns: auto 65px 55px 75px 0px 115px 230px;
-      //                             best times  95px
+      //                       todo  best times total_3 | 95px
       &.__head {
         text-align: center;
         white-space: pre;
@@ -279,11 +279,13 @@
         &.__price {
           grid-row: 1 / 4;
           grid-column: 3;
+          text-align: center;
         }
 
         &.__sum {
           grid-row: 1 / 4;
           grid-column: 4;
+          text-align: center;
         }
 
         &.__statuses {
@@ -309,7 +311,6 @@
           grid-column: 7;
           text-align: left;
         }
-
       }
     }
 

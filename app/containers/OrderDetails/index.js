@@ -103,7 +103,7 @@ const OrderDetails = props => {
     quantity: 'Кол-во',
     price: 'Цена\nза шт.',
     sum: 'Сумма',
-    //statuses: 'Статус', // todo best times
+    statuses: 'Статус', // todo best times
     calculated_delivery_date: 'Расчетная дата',
     real_delivery_date: 'дата поставки',
     comment: 'Комментарий менеджера',
@@ -114,7 +114,7 @@ const OrderDetails = props => {
       {Object.keys(tableHeader).map((head, hi) =>
         ['real_delivery_date', 'manufacturer', 'supplier'].indexOf(head) > -1 ? null : (
           <div key={hi} className={`details-results__cell __${head}`}>
-            {head === 'calculated_delivery_date' ? `${tableHeader[head]}/\n${tableHeader.real_delivery_date}` : tableHeader[head]}
+            {head === 'statuses' ? null : head === 'calculated_delivery_date' ? `${tableHeader[head]}/\n${tableHeader.real_delivery_date}` : tableHeader[head]}
           </div>
         ),
       )}
@@ -230,7 +230,7 @@ const OrderDetails = props => {
           <div className="orders-chronology__scroller">
             {order.chronology && order.chronology.length ? (
               <ul className="orders-chronology__list">
-                {order.chronology.map((c, ci) => (
+                {order.chronology.reverse().map((c, ci) => (
                   <li key={ci} className={ci % 2 ? '__even' : '__odd'}>
                     {c.datetime ? <span className="orders-chronology__date">{dateFormatter(c.datetime)}</span> : null}
                     <span>{c.name}</span>

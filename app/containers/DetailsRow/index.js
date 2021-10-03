@@ -108,7 +108,9 @@ const DetailsRow = props => {
           ) : cell === 'sum' ? (
             <span className="details-results__value">{priceFormatter(row.quantity * row.price)}</span>
           ) : cell === 'statuses' ? (
-            <span className="details-results__value">{row[cell] && row[cell].length ? buildChronology(row) : <span data-empty={cell} />}</span>
+            1 ? null : ( // todo best times
+              <span className="details-results__value">{row[cell] && row[cell].length ? buildChronology(row) : <span data-empty={cell} />}</span>
+            )
           ) : (
             <span className="details-results__value">{row[cell] ? row[cell] : <span data-empty={cell} />}</span>
           )}
