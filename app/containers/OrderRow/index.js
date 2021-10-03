@@ -1,8 +1,8 @@
 import React, { createRef, useEffect, useState } from 'react';
 import Ripples from 'react-ripples';
-import { formatDate } from 'react-intl/src/format';
 import priceFormatter from '../../utils/priceFormatter';
 import dateFormatter from '../../utils/dateFormatter';
+import { formatDate } from 'react-intl/src/format';
 
 const OrderRow = props => {
   const { rowIndex, tableHeader, rowClick, row, updateCart, notificationFunc } = props;
@@ -22,27 +22,27 @@ const OrderRow = props => {
     );
   };
 
-  const buildChronology = row => (
-  // let products = row.products.map((p, pi) => {
-  //  return <li className={pi % 2 === 0 ? ' __odd' : ' __even'} />;
-  // });
+  const buildChronology = row => {
+    // let products = row.products.map((p, pi) => {
+    //  return <li className={pi % 2 === 0 ? ' __odd' : ' __even'} />;
+    // });
 
-    (
+    return (
       <div className="orders-chronology__scroller">
-      {row.chronology && row.chronology.length ? (
-        <ul className="orders-chronology__list">
-          {row.chronology.map((c, ci) => (
-            <li key={ci} className={ci % 2 ? '__even' : '__odd'}>
-              {c.datetime ? <span className="orders-chronology__date">{dateFormatter(c.datetime)}</span> : null}
-              <span>{c.name}</span>
-              {c.file ? (
-                <a className="orders-chronology__link __green" href={c.file}>
-                  xlsx
-                </a>
-              ) : null}
-            </li>
-          ))}
-          {/* <li className="__odd">
+        {row.chronology && row.chronology.length ? (
+          <ul className="orders-chronology__list">
+            {row.chronology.map((c, ci) => (
+              <li key={ci} className={ci % 2 ? '__even' : '__odd'}>
+                {c.datetime ? <span className="orders-chronology__date">{dateFormatter(c.datetime)}</span> : null}
+                <span>{c.name}</span>
+                {c.file ? (
+                  <a className="orders-chronology__link __green" href={c.file}>
+                    xlsx
+                  </a>
+                ) : null}
+              </li>
+            ))}
+            {/*<li className="__odd">
             <span>25.05.2021 — отгружено 20%</span>
             <a className="orders-chronology__link __green" href="#">
               упд xlsx
@@ -101,29 +101,33 @@ const OrderRow = props => {
             <a className="orders-chronology__link __red" href="#">
               pdf
             </a>
-          </li> */}
-        </ul>
-      ) : (
-        <span data-empty="chronology" />
-      )}
-    </div>
-  );
-  const buildStatusHealth = row => (
-    <ul className="orders-health__list">
-      <li>
-        <span>Оплачено</span>
-        {healthGradient(parseInt(row.statuses && row.statuses.hasOwnProperty('pay') ? row.statuses.pay : 0))}
-      </li>
-      <li>
-        <span>На складе</span>
-        {healthGradient(parseInt(row.statuses && row.statuses.hasOwnProperty('stock') ? row.statuses.stock : 0))}
-      </li>
-      <li>
-        <span>Отгружено</span>
-        {healthGradient(parseInt(row.statuses && row.statuses.hasOwnProperty('ship') ? row.statuses.ship : 0))}
-      </li>
-    </ul>
-  );
+          </li>*/}
+          </ul>
+        ) : (
+          <span data-empty={'chronology'} />
+        )}
+      </div>
+    );
+  };
+
+  const buildStatusHealth = row => {
+    return (
+      <ul className="orders-health__list">
+        <li>
+          <span>Оплачено</span>
+          {healthGradient(parseInt(row.statuses && row.statuses.hasOwnProperty('pay') ? row.statuses.pay : 0))}
+        </li>
+        <li>
+          <span>На складе</span>
+          {healthGradient(parseInt(row.statuses && row.statuses.hasOwnProperty('stock') ? row.statuses.stock : 0))}
+        </li>
+        <li>
+          <span>Отгружено</span>
+          {healthGradient(parseInt(row.statuses && row.statuses.hasOwnProperty('ship') ? row.statuses.ship : 0))}
+        </li>
+      </ul>
+    );
+  };
 
   return (
     <div
