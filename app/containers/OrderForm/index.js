@@ -357,7 +357,7 @@ export function OrderForm({ dndFile, delivery, updateCart, history, profile, set
     const user = localStorage.getItem('catpart-user');
 
     if (user) {
-      let userFields = JSON.parse(user);
+      const userFields = JSON.parse(user);
       setFields(userFields);
 
       if (profile.hasOwnProperty('email') && profile.email) {
@@ -520,18 +520,30 @@ export function OrderForm({ dndFile, delivery, updateCart, history, profile, set
           ref={deliveryInput || null}
         />
 
-        {deliveryOptions.length ? <FormSelect onBlur={handleChange} options={deliveryOptions} placeholder="Доставка" name="order-delivery" error={errors['order-delivery']} preSelectedValue={preSelectedDelivery} className="__lg" inputRef={deliveryInput} /> : null}
+        {deliveryOptions.length ? (
+          <FormSelect
+            //
+            onChange={handleChange}
+            options={deliveryOptions}
+            placeholder="Доставка"
+            name="order-delivery"
+            error={errors['order-delivery']}
+            preSelectedValue={preSelectedDelivery}
+            className="__lg"
+            inputRef={deliveryInput}
+          />
+        ) : null}
 
         <FormInput clear textarea placeholder="Комментарий" name="order-comment" error={null} className="__lg" inputRef={commentInput} />
 
         <FormCheck
-          onBlur={handleChange.bind(this, 'order-agreement')}
+          onChange={handleChange.bind(this, 'order-agreement')}
           defaultChecked={false}
           //
           name="order-agreement"
           value="order-agreement"
           error={errors['order-agreement']}
-          label={'Подтверждаю ознакомление с указанными в заказе сроками'}
+          label="Подтверждаю ознакомление с указанными в заказе сроками"
           inputRef={agreementCheck}
         />
 

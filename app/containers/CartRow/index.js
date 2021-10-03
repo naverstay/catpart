@@ -45,7 +45,7 @@ const CartRow = props => {
             ) : (
               <>
                 {cell === 'name' ? null : cell === 'quantity' ? (
-                  <label className="cart-results__label" htmlFor={'cart-row-' + rowIndex}>
+                  <label className="cart-results__label" htmlFor={`cart-row-${rowIndex}`}>
                     {tableHeader[cell]}
                   </label>
                 ) : (
@@ -57,7 +57,7 @@ const CartRow = props => {
                   ) : cell === 'quantity' ? (
                     <div className="cart-results__count">
                       <input
-                        id={'cart-row-' + rowIndex}
+                        id={`cart-row-${rowIndex}`}
                         ref={inputRef}
                         onChange={e => {
                           const val = +e.target.value;
@@ -99,7 +99,7 @@ const CartRow = props => {
                   ) : cell === 'total' ? (
                     <span className="cart-results__item">{priceFormatter(cartCount * parseFloat(row.pricebreaks[priceMatch].price / currency.exChange).toFixedCustom(currency.precision), currency.precision)}</span>
                   ) : (
-                    row[cell] || `!${cell}!`
+                    row[cell] || <span data-empty={cell} />
                   )}
                 </span>
               </>

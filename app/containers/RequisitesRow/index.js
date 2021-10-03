@@ -3,7 +3,7 @@ import Ripples from 'react-ripples';
 import priceFormatter from '../../utils/priceFormatter';
 
 const RequisitesRow = props => {
-  let { rowIndex, tableHeader, rowClick, row, updateCart, notificationFunc } = props;
+  const { rowIndex, tableHeader, rowClick, row, updateCart, notificationFunc } = props;
 
   return (
     <div
@@ -15,7 +15,7 @@ const RequisitesRow = props => {
       {Object.keys(tableHeader).map((cell, ci) => (
         <div key={ci} className={`requisites-results__cell __${cell}`}>
           <span className="requisites-results__label">{tableHeader[cell]}</span>
-          {cell === 'undistributed_amount' || cell === 'available' ? <span className="requisites-results__value">{priceFormatter(row[cell])}</span> : <span className="requisites-results__value">{row[cell] ? row[cell] : `!${cell}!`}</span>}
+          {cell === 'undistributed_amount' || cell === 'available' ? <span className="requisites-results__value">{priceFormatter(row[cell])}</span> : <span className="requisites-results__value">{row[cell] ? row[cell] : <span data-empty={cell} />}</span>}
         </div>
       ))}
 

@@ -66,23 +66,27 @@ const SearchRow = props => {
         <div key={ci} className={`search-results__cell __${cell}`}>
           {cell === 'name' ? null : <span className="search-results__label">{tableHeader[cell]}</span>}
           <span className="search-results__value">
-            {cell === 'pricebreaks'
-              ? row.pricebreaks.map((p, pi) => (
-                  <span key={pi} className="search-results__item">
-                    {priceHighlighter(pi, priceFormatter(parseFloat(p.price / currency.exChange).toFixedCustom(currency.precision), currency.precision))}
-                  </span>
-                ))
-              : cell === 'total'
-              ? row.pricebreaks.map((p, pi) => (
-                  <span key={pi} className="search-results__item">
-                    {priceHighlighter(pi, `x${pi === priceMatch ? itemCount : p.quant}=${priceFormatter(parseFloat(pi === priceMatch ? itemCount : p.quant) * parseFloat(p.price / currency.exChange).toFixedCustom(currency.precision), currency.precision)}`)}
-                  </span>
-                ))
-              : row[cell]
-              ? cell === 'name'
-                ? textHighlighter(row[cell], row.bold)
-                : row[cell]
-              : `!${cell}!`}
+            {cell === 'pricebreaks' ? (
+              row.pricebreaks.map((p, pi) => (
+                <span key={pi} className="search-results__item">
+                  {priceHighlighter(pi, priceFormatter(parseFloat(p.price / currency.exChange).toFixedCustom(currency.precision), currency.precision))}
+                </span>
+              ))
+            ) : cell === 'total' ? (
+              row.pricebreaks.map((p, pi) => (
+                <span key={pi} className="search-results__item">
+                  {priceHighlighter(pi, `x${pi === priceMatch ? itemCount : p.quant}=${priceFormatter(parseFloat(pi === priceMatch ? itemCount : p.quant) * parseFloat(p.price / currency.exChange).toFixedCustom(currency.precision), currency.precision)}`)}
+                </span>
+              ))
+            ) : row[cell] ? (
+              cell === 'name' ? (
+                textHighlighter(row[cell], row.bold)
+              ) : (
+                row[cell]
+              )
+            ) : (
+              <span data-empty={cell} />
+            )}
           </span>
         </div>
       ))}

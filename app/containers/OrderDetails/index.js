@@ -156,7 +156,7 @@ const OrderDetails = props => {
 
   return order.hasOwnProperty('id') ? (
     <div className="profile __details">
-      <div className="aside-title">{`${order.title || '!title!'} от ${order.created_at ? dateFormatter(order.created_at) : ''}`}</div>
+      <div className="aside-title">{`${order.title || <span data-empty="title" />} от ${order.created_at ? dateFormatter(order.created_at) : ''}`}</div>
 
       <div className="orders-details">
         <div className="orders-details__left">
@@ -178,16 +178,16 @@ const OrderDetails = props => {
           <ul className="orders-info">
             <li>
               <span>Заказчик:&nbsp;</span>
-              <b>{`${order.requisites.company_name || '!company_name!'}, ИНН ${order.requisites.inn || '!inn!'}`}</b>
+              <b>{`${order.requisites.company_name ? `${order.requisites.company_name}, ` : ''}ИНН ${order.requisites.inn || <span data-empty="inn" />}`}</b>
             </li>
             <li>
-              <span>Заказал:&nbsp;</span> <b>{order.requisites.contact_name || order.contact_name || '!requisites!'}</b>
+              <span>Заказал:&nbsp;</span> <b>{order.requisites.contact_name || order.contact_name || <span data-empty="requisites" />}</b>
             </li>
             <li>
-              <span>Доставка:&nbsp;</span> <b>{order.delivery_type || 'еще не назначено'}</b>
+              <span>Доставка:&nbsp;</span> <b>{order.delivery_type || <span data-empty="delivery_type">еще не назначено</span>}</b>
             </li>
             <li>
-              <span>Адрес доставки:&nbsp;</span> <b>{order.requisites.address || '!address!'}</b>
+              <span>Адрес доставки:&nbsp;</span> <b>{order.requisites.address || <span data-empty="address">еще не назначен</span>}</b>
             </li>
             <li>
               <span>Получатель заказа:&nbsp;</span> <b>{order.contact_name || ''}</b>
