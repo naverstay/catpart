@@ -81,8 +81,8 @@
           "item_1 norm_1 term_1 price_1 total_1 cart_1 comment_1"
           "item_2 norm_2 term_2 price_2 total_2 cart_2 comment_2"
           "item_3 norm_3 term_3 price_3 total_3 cart_3 comment_3";
-      grid-template-columns: auto 65px 55px 75px 95px 115px 230px;
-
+      grid-template-columns: auto 65px 55px 75px 0px 115px 230px;
+      //                             best times  95px
       &.__head {
         text-align: center;
         white-space: pre;
@@ -206,12 +206,12 @@
         }
 
         &.__calculated_delivery_date {
-          grid-row: 2;
+          grid-row: 1; // todo best times 2
           grid-column: 3;
         }
 
         &.__real_delivery_date {
-          grid-row: 3;
+          grid-row: 2; // todo best times 3
           grid-column: 3;
 
           &:first-letter {

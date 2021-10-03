@@ -103,7 +103,7 @@ const OrderDetails = props => {
     quantity: 'Кол-во',
     price: 'Цена\nза шт.',
     sum: 'Сумма',
-    statuses: 'Статус',
+    //statuses: 'Статус', // todo best times
     calculated_delivery_date: 'Расчетная дата',
     real_delivery_date: 'дата поставки',
     comment: 'Комментарий менеджера',
@@ -180,12 +180,13 @@ const OrderDetails = props => {
               <span>Заказчик:&nbsp;</span>
               <b>{`${order.requisites.company_name ? `${order.requisites.company_name}, ` : ''}ИНН ${order.requisites.inn || <span data-empty="inn" />}`}</b>
             </li>
-            <li>
+            {/* todo best times */}
+            {/*     <li>
               <span>Заказал:&nbsp;</span> <b>{order.requisites.contact_name || order.contact_name || <span data-empty="requisites" />}</b>
             </li>
             <li>
               <span>Доставка:&nbsp;</span> <b>{order.delivery_type || <span data-empty="delivery_type">еще не назначено</span>}</b>
-            </li>
+            </li>*/}
             <li>
               <span>Адрес доставки:&nbsp;</span> <b>{order.requisites.address || <span data-empty="address">еще не назначен</span>}</b>
             </li>
