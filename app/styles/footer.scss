@@ -17,6 +17,7 @@
     }
   }
 
+  &-offer,
   &-sales,
   &-phone {
     white-space: nowrap;
@@ -48,6 +49,7 @@
 
     @include respond-to-min($tablet) {
       max-width: 50%;
+      width: 385px;
     }
   }
 }

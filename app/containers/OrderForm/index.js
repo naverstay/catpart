@@ -4,6 +4,7 @@
  */
 
 import React, { useEffect, memo, useState } from 'react';
+import { SlideDown } from 'react-slidedown';
 
 import PropTypes from 'prop-types';
 
@@ -411,6 +412,8 @@ export function OrderForm({ dndFile, delivery, updateCart, history, profile, set
     };
   }, []);
 
+  console.log('totalCart', totalCart);
+
   return (
     <div className={`form-order${delivery ? ' __delivery' : ''}`}>
       <form ref={formRef} className="form-content" onSubmit={contactSubmit}>
@@ -535,6 +538,8 @@ export function OrderForm({ dndFile, delivery, updateCart, history, profile, set
         ) : null}
 
         <FormInput clear textarea placeholder="Комментарий" name="order-comment" error={null} className="__lg" inputRef={commentInput} />
+
+        <SlideDown className={'my-dropdown-slidedown'}>{totalCart > 20000 ? <p className={'form-free_shipping'}>Сумма вашего заказа больше 20&nbsp;000 рублей. Для вас доставка за наш счёт.</p> : null}</SlideDown>
 
         <FormCheck
           onChange={handleChange.bind(this, 'order-agreement')}

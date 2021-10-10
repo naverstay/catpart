@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 function Footer() {
   return (
     <footer className="footer row">
-      <div className="column lg-col-8">
+      <div className="column lg-col-10">
         <div className="footer-content">
           <div className="footer-copyright">
             2012-2021 © ООО «Катпарт», ИНН&nbsp;5406814289 <br />
@@ -25,6 +25,12 @@ function Footer() {
           <div className="footer-sales">
             <a className="footer-link" href="mailto:sales@catpart.ru">
               sales@catpart.ru
+            </a>
+          </div>
+
+          <div className="footer-offer">
+            <a className="footer-link" href="mailto:sales@catpart.ru">
+              Оферта
             </a>
           </div>
         </div>

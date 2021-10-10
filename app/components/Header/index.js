@@ -276,9 +276,15 @@ function Header({ history, notificationFunc, openAuthPopup, setOpenAuthPopup, op
       <div className={'header-right __auth'}>
         {profile.hasOwnProperty('id') ? (
           <Ripples during={1000} className={'btn __blue'}>
-            <Link to={'/orders'} className="btn-inner">
-              <span className={'__dotted'}>{profile.contact_name}</span>
-            </Link>
+            {history.location.pathname === '/orders' ? (
+              <span className="btn-inner">
+                <span className={'__dotted'}>{profile.contact_name}</span>
+              </span>
+            ) : (
+              <Link to={'/orders'} className="btn-inner">
+                <span className={'__dotted'}>{profile.contact_name}</span>
+              </Link>
+            )}
           </Ripples>
         ) : (
           <div ref={popupRef} className={'header-popup__holder'}>
