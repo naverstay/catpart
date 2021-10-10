@@ -5,6 +5,10 @@
     font-size: 12px;
     overflow: hidden;
 
+    &.__elaboration {
+      overflow: visible;
+    }
+
     @include respond-to-min($tablet) {
       width: calc(100% - 299px);
       float: left;

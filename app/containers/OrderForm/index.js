@@ -36,7 +36,7 @@ import FormCheck from '../../components/FormCheck';
 
 const key = 'home';
 
-export function OrderForm({ dndFile, delivery, updateCart, history, profile, setOpenAuthPopup, notificationFunc, setOrderSent, currency, totalCart, onSubmitForm, loading, setBusyOrder, onChangeUsername }) {
+export function OrderForm({ elaboration, delivery, updateCart, history, profile, setOpenAuthPopup, notificationFunc, setOrderSent, currency, totalCart, onSubmitForm, loading, setBusyOrder, onChangeUsername }) {
   useInjectReducer({ key, reducer });
   useInjectSaga({ key, saga });
 
@@ -539,18 +539,22 @@ export function OrderForm({ dndFile, delivery, updateCart, history, profile, set
 
         <FormInput clear textarea placeholder="Комментарий" name="order-comment" error={null} className="__lg" inputRef={commentInput} />
 
-        <SlideDown className={'my-dropdown-slidedown'}>{totalCart > 20000 ? <p className={'form-free_shipping'}>Сумма вашего заказа больше 20&nbsp;000 рублей. Для вас доставка за наш счёт.</p> : null}</SlideDown>
+        {delivery && (
+          <>
+            <SlideDown className={'my-dropdown-slidedown'}>{totalCart > 20000 ? <p className={'form-free_shipping'}>Сумма вашего заказа больше 20&nbsp;000 рублей. Для вас доставка за наш счёт.</p> : null}</SlideDown>
 
-        <FormCheck
-          onChange={handleChange.bind(this, 'order-agreement')}
-          defaultChecked={false}
-          //
-          name="order-agreement"
-          value="order-agreement"
-          error={errors['order-agreement']}
-          label="Подтверждаю ознакомление с указанными в заказе сроками"
-          inputRef={agreementCheck}
-        />
+            <FormCheck
+              onChange={handleChange.bind(this, 'order-agreement')}
+              defaultChecked={false}
+              //
+              name="order-agreement"
+              value="order-agreement"
+              error={errors['order-agreement']}
+              label="Подтверждаю ознакомление с указанными в заказе сроками"
+              inputRef={agreementCheck}
+            />
+          </>
+        )}
 
         <div className="form-control">
           <Ripples className={`__w-100p btn __blue __lg${!validForm ? ' __disabled' : ''}${busy ? ' __loader' : ''}`} during={1000}>
@@ -565,8 +569,9 @@ export function OrderForm({ dndFile, delivery, updateCart, history, profile, set
 }
 
 OrderForm.propTypes = {
-  dndFile: PropTypes.string,
   busy: PropTypes.bool,
+  delivery: PropTypes.bool,
+  elaboration: PropTypes.bool,
   loading: PropTypes.bool,
   error: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
   repos: PropTypes.oneOfType([PropTypes.array, PropTypes.bool]),

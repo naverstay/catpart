@@ -34,6 +34,7 @@ import SkeletonWide from '../SkeletonWide';
 import SkeletonDt from '../SkeletonDt';
 import SkeletonTab from '../SkeletonTab';
 import { smoothScrollTo } from '../../utils/smoothScrollTo';
+import DeepElaboration from '../DeepElaboration';
 
 // const key = 'home';
 const TRIGGER_DROPDOWN_LIMIT = 11;
@@ -68,33 +69,22 @@ export function FilterForm({
   const query = new URLSearchParams(props.location.search);
 
   const [count, setCount] = useState(0);
+  const [searchInfo, setSearchInfo] = useState('');
+  const [totalData, setTotalData] = useState(0);
   const [cartData, setCartData] = useState([]);
   const [scrollTriggers, setScrollTriggers] = useState([]);
+  const [elaboration, setElaboration] = useState([]);
   const [openShare, setOpenShare] = useState(false);
   const [openMoreTriggers, setOpenMoreTriggers] = useState(false);
   const [currencyList, setCurrencyList] = useState([RUB]);
+
+  const plural = (n, str1, str2, str5) => `${n} ${n % 10 == 1 && n % 100 != 11 ? str1 : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? str2 : str5}`;
 
   const moreTriggersRef = useDetectClickOutside({
     onTriggered: () => {
       setOpenMoreTriggers(false);
     },
   });
-
-  useEffect(() => {
-    const user = localStorage.getItem('catpart-user');
-    let userFields = {};
-
-    if (user) {
-      userFields = JSON.parse(user);
-
-      if (userFields.hasOwnProperty('currency')) {
-        const userCurrency = currencyList.find(c => c.name === userFields.currency);
-        if (userCurrency) {
-          setCurrency(userCurrency);
-        }
-      }
-    }
-  }, [currencyList]);
 
   useEffect(() => {
     setOpenMobMenu(false);
@@ -119,6 +109,24 @@ export function FilterForm({
     }
   }, []);
 
+  useEffect(() => {
+    const user = localStorage.getItem('catpart-user');
+    let userFields = {};
+
+    if (user) {
+      userFields = JSON.parse(user);
+
+      if (userFields.hasOwnProperty('currency')) {
+        const userCurrency = currencyList.find(c => c.name === userFields.currency);
+        if (userCurrency) {
+          setCurrency(userCurrency);
+        }
+      }
+    }
+  }, [currencyList]);
+
+  useEffect(() => {}, [totalData, searchData]);
+
   const scrollTriggerHandler = goto => {
     setOpenMoreTriggers(false);
 
@@ -130,6 +138,51 @@ export function FilterForm({
   };
 
   useEffect(() => {
+    if (!cart && searchData && searchData.hasOwnProperty('res')) {
+      setTotalData(searchData.res.reduce((total, c) => total + (c.hasOwnProperty('data') ? c.data.length : 0), 0));
+    }
+
+    console.log('searchData', cart, totalData, searchData);
+
+    if (searchData && searchData.hasOwnProperty('res')) {
+      let searchQueries = (totalData > 1 ? 'По запросам' : 'По запросу') + searchData.res.reduce((total, c) => total + (c.hasOwnProperty('q') ? `«${c.q}», ` : ''), ' ');
+
+      console.log('searchQueries', searchQueries);
+
+      setSearchInfo(searchQueries.replace(/, $/, '') + ` найдено ${plural(totalData, 'наименование', 'наименования', 'наименований')}.`);
+    }
+
+    console.log('totalData', totalData);
+
+    if (totalData === 0) {
+      setElaboration([
+        {
+          supplier: 'Avnet Silica',
+          name: '15C01M-TL-E',
+          price: 5.06688880896,
+          quantity: 3000,
+          delivery_period: '19.07.2024',
+          currency: 'EUR',
+        },
+        {
+          supplier: 'Digi-Key Electronics',
+          name: '15C01M-TL-E',
+          price: 34.105129632,
+          quantity: 3000,
+          delivery_period: '2 недели',
+          currency: 'USD',
+        },
+        {
+          supplier: 'RS components',
+          name: '15C01M-TL-E (REEL)',
+          price: 25.143551999999996,
+          quantity: 2550,
+          delivery_period: '2-3 недели',
+          currency: 'RUB',
+        },
+      ]);
+    }
+
     if (searchData && searchData.bom) {
       setScrollTriggers(
         searchData.res.map((c, ci) =>
@@ -187,16 +240,6 @@ export function FilterForm({
       precision: evt.target.dataset.currency === 'RUB' ? 2 : 4,
     });
   };
-
-  const plural = (n, str1, str2, str5) => `${n} ${n % 10 == 1 && n % 100 != 11 ? str1 : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? str2 : str5}`;
-
-  let totalData = 0;
-  let searchInfo = '';
-
-  if (!cart && searchData && searchData.hasOwnProperty('res')) {
-    totalData = searchData.res.reduce((total, c) => total + (c.hasOwnProperty('data') ? c.data.length : 0), 0);
-    searchInfo = (searchData.bom ? 'BOM-поиск. ' : `По запросу «${query.get('art') || ''}» `) + (totalData ? `найдено ${plural(totalData, 'наименование', 'наименования', 'наименований')}.` : 'ничего не найдено :(');
-  }
 
   return (
     <>
@@ -267,7 +310,7 @@ export function FilterForm({
             </div>
           ) : null)}
 
-        {!cart && showResults ? <div className="form-filter__stat">{searchInfo}</div> : <div className="form-filter__stat">&nbsp;</div>}
+        {!cart && showResults ? <h1 className="form-filter__stat">{searchInfo}</h1> : <div className="form-filter__stat">&nbsp;</div>}
 
         {busy ? null : (
           <div className={`form-filter__controls${cart ? ' __cart' : ''}`}>
@@ -362,7 +405,7 @@ export function FilterForm({
 
           <OrderForm profile={profile} history={history} setOpenAuthPopup={setOpenAuthPopup} setBusyOrder={setBusyOrder} updateCart={updateCart} notificationFunc={notificationFunc} setOrderSent={setOrderSent} totalCart={totalCart} currency={currency} delivery />
         </>
-      ) : busy || !totalData ? null : (
+      ) : busy ? null : totalData > 0 ? (
         <SearchResults
           scrollTriggers={scrollTriggers}
           setScrollTriggers={setScrollTriggers}
@@ -377,6 +420,11 @@ export function FilterForm({
           bom={searchData.bom}
           list={searchData.res}
         />
+      ) : (
+        <>
+          <DeepElaboration data={elaboration} setElaboration={setElaboration} elaboration={elaboration} />
+          <OrderForm profile={profile} history={history} setOpenAuthPopup={setOpenAuthPopup} setBusyOrder={setBusyOrder} updateCart={updateCart} notificationFunc={notificationFunc} setOrderSent={setOrderSent} totalCart={totalCart} currency={currency} elaboration />
+        </>
       )}
     </>
   );

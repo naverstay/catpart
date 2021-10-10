@@ -29,7 +29,7 @@ function Footer() {
           </div>
 
           <div className="footer-offer">
-            <a className="footer-link" href="mailto:sales@catpart.ru">
+            <a className="footer-link" href="https://dev.catpart.ru/offer.docx">
               Оферта
             </a>
           </div>

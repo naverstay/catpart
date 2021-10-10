@@ -128,7 +128,7 @@ export function SearchResults(props) {
   //  }
   // }, [list]);
 
-  window.log && console.log('list', list.length ? list[0].data : '0');
+  window.log && console.log('list', list, list && list.length ? list[0].data : '0');
 
   return (
     <div className="search-results">

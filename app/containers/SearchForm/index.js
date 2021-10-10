@@ -28,7 +28,7 @@ import FormInput from '../../components/FormInput';
 
 // const key = 'home';
 
-export function SearchForm({ dndFile, notificationFunc, busy, busyOrder, setFormBusy, history, setSearchData, location, onSubmitForm, artNumber, loading, error, repos, onChangeUsername }) {
+export function SearchForm({ notificationFunc, busy, busyOrder, setFormBusy, history, setSearchData, location, onSubmitForm, artNumber, loading, error, repos, onChangeUsername }) {
   // useInjectReducer({ key, reducer });
   // useInjectSaga({ key, saga });
 
@@ -282,7 +282,6 @@ export function SearchForm({ dndFile, notificationFunc, busy, busyOrder, setForm
 }
 
 SearchForm.propTypes = {
-  dndFile: PropTypes.string,
   busy: PropTypes.bool,
   loading: PropTypes.bool,
   error: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
