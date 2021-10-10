@@ -401,7 +401,7 @@ export function OrderForm({ elaboration, delivery, updateCart, history, profile,
       }
     }
 
-    if (!totalCart) {
+    if (!elaboration && !totalCart) {
       history.push('/');
     }
 

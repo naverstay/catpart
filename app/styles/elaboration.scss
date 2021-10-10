@@ -4,10 +4,11 @@
   &-title {
     font-weight: bold;
     font-size: 36px;
-    margin: 0 0 15px;
+    margin: -8px 0 22px;
   }
 
   &-table {
+    max-width: 810px;
 
     &__cell {
       @include respond-to-max($tablet) {

@@ -214,7 +214,7 @@ export function FilterForm({
     } else {
       setScrollTriggers([]);
     }
-  }, [searchData]);
+  }, [searchData, totalData]);
 
   const reposListProps = {
     loading,
