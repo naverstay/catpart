@@ -283,8 +283,8 @@ export default function App() {
         }
 
         apiGET(requestURL, options, data => {
-          setFormBusy(false);
           setSearchData(data);
+          setFormBusy(false);
         });
       }
     }

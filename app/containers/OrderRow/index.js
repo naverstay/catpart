@@ -145,7 +145,7 @@ const OrderRow = props => {
             typeof row[cell] === 'string' ? (
               <span className="orders-results__value">{row[cell]}</span>
             ) : (
-              <span className="orders-results__value">{row[cell].company_name}</span>
+              <span className="orders-results__value">{`${row[cell].company_name ? `${row[cell].company_name}, ` : ''}ИНН ${row[cell].inn || <span data-empty="inn" />}`}</span>
             )
           ) : cell === 'statuses' ? (
             buildStatusHealth(row)

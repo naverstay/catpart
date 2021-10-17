@@ -337,7 +337,6 @@ export function OrderForm({ elaboration, delivery, updateCart, history, profile,
   useEffect(() => {
     if (delivery) {
       counterEffect(totalPriceRef.current, totalPrice, totalCart / currency.exChange, 800, currency.precision);
-
       setTotalPrice(totalCart / currency.exChange);
     }
   }, [totalCart, currency]);
@@ -411,8 +410,6 @@ export function OrderForm({ elaboration, delivery, updateCart, history, profile,
       phoneInput.current = false;
     };
   }, []);
-
-  console.log('totalCart', totalCart);
 
   return (
     <div className={`form-order${delivery ? ' __delivery' : ''}`}>
