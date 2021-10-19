@@ -35,7 +35,7 @@ const CartRow = props => {
               <>
                 <p>
                   <span className="cart-results__label __show">{tableHeader[cell]}:</span>
-                  <span className="cart-results__value">Склад №{rowIndex + 1}</span>
+                  <span className="cart-results__value">{row.supplierAlias}</span>
                 </p>
                 <p>
                   <span className="cart-results__label __show">{tableHeader.manufacturer}:</span>
@@ -98,6 +98,8 @@ const CartRow = props => {
                     </div>
                   ) : cell === 'total' ? (
                     <span className="cart-results__item">{priceFormatter(parseFloat((cartCount * row.pricebreaks[priceMatch].price) / currency.exChange).toFixedCustom(currency.precision), currency.precision)}</span>
+                  ) : cell === 'supplier' ? (
+                    row.supplierAlias
                   ) : (
                     row[cell] || <span data-empty={cell} />
                   )}

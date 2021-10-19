@@ -14,7 +14,7 @@ import SearchRow from '../SearchRow';
 import { smoothScrollTo } from '../../utils/smoothScrollTo';
 
 export function SearchResults(props) {
-  const { bom, list, cart, pageY, scrollTriggers, setScrollTriggers, setShowTableHeadFixed, setTableHeadFixed, currency, showResults, highlight, notificationFunc, updateCart } = props;
+  const { bom, list, cart, pageY, scrollTriggers, setScrollTriggers, setShowTableHeadFixed, setTableHeadFixed, currency, currencyList, updateSupplierItems, highlight, notificationFunc, updateCart } = props;
 
   const tableHead = useRef();
 
@@ -154,7 +154,23 @@ export function SearchResults(props) {
                     trigger={<span>{query.q}</span>}
                   >
                     {query.hasOwnProperty('data')
-                      ? query.data.map((row, ri) => <SearchRow key={ri} updateCart={updateCart} tableHeader={tableHeader} defaultCount={query.c} currency={currency} highlight={query.q} notificationFunc={notificationFunc} row={row} rowIndex={ri} />)
+                      ? query.data
+                          .filter(f => f.supplier === 'Louisyen')
+                          .map((row, ri) => (
+                            <SearchRow
+                              key={ri}
+                              updateCart={updateCart}
+                              tableHeader={tableHeader}
+                              defaultCount={query.c}
+                              updateSupplierItems={updateSupplierItems}
+                              currencyList={currencyList}
+                              currency={currency}
+                              highlight={query.q}
+                              notificationFunc={notificationFunc}
+                              row={row}
+                              rowIndex={ri}
+                            />
+                          ))
                       : null}
                   </Collapsible>
                 );
@@ -167,7 +183,23 @@ export function SearchResults(props) {
             // )
 
             list[0].hasOwnProperty('data')
-            ? list[0].data.map((row, ri) => <SearchRow key={ri} updateCart={updateCart} tableHeader={tableHeader} defaultCount={list[0].c} currency={currency} highlight={list[0].q} notificationFunc={notificationFunc} row={row} rowIndex={ri} />)
+            ? list[0].data
+                //.filter(f => f.supplier === 'Louisyen')
+                .map((row, ri) => (
+                  <SearchRow
+                    key={ri}
+                    updateCart={updateCart}
+                    tableHeader={tableHeader}
+                    defaultCount={list[0].c}
+                    updateSupplierItems={updateSupplierItems}
+                    currencyList={currencyList}
+                    currency={currency}
+                    highlight={list[0].q}
+                    notificationFunc={notificationFunc}
+                    row={row}
+                    rowIndex={ri}
+                  />
+                ))
             : null
           : null}
       </div>

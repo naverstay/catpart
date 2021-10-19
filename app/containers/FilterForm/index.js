@@ -142,17 +142,17 @@ export function FilterForm({
       setTotalData(searchData.res.reduce((total, c) => total + (c.hasOwnProperty('data') ? c.data.length : 0), 0));
     }
 
-    console.log('searchData', cart, totalData, searchData);
+    window.log && console.log('searchData', cart, totalData, searchData);
 
     if (searchData && searchData.hasOwnProperty('res')) {
       let searchQueries = (totalData > 1 ? 'По запросам' : 'По запросу') + searchData.res.reduce((total, c) => total + (c.hasOwnProperty('q') ? `«${c.q}», ` : ''), ' ');
 
-      console.log('searchQueries', searchQueries);
+      window.log && console.log('searchQueries', searchQueries);
 
       setSearchInfo(searchQueries.replace(/, $/, '') + ` найдено ${plural(totalData, 'наименование', 'наименования', 'наименований')}.`);
     }
 
-    console.log('totalData', totalData);
+    window.log && console.log('totalData', totalData);
 
     if (totalData === 0) {
       setElaboration([
@@ -239,6 +239,10 @@ export function FilterForm({
       name: evt.target.dataset.currency,
       precision: evt.target.dataset.currency === 'RUB' ? 2 : 4,
     });
+  };
+
+  const updateSupplierItems = (supplier, item, priceMatch, count) => {
+    window.log && console.log('updateSupplierItems', supplier, item, priceMatch, count);
   };
 
   return (
@@ -416,6 +420,8 @@ export function FilterForm({
           highlight={decodeURIComponent(query.get('art') || '')}
           showResults={showResults}
           count={query.get('q') || ''}
+          updateSupplierItems={updateSupplierItems}
+          currencyList={currencyList}
           currency={currency}
           bom={searchData.bom}
           list={searchData.res}

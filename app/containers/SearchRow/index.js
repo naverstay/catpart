@@ -10,7 +10,7 @@ function escapeRegExp(string) {
 }
 
 const SearchRow = props => {
-  let { rowIndex, tableHeader, currency, row, highlight, defaultCount, updateCart, notificationFunc } = props;
+  let { rowIndex, tableHeader, currencyList, updateSupplierItems, currency, row, highlight, defaultCount, updateCart, notificationFunc } = props;
   defaultCount = +defaultCount;
 
   if (!defaultCount || defaultCount < row.moq) {
@@ -21,11 +21,18 @@ const SearchRow = props => {
     defaultCount = row.quantity;
   }
 
+  const getUSDExchange = () => {
+    const USD = currencyList.find(f => f.name === 'USD');
+    return USD && USD.hasOwnProperty('exChange') ? USD.exChange : 1;
+  };
+
+  const LOUISYEN_PRICE_LIMIT = 1500;
+  let priceMatch = defaultCount ? row.pricebreaks.length - 1 : -1;
   const inputRef = createRef();
   const [disableAddBtn, setDisableAddBtn] = useState(false);
   const [itemCount, setItemCount] = useState(defaultCount || 1);
+  const [isAbove1500, setIsAbove1500] = useState((defaultCount * row.pricebreaks[priceMatch].price) / getUSDExchange() > LOUISYEN_PRICE_LIMIT);
   const extraSymbols = [',', '.', '-', ' ', '#', '_', '+', ')', '(', '[', ']'];
-  let priceMatch = defaultCount ? row.pricebreaks.length - 1 : -1;
 
   const textHighlighter = (txt, bold) => {
     let ret = <>{txt}</>;
@@ -42,6 +49,26 @@ const SearchRow = props => {
     }
 
     return ret;
+  };
+
+  const updateItemCount = count => {
+    if (row.supplier === 'Louisyen') {
+      updateSupplierItems('Louisyen', row, priceMatch, count);
+
+      if ((count * row.pricebreaks[priceMatch].price) / getUSDExchange() > LOUISYEN_PRICE_LIMIT) {
+        if (!isAbove1500) {
+          console.log('updateItemPrice up');
+          setIsAbove1500(true);
+        }
+      } else {
+        if (isAbove1500) {
+          console.log('updateItemPrice down');
+          setIsAbove1500(false);
+        }
+      }
+    }
+
+    setItemCount(count);
   };
 
   const priceHighlighter = (ind, price) => (ind === priceMatch ? <b>{price}</b> : <>{price}</>);
@@ -75,9 +102,11 @@ const SearchRow = props => {
             ) : cell === 'total' ? (
               row.pricebreaks.map((p, pi) => (
                 <span key={pi} className="search-results__item">
-                  {priceHighlighter(pi, `x${pi === priceMatch ? itemCount : p.quant}=${priceFormatter(parseFloat(pi === priceMatch ? itemCount : p.quant) * parseFloat(p.price / currency.exChange).toFixedCustom(currency.precision), currency.precision)}`)}
+                  {priceHighlighter(pi, `x${pi === priceMatch ? itemCount : p.quant}=${priceFormatter(parseFloat(((pi === priceMatch ? itemCount : p.quant) * p.price) / currency.exChange).toFixedCustom(currency.precision), currency.precision)}`)}
                 </span>
               ))
+            ) : cell === 'supplier' ? (
+              row.supplierAlias
             ) : row[cell] ? (
               cell === 'name' ? (
                 textHighlighter(row[cell], row.bold)
@@ -100,7 +129,7 @@ const SearchRow = props => {
 
               const val = +(e.target.value || 1);
               if (val > 0) {
-                setItemCount(Math.max(row.moq, val));
+                updateItemCount(Math.max(row.moq, val));
                 // updateCart(row.id, val, row.cur);
               }
             }}
@@ -108,12 +137,12 @@ const SearchRow = props => {
               const val = +(e.target.value || 1);
               if (e.target.value.length && val < row.moq) {
                 e.target.value = `${row.moq}`;
-                setItemCount(row.moq);
+                updateItemCount(row.moq);
                 notificationFunc('success', `Для ${row.name}`, `минимальное количество: ${row.moq}`);
               }
               if (e.target.value.length && val > row.quantity) {
                 e.target.value = `${row.quantity}`;
-                setItemCount(row.quantity);
+                updateItemCount(row.quantity);
                 notificationFunc('success', `Для ${row.name}`, `максимальное количество: ${row.quantity}`);
               }
             }}
