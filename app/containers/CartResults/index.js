@@ -16,6 +16,7 @@ import priceFormatter from '../../utils/priceFormatter';
 import SearchRow from '../SearchRow';
 import CartRow from '../CartRow';
 import { smoothScrollTo } from '../../utils/smoothScrollTo';
+import { getJsonData } from '../../utils/getJsonData';
 
 export function CartResults(props) {
   let { cart, currency, count, pageY, setShowTableHeadFixed, setTableHeadFixed, updateCart, notificationFunc } = props;
@@ -25,7 +26,7 @@ export function CartResults(props) {
   let list = [];
   let store = localStorage.getItem('catpart');
   if (store) {
-    list = [...JSON.parse(store)];
+    list = [...getJsonData(store)];
   }
 
   let tableHeader = {

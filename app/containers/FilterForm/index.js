@@ -35,6 +35,7 @@ import SkeletonDt from '../SkeletonDt';
 import SkeletonTab from '../SkeletonTab';
 import { smoothScrollTo } from '../../utils/smoothScrollTo';
 import DeepElaboration from '../DeepElaboration';
+import { getJsonData } from '../../utils/getJsonData';
 
 // const key = 'home';
 const TRIGGER_DROPDOWN_LIMIT = 11;
@@ -50,6 +51,8 @@ export function FilterForm({
   history,
   setOpenAuthPopup,
   setCurrency,
+  currencyList,
+  setCurrencyList,
   setOrderSent,
   setShowTableHeadFixed,
   setTableHeadFixed,
@@ -70,13 +73,12 @@ export function FilterForm({
 
   const [count, setCount] = useState(0);
   const [searchInfo, setSearchInfo] = useState('');
-  const [totalData, setTotalData] = useState(0);
+  const [totalData, setTotalData] = useState(-1);
   const [cartData, setCartData] = useState([]);
   const [scrollTriggers, setScrollTriggers] = useState([]);
   const [elaboration, setElaboration] = useState([]);
   const [openShare, setOpenShare] = useState(false);
   const [openMoreTriggers, setOpenMoreTriggers] = useState(false);
-  const [currencyList, setCurrencyList] = useState([RUB]);
 
   const plural = (n, str1, str2, str5) => `${n} ${n % 10 == 1 && n % 100 != 11 ? str1 : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? str2 : str5}`;
 
@@ -105,7 +107,7 @@ export function FilterForm({
 
     const store = localStorage.getItem('catpart');
     if (store) {
-      setCartData([...JSON.parse(store)]);
+      setCartData([...getJsonData(store)]);
     }
   }, []);
 
@@ -114,7 +116,7 @@ export function FilterForm({
     let userFields = {};
 
     if (user) {
-      userFields = JSON.parse(user);
+      userFields = getJsonData(user);
 
       if (userFields.hasOwnProperty('currency')) {
         const userCurrency = currencyList.find(c => c.name === userFields.currency);
@@ -154,36 +156,45 @@ export function FilterForm({
 
     window.log && console.log('totalData', totalData);
 
-    if (totalData === 0) {
-      setElaboration([
-        {
-          supplier: 'Avnet Silica',
-          name: '15C01M-TL-E',
-          price: 5.06688880896,
-          quantity: 3000,
-          delivery_period: '19.07.2024',
-          currency: 'EUR',
-        },
-        {
-          supplier: 'Digi-Key Electronics',
-          name: '15C01M-TL-E',
-          price: 34.105129632,
-          quantity: 3000,
-          delivery_period: '2 недели',
-          currency: 'USD',
-        },
-        {
-          supplier: 'RS components',
-          name: '15C01M-TL-E (REEL)',
-          price: 25.143551999999996,
-          quantity: 2550,
-          delivery_period: '2-3 недели',
-          currency: 'RUB',
-        },
-      ]);
+    if (totalData === 0 && searchData && searchData.hasOwnProperty('res')) {
+      let deep = searchData.res.map(item => {
+        return {
+          name: item.q,
+          quantity: item.c,
+        };
+      });
+
+      setElaboration(deep);
+
+      //setElaboration([
+      //  {
+      //    supplier: 'Avnet Silica',
+      //    name: '15C01M-TL-E',
+      //    price: 5.06688880896,
+      //    quantity: 3000,
+      //    delivery_period: '19.07.2024',
+      //    currency: 'EUR',
+      //  },
+      //  {
+      //    supplier: 'Digi-Key Electronics',
+      //    name: '15C01M-TL-E',
+      //    price: 34.105129632,
+      //    quantity: 3000,
+      //    delivery_period: '2 недели',
+      //    currency: 'USD',
+      //  },
+      //  {
+      //    supplier: 'RS components',
+      //    name: '15C01M-TL-E (REEL)',
+      //    price: 25.143551999999996,
+      //    quantity: 2550,
+      //    delivery_period: '2-3 недели',
+      //    currency: 'RUB',
+      //  },
+      //]);
     }
 
-    if (searchData && searchData.bom) {
+    if (searchData && searchData.bom && totalData) {
       setScrollTriggers(
         searchData.res.map((c, ci) =>
           ci >= TRIGGER_DROPDOWN_LIMIT ? (
@@ -226,7 +237,7 @@ export function FilterForm({
     let userFields = { currency: evt.target.dataset.currency };
 
     if (user) {
-      userFields = JSON.parse(user);
+      userFields = getJsonData(user);
       userFields.currency = evt.target.dataset.currency;
     }
 
@@ -239,10 +250,6 @@ export function FilterForm({
       name: evt.target.dataset.currency,
       precision: evt.target.dataset.currency === 'RUB' ? 2 : 4,
     });
-  };
-
-  const updateSupplierItems = (supplier, item, priceMatch, count) => {
-    window.log && console.log('updateSupplierItems', supplier, item, priceMatch, count);
   };
 
   return (
@@ -325,7 +332,7 @@ export function FilterForm({
                     onClick={() => {
                       const store = localStorage.getItem('catpart');
                       if (store) {
-                        xlsDownload([...JSON.parse(store)], currency, 0);
+                        xlsDownload([...getJsonData(store)], currency, 0);
                       } else {
                         notificationFunc('success', 'Корзина пуста.', 'Нечего скачивать.');
                       }
@@ -342,7 +349,7 @@ export function FilterForm({
                   </Ripples>
                 </div>
               </div>
-            ) : totalData ? (
+            ) : totalData > 0 ? (
               <div className="form-filter__controls_left">
                 <div className="form-filter__control">
                   <Ripples
@@ -375,9 +382,10 @@ export function FilterForm({
               </div>
             ) : null}
 
-            {cart || totalData ? (
+            {cart || totalData > 0 ? (
               <div onChange={onChangeSwitch} className="form-filter__controls_right">
-                {currencyList.length > 1 &&
+                {currencyList &&
+                  currencyList.length > 1 &&
                   currencyList.map((cur, ind) => (
                     <Ripples key={ind} className="form-filter__control" during={1000}>
                       <label className="form-radio__btn">
@@ -420,16 +428,15 @@ export function FilterForm({
           highlight={decodeURIComponent(query.get('art') || '')}
           showResults={showResults}
           count={query.get('q') || ''}
-          updateSupplierItems={updateSupplierItems}
           currencyList={currencyList}
           currency={currency}
           bom={searchData.bom}
           list={searchData.res}
         />
-      ) : (
+      ) : totalData < 0 ? null : (
         <>
           <DeepElaboration data={elaboration} setElaboration={setElaboration} elaboration={elaboration} />
-          <OrderForm profile={profile} history={history} setOpenAuthPopup={setOpenAuthPopup} setBusyOrder={setBusyOrder} updateCart={updateCart} notificationFunc={notificationFunc} setOrderSent={setOrderSent} totalCart={totalCart} currency={currency} elaboration />
+          <OrderForm profile={profile} history={history} setOpenAuthPopup={setOpenAuthPopup} setBusyOrder={setBusyOrder} updateCart={updateCart} notificationFunc={notificationFunc} setOrderSent={setOrderSent} totalCart={totalCart} currency={currency} elaboration={elaboration} />
         </>
       )}
     </>

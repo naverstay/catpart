@@ -4,13 +4,10 @@ import ElaborationRow from '../ElaborationRow';
 const DeepElaboration = props => {
   const { data, setElaboration } = props;
 
-  const updateRow = (row, index) => {
-    let newData = data.filter((d, di) => di === index).forEach(el => row);
-    console.log('newData', newData);
+  const updateRow = (index, row) => {
+    let newData = data.map((d, di) => (di === index ? row : d));
     setElaboration(newData);
   };
-
-  console.log('DeepElaboration', data);
 
   return (
     <>

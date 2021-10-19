@@ -10,7 +10,7 @@ function escapeRegExp(string) {
 }
 
 const SearchRow = props => {
-  let { rowIndex, tableHeader, currencyList, updateSupplierItems, currency, row, highlight, defaultCount, updateCart, notificationFunc } = props;
+  let { rowIndex, tableHeader, currency, row, highlight, defaultCount, updateCart, notificationFunc } = props;
   defaultCount = +defaultCount;
 
   if (!defaultCount || defaultCount < row.moq) {
@@ -21,17 +21,10 @@ const SearchRow = props => {
     defaultCount = row.quantity;
   }
 
-  const getUSDExchange = () => {
-    const USD = currencyList.find(f => f.name === 'USD');
-    return USD && USD.hasOwnProperty('exChange') ? USD.exChange : 1;
-  };
-
-  const LOUISYEN_PRICE_LIMIT = 1500;
   let priceMatch = defaultCount ? row.pricebreaks.length - 1 : -1;
   const inputRef = createRef();
   const [disableAddBtn, setDisableAddBtn] = useState(false);
   const [itemCount, setItemCount] = useState(defaultCount || 1);
-  const [isAbove1500, setIsAbove1500] = useState((defaultCount * row.pricebreaks[priceMatch].price) / getUSDExchange() > LOUISYEN_PRICE_LIMIT);
   const extraSymbols = [',', '.', '-', ' ', '#', '_', '+', ')', '(', '[', ']'];
 
   const textHighlighter = (txt, bold) => {
@@ -51,26 +44,6 @@ const SearchRow = props => {
     return ret;
   };
 
-  const updateItemCount = count => {
-    if (row.supplier === 'Louisyen') {
-      updateSupplierItems('Louisyen', row, priceMatch, count);
-
-      if ((count * row.pricebreaks[priceMatch].price) / getUSDExchange() > LOUISYEN_PRICE_LIMIT) {
-        if (!isAbove1500) {
-          console.log('updateItemPrice up');
-          setIsAbove1500(true);
-        }
-      } else {
-        if (isAbove1500) {
-          console.log('updateItemPrice down');
-          setIsAbove1500(false);
-        }
-      }
-    }
-
-    setItemCount(count);
-  };
-
   const priceHighlighter = (ind, price) => (ind === priceMatch ? <b>{price}</b> : <>{price}</>);
 
   useEffect(() => {
@@ -88,7 +61,7 @@ const SearchRow = props => {
   }
 
   return (
-    <div className={`search-results__row${rowIndex % 2 === 0 ? ' __odd' : ' __even'}`}>
+    <div className={`search-results__row${rowIndex % 2 === 0 ? ' __odd' : ' __even'}` + (row.supplier === 'Louisyen' ? ' __lilu' : '')}>
       {Object.keys(tableHeader).map((cell, ci) => (
         <div key={ci} className={`search-results__cell __${cell}`}>
           {cell === 'name' ? null : <span className="search-results__label">{tableHeader[cell]}</span>}
@@ -129,7 +102,7 @@ const SearchRow = props => {
 
               const val = +(e.target.value || 1);
               if (val > 0) {
-                updateItemCount(Math.max(row.moq, val));
+                setItemCount(Math.max(row.moq, val));
                 // updateCart(row.id, val, row.cur);
               }
             }}
@@ -137,12 +110,12 @@ const SearchRow = props => {
               const val = +(e.target.value || 1);
               if (e.target.value.length && val < row.moq) {
                 e.target.value = `${row.moq}`;
-                updateItemCount(row.moq);
+                setItemCount(row.moq);
                 notificationFunc('success', `Для ${row.name}`, `минимальное количество: ${row.moq}`);
               }
               if (e.target.value.length && val > row.quantity) {
                 e.target.value = `${row.quantity}`;
-                updateItemCount(row.quantity);
+                setItemCount(row.quantity);
                 notificationFunc('success', `Для ${row.name}`, `максимальное количество: ${row.quantity}`);
               }
             }}

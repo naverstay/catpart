@@ -1,16 +1,9 @@
 import React, { createRef, useEffect, useState } from 'react';
-import Ripples from 'react-ripples';
-import priceFormatter from '../../utils/priceFormatter';
-
 import { setInputFilter } from '../../utils/inputFilter';
-import { findPriceIndex } from '../../utils/findPriceIndex';
 import FormInput from '../../components/FormInput';
-import innValidation from '../../utils/innValidation';
-import { validateEmail } from '../../utils/validateEmail';
-import checkEmailExist from '../../utils/checkEmailExist';
 
 const ElaborationRow = props => {
-  let { rowIndex, updateRow, currency, row, notificationFunc } = props;
+  let { rowIndex, updateRow, row } = props;
 
   const inputQuantityRef = createRef();
 
@@ -19,32 +12,40 @@ const ElaborationRow = props => {
   const elaborationFields = ['name', 'quantity', 'price', 'delivery_period'];
 
   const [fields, setFields] = useState({
-    'elaboration-name': '',
+    'elaboration-name': row.name,
+    'elaboration-quantity': row.quantity,
+    'elaboration-price': row.price,
+    'elaboration-delivery_period': row.delivery_period,
   });
   const [errors, setErrors] = useState({
     'elaboration-name': null,
   });
 
   const validate = () => {
+    let obj = {};
     setErrors(errors);
     setJustRedraw(justRedraw + 1);
+
+    elaborationFields.forEach(field => {
+      obj[field] = fields['elaboration-' + field] || '';
+    });
+
+    updateRow(rowIndex, obj);
   };
 
   const handleChange = (field, e) => {
-    window.log && console.log('handleChange', field, e);
+    e.persist();
+    window.log && console.log('handleChange', field, e.target.value);
     fields[field] = e.target.value;
     setFields(fields);
 
-    console.log('row', row, rowIndex, fields, field);
-
     switch (field) {
       case 'elaboration-name':
-        if (!e.target.value.length) {
-          errors[field] = 'Не может быть пустым';
-          validate();
-        }
+        errors[field] = e.target.value.length ? '' : 'Не может быть пустым';
+        validate();
         break;
       default:
+        validate();
         break;
     }
   };
@@ -65,9 +66,9 @@ const ElaborationRow = props => {
         <div key={fi} className={'elaboration-table__cell __' + f}>
           <label className="custom-input form-control">
             <FormInput
-              onBlur={f === 'name' ? handleChange.bind(this, 'elaboration-name') : null}
+              onBlur={handleChange.bind(this, 'elaboration-' + f)}
               placeholder={elaborationLabels[fi]}
-              defaultValue={String(row[f])}
+              defaultValue={row.hasOwnProperty(f) ? String(row[f]) : ''}
               name={'elaboration-' + f}
               //
               error={f === 'name' ? errors['elaboration-name'] : null}

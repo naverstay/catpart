@@ -27,6 +27,7 @@ import ProfileRequisites from '../ProfileRequisites';
 import { validateJSON } from '../../utils/validateJSON';
 import OrderDetails from '../OrderDetails';
 import { OrdersPage } from '../OrdersPage';
+import { getJsonData } from '../../utils/getJsonData';
 //import ContactsPage from '../ContactsPage';
 
 export default function App() {
@@ -34,6 +35,7 @@ export default function App() {
 
   const RUB = { name: 'RUB', exChange: 1, precision: 2 };
   const [currency, setCurrency] = useState(RUB);
+  const [currencyList, setCurrencyList] = useState([RUB]);
   const [tableHeadFixed, setTableHeadFixed] = useState(null);
   const [showTableHeadFixed, setShowTableHeadFixed] = useState(false);
   const [searchData, setSearchData] = useState({});
@@ -61,6 +63,14 @@ export default function App() {
   const [openDetails, setOpenDetails] = useState(0);
   const [asideOpen, setAsideOpen] = useState(false);
   const [asideContent, setAsideContent] = useState(null);
+
+  const LOUISYEN_PRICE_LIMIT = 1500;
+  const [isAbove1500, setIsAbove1500] = useState(false);
+
+  const getUSDExchange = () => {
+    const USD = currencyList.find(f => f.name === 'USD');
+    return USD && USD.hasOwnProperty('exChange') ? USD.exChange : 1;
+  };
 
   const updateLocationParams = loc => {
     setCenteredForm(loc.pathname === '/');
@@ -155,6 +165,59 @@ export default function App() {
     createNotification('success', `Требуется авторизация`, ' ');
   };
 
+  const updateStore = (store, options, cb) => {
+    const requestURL = '/search/check_price';
+
+    apiGET(requestURL, options, data => {
+      data.forEach(item => {
+        store.forEach((storeItem, storeIndex) => {
+          if (storeItem.name === item.name) {
+            store[storeIndex] = { ...storeItem, ...item };
+          }
+        });
+      });
+      cb(store);
+    });
+  };
+
+  const checkLouisyen = (store, done) => {
+    let itemsLouisyen = store.filter(f => f.supplier === 'Louisyen');
+
+    if (itemsLouisyen.length) {
+      let totalLouisyen = itemsLouisyen.reduce((total, l) => l.pricebreaks[findPriceIndex(l.pricebreaks, l.cart)].price * l.cart, 0) / getUSDExchange();
+
+      const options = {
+        supplier: 'Louisyen',
+        basketPrice: totalLouisyen,
+        names: itemsLouisyen.map(m => m.name),
+      };
+
+      if (totalLouisyen > LOUISYEN_PRICE_LIMIT) {
+        if (!isAbove1500) {
+          console.log('updateItemPrice up');
+          updateStore(store, options, data => {
+            setIsAbove1500(true);
+            done(data);
+          });
+        } else {
+          done(store);
+        }
+      } else {
+        if (isAbove1500) {
+          console.log('updateItemPrice down');
+          updateStore(store, options, data => {
+            setIsAbove1500(false);
+            done(data);
+          });
+        } else {
+          done(store);
+        }
+      }
+    } else {
+      done(store);
+    }
+  };
+
   const createNotification = (type, title, text) => {
     window.log && console.log('createNotification', type, text);
 
@@ -190,8 +253,8 @@ export default function App() {
 
     let store = localStorage.getItem('catpart');
 
-    if (store) {
-      store = JSON.parse(store);
+    if (store && store !== 'undefined') {
+      store = getJsonData(store);
     } else {
       store = [];
     }
@@ -241,14 +304,18 @@ export default function App() {
       }
     }
 
-    localStorage.setItem('catpart', JSON.stringify(store));
-    setCartCount(store.length);
+    new Promise((res, rej) => {
+      checkLouisyen(store, res);
+    }).then(store => {
+      localStorage.setItem('catpart', JSON.stringify(store));
+      setCartCount(store.length);
 
-    if (store.length) {
-      setTotalCart(store.reduce((total, c) => total + c.cart * c.pricebreaks[findPriceIndex(c.pricebreaks, c.cart)].price, 0));
-    } else if (window.location.pathname === '/order' && !clear) {
-      history.push('/');
-    }
+      if (store.length) {
+        setTotalCart(store.reduce((total, c) => total + c.cart * c.pricebreaks[findPriceIndex(c.pricebreaks, c.cart)].price, 0));
+      } else if (window.location.pathname === '/order' && !clear) {
+        history.push('/');
+      }
+    });
   };
 
   const onSubmitSearchForm = evt => {
@@ -321,7 +388,7 @@ export default function App() {
 
     if (profileLS) {
       if (validateJSON(profileLS)) {
-        setProfile(JSON.parse(profileLS));
+        setProfile(getJsonData(profileLS));
       } else {
         localStorage.removeItem('catpart-profile');
       }
@@ -528,6 +595,8 @@ export default function App() {
                       setBusyOrder={setBusyOrder}
                       currency={currency}
                       setCurrency={setCurrency}
+                      currencyList={currencyList}
+                      setCurrencyList={setCurrencyList}
                       RUB={RUB}
                       setTableHeadFixed={setTableHeadFixed}
                       setOpenAuthPopup={setOpenAuthPopup}
@@ -555,6 +624,8 @@ export default function App() {
                       setBusyOrder={setBusyOrder}
                       currency={currency}
                       setCurrency={setCurrency}
+                      currencyList={currencyList}
+                      setCurrencyList={setCurrencyList}
                       RUB={RUB}
                       setShowTableHeadFixed={setShowTableHeadFixed}
                       setTableHeadFixed={setTableHeadFixed}

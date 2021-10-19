@@ -63,7 +63,6 @@ const CartRow = props => {
                           const val = +e.target.value;
                           if (val > 0) {
                             setCartCount(parseFloat(val));
-                            window.log && console.log('row', row);
                           }
                         }}
                         onBlur={e => {

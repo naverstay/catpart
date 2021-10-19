@@ -6,6 +6,7 @@ import FormInput from '../FormInput';
 import { validateEmail } from '../../utils/validateEmail';
 import apiPOST from '../../utils/upload';
 import apiGET from '../../utils/search';
+import { getJsonData } from '../../utils/getJsonData';
 
 function Header({ history, notificationFunc, openAuthPopup, setOpenAuthPopup, openMobMenu, cartCount, profile, setProfile, setOpenMobMenu, showCabinet }) {
   const headerRef = useDetectClickOutside({
@@ -58,7 +59,7 @@ function Header({ history, notificationFunc, openAuthPopup, setOpenAuthPopup, op
       let userFields = {};
 
       if (user) {
-        userFields = JSON.parse(user);
+        userFields = getJsonData(user);
       }
 
       userFields['order-name'] = data.contact_name;
@@ -195,7 +196,7 @@ function Header({ history, notificationFunc, openAuthPopup, setOpenAuthPopup, op
       const user = localStorage.getItem('catpart-user');
 
       if (history.location.pathname === '/order' && user) {
-        userFields = JSON.parse(user);
+        userFields = getJsonData(user);
 
         if (userFields.hasOwnProperty('order-email')) {
           userEmail = userFields['order-email'];

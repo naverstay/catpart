@@ -33,6 +33,7 @@ import dateFormatter from '../../utils/dateFormatter';
 import innValidation from '../../utils/innValidation';
 import checkEmailExist from '../../utils/checkEmailExist';
 import FormCheck from '../../components/FormCheck';
+import { getJsonData } from '../../utils/getJsonData';
 
 const key = 'home';
 
@@ -86,7 +87,7 @@ export function OrderForm({ elaboration, delivery, updateCart, history, profile,
     let userFields = {};
 
     if (user) {
-      userFields = JSON.parse(user);
+      userFields = getJsonData(user);
     }
 
     localStorage.setItem('catpart-user', JSON.stringify(Object.assign(userFields, fields)));
@@ -179,7 +180,7 @@ export function OrderForm({ elaboration, delivery, updateCart, history, profile,
     let store = localStorage.getItem('catpart');
 
     if (store) {
-      store = JSON.parse(store);
+      store = getJsonData(store);
     } else {
       store = {};
     }
@@ -192,7 +193,7 @@ export function OrderForm({ elaboration, delivery, updateCart, history, profile,
       localStorage.setItem('catpart', JSON.stringify(store));
     }
 
-    const ymproducts = [];
+    let ymproducts = [];
 
     const products = store.map(s => {
       const priceIndex = findPriceIndex(s.pricebreaks, s.cart);
@@ -231,50 +232,7 @@ export function OrderForm({ elaboration, delivery, updateCart, history, profile,
     });
 
     if (products.length) {
-      const order = {
-        authCode: '123456',
-        catpartCompanyId: 213,
-        catpartDealId: 133,
-        INN: parseInt(fields['order-inn']),
-        name: fields['order-name'],
-        email: fields['order-email'],
-        phone: fields['order-phone'],
-        delivery: fields['order-delivery'],
-        comment: commentInput.current.value || '',
-        maxDeliveryTime: 'Максимальный срок',
-        summ: (totalCart / currency.exChange).toFixedCustom(2),
-        products,
-      };
-
-      const r = {
-        contact_email: 'test@test.ru',
-        contact_phone: '79999999999',
-        inn: 123456789,
-        contact_name: 'Antwon Gulgowski DVM',
-        delivery_type: 'test',
-        amount: 7634.19,
-        comment: '',
-        products: [
-          {
-            name: '3128919224',
-            supplier: 'Kuhic Inc',
-            manufacturer: 'Keeling Inc',
-            packingrate: 2000,
-            quantity: 629,
-            price: 55.38,
-          },
-          {
-            name: '9181399170',
-            supplier: 'Leuschke PLC',
-            manufacturer: "Jacobs, O'Conner and Frami",
-            packingrate: 1000,
-            quantity: 881,
-            price: 44.02,
-          },
-        ],
-      };
-
-      const orderDB = {
+      let orderDB = {
         inn: parseInt(fields['order-inn']),
         contact_name: fields['order-name'],
         contact_email: fields['order-email'],
@@ -284,6 +242,12 @@ export function OrderForm({ elaboration, delivery, updateCart, history, profile,
         amount: (totalCart / currency.exChange).toFixedCustom(2),
         products,
       };
+
+      if (elaboration && elaboration.length) {
+        ymproducts = elaboration;
+        orderDB.products = elaboration;
+        orderDB.explore = true;
+      }
 
       // apiORDER(url, order, {}, respData => {
       //  if (respData && respData.hasOwnProperty('status') && respData.status === 'ok') {
@@ -342,6 +306,14 @@ export function OrderForm({ elaboration, delivery, updateCart, history, profile,
   }, [totalCart, currency]);
 
   useEffect(() => {
+    if (elaboration && elaboration.length) {
+      errors['order-elaboration'] = elaboration.filter(el => el.name.length).length === elaboration.length ? '' : 'Пропущено название';
+      setErrors(errors);
+      validate();
+    }
+  }, [elaboration]);
+
+  useEffect(() => {
     setInputFilter(phoneInput.current, function(value) {
       return /^\+?\d*$/.test(value); // Allow digits and '+' on beginning only, using a RegExp
     });
@@ -356,8 +328,17 @@ export function OrderForm({ elaboration, delivery, updateCart, history, profile,
 
     const user = localStorage.getItem('catpart-user');
 
+    if (elaboration && elaboration.length) {
+      delete errors['order-agreement'];
+      delete fields['order-agreement'];
+      setFields(fields);
+      errors['order-elaboration'] = elaboration.filter(el => el.name.length).length === elaboration.length ? '' : 'Пропущено название';
+      setErrors(errors);
+      validate();
+    }
+
     if (user) {
-      const userFields = JSON.parse(user);
+      const userFields = getJsonData(user);
       setFields(userFields);
 
       if (profile.hasOwnProperty('email') && profile.email) {
@@ -400,7 +381,7 @@ export function OrderForm({ elaboration, delivery, updateCart, history, profile,
       }
     }
 
-    if (!elaboration && !totalCart) {
+    if (!(elaboration && elaboration.length) && !totalCart) {
       history.push('/');
     }
 
@@ -538,7 +519,7 @@ export function OrderForm({ elaboration, delivery, updateCart, history, profile,
 
         {delivery && (
           <>
-            <SlideDown className={'my-dropdown-slidedown'}>{totalCart > 20000 ? <p className={'form-free_shipping'}>Сумма вашего заказа больше 20&nbsp;000 рублей. Для вас доставка за наш счёт.</p> : null}</SlideDown>
+            <SlideDown>{totalCart > 20000 ? <p className={'form-free_shipping'}>Сумма вашего заказа больше 20&nbsp;000 рублей. Для вас доставка за наш счёт.</p> : null}</SlideDown>
 
             <FormCheck
               onChange={handleChange.bind(this, 'order-agreement')}
@@ -554,7 +535,7 @@ export function OrderForm({ elaboration, delivery, updateCart, history, profile,
         )}
 
         <div className="form-control">
-          <Ripples className={`__w-100p btn __blue __lg${!validForm ? ' __disabled' : ''}${busy ? ' __loader' : ''}`} during={1000}>
+          <Ripples className={`__w-100p btn __blue __lg${validForm ? '' : ' __disabled'}${busy ? ' __loader' : ''}`} during={1000}>
             <button name="order-submit" className="btn-inner">
               <span>Оформить заказ</span>
             </button>
@@ -568,7 +549,7 @@ export function OrderForm({ elaboration, delivery, updateCart, history, profile,
 OrderForm.propTypes = {
   busy: PropTypes.bool,
   delivery: PropTypes.bool,
-  elaboration: PropTypes.bool,
+  elaboration: PropTypes.array,
   loading: PropTypes.bool,
   error: PropTypes.oneOfType([PropTypes.object, PropTypes.bool]),
   repos: PropTypes.oneOfType([PropTypes.array, PropTypes.bool]),
