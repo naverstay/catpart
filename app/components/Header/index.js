@@ -174,7 +174,7 @@ function Header({ history, notificationFunc, openAuthPopup, setOpenAuthPopup, op
       window.log && console.log('data', data);
 
       if (data.error) {
-        notificationFunc('success', `Письмо не отправлено. `, 'Проверьте логин.');
+        notificationFunc('success', `Письмо не отправлено. `, 'Такого аккаунта не существует.');
       } else {
         notificationFunc('success', `Письмо отправлено. `, 'Проверьте почту.');
       }
