@@ -37,7 +37,7 @@ import { getJsonData } from '../../utils/getJsonData';
 
 const key = 'home';
 
-export function OrderForm({ elaboration, delivery, updateCart, history, profile, setOpenAuthPopup, notificationFunc, setOrderSent, currency, totalCart, onSubmitForm, loading, setBusyOrder, onChangeUsername }) {
+export function OrderForm({ elaboration, setElaboration, delivery, updateCart, history, profile, setOpenAuthPopup, notificationFunc, setOrderSent, currency, totalCart, onSubmitForm, loading, setBusyOrder, onChangeUsername }) {
   useInjectReducer({ key, reducer });
   useInjectSaga({ key, saga });
 
@@ -95,6 +95,8 @@ export function OrderForm({ elaboration, delivery, updateCart, history, profile,
     setErrors(errors);
 
     setValidForm(!Object.values(errors).filter(er => er === null || er.length).length);
+
+    console.log('setValidForm', errors);
 
     setJustRedraw(justRedraw + 1);
 
@@ -231,7 +233,54 @@ export function OrderForm({ elaboration, delivery, updateCart, history, profile,
       // };
     });
 
-    if (products.length) {
+    if (elaboration && elaboration.length) {
+      let orderDB = {
+        inn: parseInt(fields['order-inn']),
+        contact_name: fields['order-name'],
+        contact_email: fields['order-email'],
+        contact_phone: fields['order-phone'],
+        delivery_type: fields['order-delivery'],
+        comment: commentInput.current.value || '',
+        amount: (totalCart / currency.exChange).toFixedCustom(2),
+        products: elaboration,
+        explore: true,
+      };
+
+      if (elaboration && elaboration.length) {
+        ymproducts = elaboration;
+      }
+
+      apiORDERDB(url, orderDB, {}, respData => {
+        window.log && console.log('respData', respData);
+        if (respData && respData.hasOwnProperty('status') && respData.status === 200) {
+          if (typeof ym === 'function') {
+            ym(81774553, 'reachGoal', 'senttheorder');
+          }
+
+          window.gTag({
+            event: 'order',
+            ecommerce: {
+              currencyCode: 'RUB',
+              purchase: {
+                actionField: {
+                  id: `gtm_${new Date().getTime()}`,
+                },
+                // amount: (totalCart / currency.exChange).toFixedCustom(2),
+                products: ymproducts,
+              },
+            },
+          });
+
+          notificationFunc('success', 'Запрос на проработку отправлен!', 'И уже обрабатывается ;)');
+          history.push('/');
+        } else {
+          notificationFunc('success', 'Ошибка обработки запроса.', 'Повторите позже.');
+        }
+
+        setBusy(false);
+        setBusyOrder(false);
+      });
+    } else if (products.length) {
       let orderDB = {
         inn: parseInt(fields['order-inn']),
         contact_name: fields['order-name'],
@@ -242,12 +291,6 @@ export function OrderForm({ elaboration, delivery, updateCart, history, profile,
         amount: (totalCart / currency.exChange).toFixedCustom(2),
         products,
       };
-
-      if (elaboration && elaboration.length) {
-        ymproducts = elaboration;
-        orderDB.products = elaboration;
-        orderDB.explore = true;
-      }
 
       // apiORDER(url, order, {}, respData => {
       //  if (respData && respData.hasOwnProperty('status') && respData.status === 'ok') {
@@ -307,10 +350,17 @@ export function OrderForm({ elaboration, delivery, updateCart, history, profile,
 
   useEffect(() => {
     if (elaboration && elaboration.length) {
+      delete errors['order-agreement'];
+      delete fields['order-agreement'];
       errors['order-elaboration'] = elaboration.filter(el => el.name.length).length === elaboration.length ? '' : 'Пропущено название';
-      setErrors(errors);
-      validate();
+    } else {
+      delete errors['order-elaboration'];
+      errors['order-agreement'] = null;
+      fields['order-agreement'] = false;
     }
+    setFields(fields);
+    setErrors(errors);
+    validate();
   }, [elaboration]);
 
   useEffect(() => {
@@ -331,8 +381,8 @@ export function OrderForm({ elaboration, delivery, updateCart, history, profile,
     if (elaboration && elaboration.length) {
       delete errors['order-agreement'];
       delete fields['order-agreement'];
-      setFields(fields);
       errors['order-elaboration'] = elaboration.filter(el => el.name.length).length === elaboration.length ? '' : 'Пропущено название';
+      setFields(fields);
       setErrors(errors);
       validate();
     }

@@ -127,8 +127,6 @@ export function FilterForm({
     }
   }, [currencyList]);
 
-  useEffect(() => {}, [totalData, searchData]);
-
   const scrollTriggerHandler = goto => {
     setOpenMoreTriggers(false);
 
@@ -393,7 +391,7 @@ export function FilterForm({
                           name="currency"
                           className="hide"
                           // checked={}
-                          defaultChecked={currency.name === cur.name}
+                          defaultChecked={currency.name === cur.name ? true : null}
                           data-currency={cur.name}
                           type="radio"
                           value={cur.exChange}
@@ -436,7 +434,19 @@ export function FilterForm({
       ) : totalData < 0 ? null : (
         <>
           <DeepElaboration data={elaboration} setElaboration={setElaboration} elaboration={elaboration} />
-          <OrderForm profile={profile} history={history} setOpenAuthPopup={setOpenAuthPopup} setBusyOrder={setBusyOrder} updateCart={updateCart} notificationFunc={notificationFunc} setOrderSent={setOrderSent} totalCart={totalCart} currency={currency} elaboration={elaboration} />
+          <OrderForm
+            profile={profile}
+            history={history}
+            setOpenAuthPopup={setOpenAuthPopup}
+            setBusyOrder={setBusyOrder}
+            updateCart={updateCart}
+            notificationFunc={notificationFunc}
+            setOrderSent={setOrderSent}
+            totalCart={totalCart}
+            currency={currency}
+            setElaboration={setElaboration}
+            elaboration={elaboration}
+          />
         </>
       )}
     </>
