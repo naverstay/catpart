@@ -171,7 +171,7 @@ export default function App() {
     apiGET(requestURL, options, data => {
       data.forEach(item => {
         store.forEach((storeItem, storeIndex) => {
-          if (storeItem.name === item.name) {
+          if (storeItem.id === item.id) {
             store[storeIndex] = { ...storeItem, ...item };
           }
         });
@@ -187,9 +187,8 @@ export default function App() {
       let totalLouisyen = itemsLouisyen.reduce((total, l) => l.pricebreaks[findPriceIndex(l.pricebreaks, l.cart)].price * l.cart, 0) / getUSDExchange();
 
       const options = {
-        supplier: 'Louisyen',
         basketPrice: totalLouisyen,
-        names: itemsLouisyen.map(m => m.name),
+        ids: itemsLouisyen.map(m => m.id),
       };
 
       if (totalLouisyen > LOUISYEN_PRICE_LIMIT) {
@@ -305,7 +304,11 @@ export default function App() {
     }
 
     new Promise((res, rej) => {
-      checkLouisyen(store, res);
+      if (window.location.pathname === '/order') {
+        checkLouisyen(store, res);
+      } else {
+        res(store);
+      }
     }).then(store => {
       localStorage.setItem('catpart', JSON.stringify(store));
       setCartCount(store.length);
