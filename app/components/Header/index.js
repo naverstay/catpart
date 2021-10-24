@@ -8,7 +8,7 @@ import apiPOST from '../../utils/upload';
 import apiGET from '../../utils/search';
 import { getJsonData } from '../../utils/getJsonData';
 
-function Header({ history, notificationFunc, openAuthPopup, setOpenAuthPopup, openMobMenu, cartCount, profile, setProfile, setOpenMobMenu, showCabinet }) {
+function Header({ history, notificationFunc, openAuthPopup, setOpenAuthPopup, openMobMenu, cartCount, profile, setProfile, setOpenMobMenu }) {
   const headerRef = useDetectClickOutside({
     onTriggered: () => {
       setOpenMobMenu(false);
@@ -289,22 +289,18 @@ function Header({ history, notificationFunc, openAuthPopup, setOpenAuthPopup, op
           </Ripples>
         ) : (
           <div ref={popupRef} className={'header-popup__holder'}>
-            {/* preprod */}
-            {showCabinet ? (
-              <Ripples
-                onClick={() => {
-                  setOpenAuthPopup(!openAuthPopup);
-                  window.log && console.log('open', openAuthPopup);
-                }}
-                during={1000}
-                className={'btn __blue'}
-              >
-                <span className="btn-inner">
-                  <span className={'__dotted'}>Личный кабинет</span>
-                </span>
-              </Ripples>
-            ) : null}
-            {/* preprod */}
+            <Ripples
+              onClick={() => {
+                setOpenAuthPopup(!openAuthPopup);
+                window.log && console.log('open', openAuthPopup);
+              }}
+              during={1000}
+              className={'btn __blue'}
+            >
+              <span className="btn-inner">
+                <span className={'__dotted'}>Личный кабинет</span>
+              </span>
+            </Ripples>
 
             {openAuthPopup || openResetPassword ? (
               <div className="header-popup">

@@ -375,16 +375,6 @@ export default function App() {
   };
 
   useEffect(() => {
-    // preprod
-
-    if (!showCabinet) {
-      localStorage.removeItem('access_token');
-      localStorage.removeItem('catpart-profile');
-      setProfile({});
-    }
-
-    // preprod
-
     updateLocationParams(window.location);
 
     const profileLS = localStorage.getItem('catpart-profile');
@@ -490,25 +480,12 @@ export default function App() {
     }
   }, [asideOpen]);
 
-  let showCabinet = ['localhost', 'html'].indexOf(location.hostname.split('.')[0]) > -1;
-
-  window.log = showCabinet;
+  window.log = ['localhost', 'html'].indexOf(location.hostname.split('.')[0]) > -1;
 
   return (
     <>
       <div className={`app-wrapper${appDrag ? ' __over' : ''}`}>
-        <Header
-          showCabinet={showCabinet}
-          setOpenAuthPopup={setOpenAuthPopup}
-          openAuthPopup={openAuthPopup}
-          notificationFunc={createNotification}
-          setProfile={setProfile}
-          history={history}
-          profile={profile}
-          cartCount={cartCount}
-          openMobMenu={openMobMenu}
-          setOpenMobMenu={setOpenMobMenu}
-        />
+        <Header setOpenAuthPopup={setOpenAuthPopup} openAuthPopup={openAuthPopup} notificationFunc={createNotification} setProfile={setProfile} history={history} profile={profile} cartCount={cartCount} openMobMenu={openMobMenu} setOpenMobMenu={setOpenMobMenu} />
 
         <main className={`main${centeredForm ? ' __center' : ''}`}>
           <SearchForm setFormBusy={setFormBusy} history={history} setSearchData={setSearchData} setOpenMobMenu={setOpenMobMenu} busyOrder={busyOrder} busy={formBusy} onSubmitForm={onSubmitSearchForm} notificationFunc={createNotification} />
