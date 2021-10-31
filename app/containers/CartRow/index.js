@@ -27,7 +27,7 @@ const CartRow = props => {
   }
 
   return (
-    <div className={`cart-results__row${rowIndex % 2 === 0 ? ' __odd' : ' __even'}`}>
+    <div className={`cart-results__row ${rowIndex % 2 === 0 ? '__odd' : '__even' + row.supplier === 'Louisyen' ? ' __lilu' : ''}`}>
       {Object.keys(tableHeader).map((cell, ci) =>
         cell === 'manufacturer' ? null : (
           <div key={ci} className={`cart-results__cell __${cell}`}>

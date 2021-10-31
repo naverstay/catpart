@@ -96,8 +96,6 @@ export function OrderForm({ elaboration, setElaboration, delivery, updateCart, h
 
     setValidForm(!Object.values(errors).filter(er => er === null || er.length).length);
 
-    console.log('setValidForm', errors);
-
     setJustRedraw(justRedraw + 1);
 
     if (emailExists) {
@@ -190,10 +188,10 @@ export function OrderForm({ elaboration, setElaboration, delivery, updateCart, h
     setBusy(true);
     setBusyOrder(true);
 
-    if (!store.hasOwnProperty('order')) {
-      store.order = [];
-      localStorage.setItem('catpart', JSON.stringify(store));
-    }
+    //if (!store.hasOwnProperty('order')) {
+    //  store.order = [];
+    //  localStorage.setItem('catpart', JSON.stringify(store));
+    //}
 
     let ymproducts = [];
 

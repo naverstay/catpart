@@ -61,7 +61,7 @@ const SearchRow = props => {
   }
 
   return (
-    <div className={`search-results__row${rowIndex % 2 === 0 ? ' __odd' : ' __even'}` + (row.supplier === 'Louisyen' ? ' __lilu' : '')}>
+    <div className={`search-results__row ${rowIndex % 2 === 0 ? '__odd' : '__even' + row.supplier === 'Louisyen' ? ' __lilu' : ''}`}>
       {Object.keys(tableHeader).map((cell, ci) => (
         <div key={ci} className={`search-results__cell __${cell}`}>
           {cell === 'name' ? null : <span className="search-results__label">{tableHeader[cell]}</span>}

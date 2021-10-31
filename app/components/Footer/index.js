@@ -1,8 +1,22 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { Link } from 'react-router-dom';
+import apiGET from '../../utils/search';
+import { getJsonData } from '../../utils/getJsonData';
 
 function Footer() {
+  const [offerLink, setOfferLink] = useState('#');
+
+  useEffect(() => {
+    const requestURL = '/settings';
+
+    apiGET(requestURL, {}, data => {
+      if (data && data.hasOwnProperty('offer_file')) {
+        setOfferLink(data.offer_file.value);
+      }
+    });
+  }, []);
+
   return (
     <footer className="footer row">
       <div className="column lg-col-10">
@@ -29,7 +43,7 @@ function Footer() {
           </div>
 
           <div className="footer-offer">
-            <a className="footer-link" href="https://dev.catpart.ru/offer.docx">
+            <a className="footer-link" href={offerLink}>
               Оферта
             </a>
           </div>

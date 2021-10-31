@@ -28,6 +28,7 @@ import { validateJSON } from '../../utils/validateJSON';
 import OrderDetails from '../OrderDetails';
 import { OrdersPage } from '../OrdersPage';
 import { getJsonData } from '../../utils/getJsonData';
+import apiPOST from '../../utils/upload';
 //import ContactsPage from '../ContactsPage';
 
 export default function App() {
@@ -54,8 +55,7 @@ export default function App() {
   const [centeredForm, setCenteredForm] = useState(true);
   const [formBusy, setFormBusy] = useState(false);
   const [busyOrder, setBusyOrder] = useState(false);
-  const [formDrag, setFormDrag] = useState(false);
-
+  const [profileChecked, setProfileChecked] = useState(false);
   const [profile, setProfile] = useState({});
   const [profileRequisites, setProfileRequisites] = useState({});
   const [openProfile, setOpenProfile] = useState(false);
@@ -156,11 +156,11 @@ export default function App() {
     localStorage.removeItem('catpart-profile');
     history.push('/');
     setProfile({});
+    setProfileChecked(true);
   };
 
   const needLogin = () => {
     window.log && console.log('needLogin', profile);
-
     logOut();
     createNotification('success', `Требуется авторизация`, ' ');
   };
@@ -180,36 +180,70 @@ export default function App() {
     });
   };
 
-  const checkLouisyen = (store, done) => {
-    let itemsLouisyen = store.filter(f => f.supplier === 'Louisyen');
+  const updateAll = (store, options, cb) => {
+    const requestURL = '/cart/calculate';
 
-    if (itemsLouisyen.length) {
-      let totalLouisyen = itemsLouisyen.reduce((total, l) => l.pricebreaks[findPriceIndex(l.pricebreaks, l.cart)].price * l.cart, 0) / getUSDExchange();
-
-      const options = {
-        basketPrice: totalLouisyen,
-        ids: itemsLouisyen.map(m => m.id),
-      };
-
-      if (totalLouisyen > LOUISYEN_PRICE_LIMIT) {
-        if (!isAbove1500) {
-          console.log('updateItemPrice up');
-          updateStore(store, options, data => {
-            setIsAbove1500(true);
-            done(data);
+    apiPOST(
+      requestURL,
+      options,
+      {},
+      data => {
+        data.forEach(item => {
+          store.forEach((storeItem, storeIndex) => {
+            if (storeItem.id === item.id) {
+              store[storeIndex] = { ...storeItem, ...item };
+            }
           });
-        } else {
-          done(store);
-        }
+        });
+        cb(store);
+      },
+      true,
+    );
+  };
+
+  const checkSupplierPrices = (store, supplier, done) => {
+    let filteredItems = store.filter(f => (supplier ? f.supplier === supplier : true));
+
+    window.log && console.log('filteredItems', filteredItems);
+
+    if (filteredItems.length) {
+      let totalPrice = filteredItems.reduce((total, l) => l.pricebreaks[findPriceIndex(l.pricebreaks, l.cart)].price * l.cart, 0) / getUSDExchange();
+
+      if (!supplier) {
+        const options = filteredItems.map(m => {
+          return {
+            id: m.id,
+            pricebreaks: m.pricebreaks,
+          };
+        });
+
+        updateAll(store, options, data => {
+          checkSupplierPrices(data, 'Louisyen', done);
+        });
       } else {
-        if (isAbove1500) {
-          console.log('updateItemPrice down');
-          updateStore(store, options, data => {
-            setIsAbove1500(false);
-            done(data);
-          });
+        const options = {
+          basketPrice: totalPrice,
+          ids: filteredItems.map(m => m.id),
+        };
+
+        if (totalPrice > LOUISYEN_PRICE_LIMIT) {
+          if (!isAbove1500) {
+            updateStore(store, options, data => {
+              setIsAbove1500(true);
+              done(data);
+            });
+          } else {
+            done(store);
+          }
         } else {
-          done(store);
+          if (isAbove1500) {
+            updateStore(store, options, data => {
+              setIsAbove1500(false);
+              done(data);
+            });
+          } else {
+            done(store);
+          }
         }
       }
     } else {
@@ -233,7 +267,7 @@ export default function App() {
           animationIn: ['animate__animated', 'animate__bounceInRight'],
           animationOut: ['animate__animated', 'animate__bounceOutRight'],
           dismiss: {
-            duration: 2000,
+            duration: 20000,
             waitForAnimation: true,
             pauseOnHover: true,
             onScreen: false,
@@ -250,12 +284,12 @@ export default function App() {
   const updateCart = (id = null, count = 0, cur = {}, clear = false) => {
     window.log && console.log('updateCart', id, count);
 
-    let store = localStorage.getItem('catpart');
+    let store = [];
+    let catpartMode = localStorage.getItem('catpart-mode');
+    let catpartStore = localStorage.getItem('catpart');
 
-    if (store && store !== 'undefined') {
-      store = getJsonData(store);
-    } else {
-      store = [];
+    if (catpartStore && catpartStore !== 'undefined') {
+      store = getJsonData(catpartStore);
     }
 
     if (clear) {
@@ -304,13 +338,36 @@ export default function App() {
     }
 
     new Promise((res, rej) => {
-      if (window.location.pathname === '/order') {
-        checkLouisyen(store, res);
+      if (id < 0) {
+        if (profileChecked) {
+          if (profile.hasOwnProperty('id')) {
+            if (catpartMode !== 'auth') {
+              checkSupplierPrices(store, '', res);
+            } else {
+              res(store);
+            }
+          } else {
+            if (catpartMode === 'auth') {
+              checkSupplierPrices(store, '', res);
+            } else {
+              res(store);
+            }
+          }
+        } else {
+          res(store);
+        }
+      } else if (window.location.pathname === '/order') {
+        checkSupplierPrices(store, 'Louisyen', res);
       } else {
         res(store);
       }
     }).then(store => {
       localStorage.setItem('catpart', JSON.stringify(store));
+
+      if (profileChecked) {
+        localStorage.setItem('catpart-mode', profile.hasOwnProperty('id') ? 'auth' : '');
+      }
+
       setCartCount(store.length);
 
       if (store.length) {
@@ -387,8 +444,6 @@ export default function App() {
       }
     }
 
-    const dropContainer = document.getElementById('app');
-
     document.body.addEventListener('scroll', handleScroll);
 
     window.addEventListener('resize', appHeight);
@@ -399,7 +454,7 @@ export default function App() {
       document.body.style.cursor = 'pointer';
     }
 
-    updateCart();
+    const dropContainer = document.getElementById('app');
 
     dropContainer.ondragover = dropContainer.ondragenter = function(evt) {
       evt.preventDefault();
@@ -426,6 +481,8 @@ export default function App() {
 
       fileInput.dispatchEvent(new Event('change', { bubbles: true }));
     };
+
+    setProfileChecked(true);
 
     return () => {
       document.body.removeEventListener('scroll', handleScroll);
@@ -479,6 +536,13 @@ export default function App() {
       setOpenDetails(0);
     }
   }, [asideOpen]);
+
+  useEffect(() => {
+    console.log('prev', profile);
+    //if (profileChecked) {
+    updateCart(-1);
+    //}
+  }, [profile]);
 
   window.log = ['localhost', 'html'].indexOf(location.hostname.split('.')[0]) > -1;
 

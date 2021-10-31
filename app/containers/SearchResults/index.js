@@ -154,9 +154,7 @@ export function SearchResults(props) {
                     trigger={<span>{query.q}</span>}
                   >
                     {query.hasOwnProperty('data')
-                      ? query.data
-                          .filter(f => f.supplier === 'Louisyen')
-                          .map((row, ri) => <SearchRow key={ri} updateCart={updateCart} tableHeader={tableHeader} defaultCount={query.c} currencyList={currencyList} currency={currency} highlight={query.q} notificationFunc={notificationFunc} row={row} rowIndex={ri} />)
+                      ? query.data.map((row, ri) => <SearchRow key={ri} updateCart={updateCart} tableHeader={tableHeader} defaultCount={query.c} currencyList={currencyList} currency={currency} highlight={query.q} notificationFunc={notificationFunc} row={row} rowIndex={ri} />)
                       : null}
                   </Collapsible>
                 );

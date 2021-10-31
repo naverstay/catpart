@@ -46,17 +46,18 @@ function checkStatus(response) {
  * @param  {object} data         The form data
  * @param  {object} [options]    The options we want to pass to "fetch"
  * @param  {function} cb         The callback function
+ * @param  {json} content-type   The json content-type
  *
  * @return {object}           The response data
  */
 
-export default function apiPOST(url, data, options, cb) {
+export default function apiPOST(url, data, options, cb, json = false) {
   return axios
     .post(API + url, data, {
       headers: {
         //'Content-Type': 'application/json',
-        'Content-Type': 'multipart/form-data',
-        //Authorization: `Bearer ${localStorage.getItem('access_token') || ''}`,
+        'Content-Type': json ? 'application/json' : 'multipart/form-data',
+        Authorization: `Bearer ${localStorage.getItem('access_token') || ''}`,
       },
       data: data,
       params: options,
