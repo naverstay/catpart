@@ -1,7 +1,7 @@
-import XLSX from 'xlsx';
-import priceFormatter from './priceFormatter';
-import dateFormatter from './dateFormatter';
-import { findPriceIndex } from './findPriceIndex';
+import XLSX from "xlsx";
+import priceFormatter from "./priceFormatter";
+import dateFormatter from "./dateFormatter";
+import { findPriceIndex } from "./findPriceIndex";
 
 const MODE_CART = 0;
 const MODE_BOM = 1;
@@ -12,16 +12,16 @@ const transformSearchData = (data, query) =>
   data.reduce(
     (arr, c) =>
       arr.concat(
-        c.hasOwnProperty('data')
+        c.hasOwnProperty("data")
           ? c.data.map(d => {
-              if (query) {
-                d.query = c.q;
-              }
-              return d;
-            })
-          : [],
+            if (query) {
+              d.query = c.q;
+            }
+            return d;
+          })
+          : []
       ),
-    [],
+    []
   );
 
 const prepareJSON = (data, mode, currency) => {
@@ -29,10 +29,10 @@ const prepareJSON = (data, mode, currency) => {
     data = transformSearchData(data, mode === MODE_BOM);
   }
 
-  window.log && console.log('prepareJSON', data);
+  window.log && console.log("prepareJSON", data);
 
   return data.map(row => {
-    let price = '';
+    let price = "";
     let priceMatch = -1;
 
     if (mode === MODE_CART) {
@@ -47,9 +47,9 @@ const prepareJSON = (data, mode, currency) => {
       row.calculated_delivery_date = dateFormatter(row.calculated_delivery_date);
       row.real_delivery_date = dateFormatter(row.real_delivery_date);
       row.sum = priceFormatter(row.quantity * row.price);
-      row.statuses = row.statuses.map(p => `${p.name} - ${dateFormatter(p.updated_at)}`).join('\n');
+      row.statuses = row.statuses.map(p => `${p.name} - ${dateFormatter(p.updated_at)}`).join("\n");
     } else {
-      row.pricebreaks = row.pricebreaks.map(p => `${p.quant} - ${priceFormatter(p.price / currency.exChange, currency.precision)}`).join('\n');
+      row.pricebreaks = row.pricebreaks.map(p => `${p.quant} - ${priceFormatter(p.price / currency.exChange, currency.precision)}`).join("\n");
       row.currency = currency.name;
     }
 
@@ -64,32 +64,32 @@ const prepareJSON = (data, mode, currency) => {
 };
 
 export const xlsDownload = (data, currency, mode) => {
-  window.log && console.log('xlsDownload', mode);
+  window.log && console.log("xlsDownload", mode);
 
   if (data && data.length) {
-    let fileName = mode === MODE_CART ? 'cart' : 'search';
+    let fileName = mode === MODE_CART ? "cart" : "search";
 
-    let tableHeader = ['supplier', 'name', 'manufacturer', 'quantity', 'pack_quant', 'price_unit', 'moq', 'delivery_period'];
-
-    if (mode === MODE_CART) {
-      tableHeader.push('cart');
-    }
-
-    tableHeader.push('pricebreaks');
+    let tableHeader = ["supplier", "name", "manufacturer", "quantity", "pack_quant", "price_unit", "moq", "delivery_period"];
 
     if (mode === MODE_CART) {
-      tableHeader.push('price');
+      tableHeader.push("cart");
     }
 
-    tableHeader.push('currency');
+    tableHeader.push("pricebreaks");
+
+    if (mode === MODE_CART) {
+      tableHeader.push("price");
+    }
+
+    tableHeader.push("currency");
 
     if (mode === MODE_BOM) {
-      tableHeader = ['query', ...tableHeader];
+      tableHeader = ["query", ...tableHeader];
     }
 
     if (mode === MODE_DETAILS) {
-      fileName = 'details';
-      tableHeader = ['name', 'supplier', 'manufacturer', 'quantity', 'price', 'sum', 'statuses', 'calculated_delivery_date', 'real_delivery_date', 'comment'];
+      fileName = "details";
+      tableHeader = ["name", "supplier", "manufacturer", "quantity", "price", "sum", "statuses", "calculated_delivery_date", "real_delivery_date", "comment"];
     }
 
     let WS = XLSX.utils.json_to_sheet(prepareJSON(JSON.parse(JSON.stringify(data)), mode, currency), { header: tableHeader });
@@ -99,8 +99,8 @@ export const xlsDownload = (data, currency, mode) => {
 
       Object.keys(newJSON).map(j => {
         const row = newJSON[j];
-        const priceMatch = row.price.split('#');
-        const space = '\n'.repeat(+priceMatch[0]);
+        const priceMatch = row.price.split("#");
+        const space = "\n".repeat(+priceMatch[0]);
         row.currency = space + row.currency;
         row.cart = space + row.cart;
         row.price = space + priceMatch[1];

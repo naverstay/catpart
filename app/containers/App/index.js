@@ -6,41 +6,44 @@
  * contain code that should be seen on all pages. (e.g. navigation bar)
  */
 
-import React, { useEffect, useState } from 'react';
-import { Helmet } from 'react-helmet';
-import { Switch, Route, useHistory } from 'react-router-dom';
-import ReactNotification, { store } from 'react-notifications-component';
-import SearchForm from 'containers/SearchForm/Loadable';
-import FilterForm from 'containers/FilterForm/Loadable';
-import FeaturePage from 'containers/FeaturePage/Loadable';
-import NotFoundPage from 'containers/NotFoundPage/Loadable';
-import Header from 'components/Header';
-import Footer from 'components/Footer';
+import React, { useEffect, useState } from "react";
+import { Helmet } from "react-helmet";
+import { Switch, Route, useHistory } from "react-router-dom";
+import ReactNotification, { store } from "react-notifications-component";
+import SearchForm from "containers/SearchForm/Loadable";
+import FilterForm from "containers/FilterForm/Loadable";
+import FeaturePage from "containers/FeaturePage/Loadable";
+import NotFoundPage from "containers/NotFoundPage/Loadable";
+import Catalogue from "components/Catalogue";
+import Header from "components/Header";
+import Footer from "components/Footer";
 
-import apiGET from '../../utils/search';
-//import PolicyPage from '../PolicyPage';
-import { findPriceIndex } from '../../utils/findPriceIndex';
-//import DeliveryPage from '../DeliveryPage';
-import AsideContainer from '../AsideContainer';
-import Profile from '../Profile';
-import ProfileRequisites from '../ProfileRequisites';
-import { validateJSON } from '../../utils/validateJSON';
-import OrderDetails from '../OrderDetails';
-import { OrdersPage } from '../OrdersPage';
-import { getJsonData } from '../../utils/getJsonData';
-import apiPOST from '../../utils/upload';
-//import ContactsPage from '../ContactsPage';
+import apiGET from "../../utils/search";
+import { findPriceIndex } from "../../utils/findPriceIndex";
+import { validateJSON } from "../../utils/validateJSON";
+import { getJsonData } from "../../utils/getJsonData";
+import { disableScroll, enableScroll } from "../../utils/togglePageScrolling";
+// import PolicyPage from '../PolicyPage';
+// import DeliveryPage from '../DeliveryPage';
+import AsideContainer from "../AsideContainer";
+import Profile from "../Profile";
+import ProfileRequisites from "../ProfileRequisites";
+import OrderDetails from "../OrderDetails";
+import { OrdersPage } from "../OrdersPage";
+import apiPOST from "../../utils/upload";
+// import ContactsPage from '../ContactsPage';
 
 export default function App() {
   const history = useHistory();
 
-  const RUB = { name: 'RUB', exChange: 1, precision: 2 };
+  const RUB = { name: "RUB", exChange: 1, precision: 2 };
   const [currency, setCurrency] = useState(RUB);
   const [currencyList, setCurrencyList] = useState([RUB]);
   const [tableHeadFixed, setTableHeadFixed] = useState(null);
   const [showTableHeadFixed, setShowTableHeadFixed] = useState(false);
   const [searchData, setSearchData] = useState({});
   const [openMobMenu, setOpenMobMenu] = useState(false);
+  const [openCatalogue, setOpenCatalogue] = useState(false);
   const [orderSent, setOrderSent] = useState(false);
   const [searchCount, setSearchCount] = useState(1);
   const [cartCount, setCartCount] = useState(0);
@@ -49,7 +52,7 @@ export default function App() {
 
   const [searchResult, setSearchResult] = useState(false);
   const [appDrag, setAppDrag] = useState(false);
-  const [dragText, setDragText] = useState('');
+  const [dragText, setDragText] = useState("");
 
   const [pageY, setPageY] = useState(0);
   const [centeredForm, setCenteredForm] = useState(true);
@@ -68,12 +71,12 @@ export default function App() {
   const [isAbove1500, setIsAbove1500] = useState(false);
 
   const getUSDExchange = () => {
-    const USD = currencyList.find(f => f.name === 'USD');
-    return USD && USD.hasOwnProperty('exChange') ? USD.exChange : 1;
+    const USD = currencyList.find(f => f.name === "USD");
+    return USD && USD.hasOwnProperty("exChange") ? USD.exChange : 1;
   };
 
   const updateLocationParams = loc => {
-    setCenteredForm(loc.pathname === '/');
+    setCenteredForm(loc.pathname === "/");
   };
 
   history.listen(function(loc) {
@@ -86,28 +89,28 @@ export default function App() {
       data: [
         {
           id: 1,
-          order_num: '1596321',
-          requisites: 'ООО "СИБЭЛКОМ-ЛОГИСТИК"',
-          client: 'Телков Вячеслав Алексеевич',
+          order_num: "1596321",
+          requisites: "ООО \"СИБЭЛКОМ-ЛОГИСТИК\"",
+          client: "Телков Вячеслав Алексеевич",
           total: 20156321.36,
           rest: 385962.21,
-          date_create: '25.05.2021',
-          date_delivery: '25.05.2021',
-          chronology: '25.05.2021 — отгружено 20%',
+          date_create: "25.05.2021",
+          date_delivery: "25.05.2021",
+          chronology: "25.05.2021 — отгружено 20%"
         },
         {
           id: 2,
-          order_num: '1596322',
-          requisites: 'ООО "СИБЭЛКОМ-ЛОГИСТИК"',
-          client: 'Телков Вячеслав Алексеевич',
+          order_num: "1596322",
+          requisites: "ООО \"СИБЭЛКОМ-ЛОГИСТИК\"",
+          client: "Телков Вячеслав Алексеевич",
           total: 20156321.36,
           rest: 385962.21,
-          date_create: '25.05.2021',
-          date_delivery: '25.05.2021',
-          chronology: '25.05.2021 — счёт выставлен',
-        },
-      ],
-    },
+          date_create: "25.05.2021",
+          date_delivery: "25.05.2021",
+          chronology: "25.05.2021 — счёт выставлен"
+        }
+      ]
+    }
   ];
 
   const requisitesList = [
@@ -115,58 +118,58 @@ export default function App() {
       data: [
         {
           id: 1,
-          company: 'ООО "СИБЭЛКОМ-ЛОГИСТИК"',
-          inn: '5406617971',
-          account: '40702810504000002378',
-          bank: 'Банк «Левобережный» (ПАО)',
-          bik: '045004850',
-          unallocated: '20 156 698,1235 RUB',
-          available: '20 156 698,1235 RUB',
-          contact: 'Телков Вячеслав Алексеевич',
+          company: "ООО \"СИБЭЛКОМ-ЛОГИСТИК\"",
+          inn: "5406617971",
+          account: "40702810504000002378",
+          bank: "Банк «Левобережный» (ПАО)",
+          bik: "045004850",
+          unallocated: "20 156 698,1235 RUB",
+          available: "20 156 698,1235 RUB",
+          contact: "Телков Вячеслав Алексеевич"
         },
         {
           id: 2,
-          company: 'ООО "СИБЭЛКОМ-ЛОГИСТИК"',
-          inn: '5406617971',
-          account: '40702810504000002378',
-          bank: 'Банк «Левобережный» (ПАО)',
-          bik: '045004850',
-          unallocated: '20 156 698,1235 RUB',
-          available: '20 156 698,1235 RUB',
-          contact: 'Телков Вячеслав Алексеевич',
+          company: "ООО \"СИБЭЛКОМ-ЛОГИСТИК\"",
+          inn: "5406617971",
+          account: "40702810504000002378",
+          bank: "Банк «Левобережный» (ПАО)",
+          bik: "045004850",
+          unallocated: "20 156 698,1235 RUB",
+          available: "20 156 698,1235 RUB",
+          contact: "Телков Вячеслав Алексеевич"
         },
         {
           id: 3,
-          company: 'ООО "СИБЭЛКОМ-ЛОГИСТИК"',
-          inn: '5406617971',
-          account: '40702810504000002378',
-          bank: 'Банк «Левобережный» (ПАО)',
-          bik: '045004850',
-          unallocated: '20 156 698,1235 RUB',
-          available: '20 156 698,1235 RUB',
-          contact: 'Телков Вячеслав Алексеевич',
-        },
-      ],
-    },
+          company: "ООО \"СИБЭЛКОМ-ЛОГИСТИК\"",
+          inn: "5406617971",
+          account: "40702810504000002378",
+          bank: "Банк «Левобережный» (ПАО)",
+          bik: "045004850",
+          unallocated: "20 156 698,1235 RUB",
+          available: "20 156 698,1235 RUB",
+          contact: "Телков Вячеслав Алексеевич"
+        }
+      ]
+    }
   ];
 
   const logOut = () => {
-    window.log && console.log('logOut');
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('catpart-profile');
-    history.push('/');
+    window.log && console.log("logOut");
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("catpart-profile");
+    history.push("/");
     setProfile({});
     setProfileChecked(true);
   };
 
   const needLogin = () => {
-    window.log && console.log('needLogin', profile);
+    window.log && console.log("needLogin", profile);
     logOut();
-    createNotification('success', `Требуется авторизация`, ' ');
+    createNotification("success", `Требуется авторизация`, " ");
   };
 
   const updateStore = (store, options, cb) => {
-    const requestURL = '/search/check_price';
+    const requestURL = "/search/check_price";
 
     apiGET(requestURL, options, data => {
       data.forEach(item => {
@@ -181,7 +184,7 @@ export default function App() {
   };
 
   const updateAll = (store, options, cb) => {
-    const requestURL = '/cart/calculate';
+    const requestURL = "/cart/calculate";
 
     apiPOST(
       requestURL,
@@ -197,33 +200,31 @@ export default function App() {
         });
         cb(store);
       },
-      true,
+      true
     );
   };
 
   const checkSupplierPrices = (store, supplier, done) => {
-    let filteredItems = store.filter(f => (supplier ? f.supplier === supplier : true));
+    const filteredItems = store.filter(f => (supplier ? f.supplier === supplier : true));
 
-    window.log && console.log('filteredItems', filteredItems);
+    window.log && console.log("filteredItems", filteredItems);
 
     if (filteredItems.length) {
-      let totalPrice = filteredItems.reduce((total, l) => l.pricebreaks[findPriceIndex(l.pricebreaks, l.cart)].price * l.cart, 0) / getUSDExchange();
+      const totalPrice = filteredItems.reduce((total, l) => l.pricebreaks[findPriceIndex(l.pricebreaks, l.cart)].price * l.cart, 0) / getUSDExchange();
 
       if (!supplier) {
-        const options = filteredItems.map(m => {
-          return {
-            id: m.id,
-            pricebreaks: m.pricebreaks,
-          };
-        });
+        const options = filteredItems.map(m => ({
+          id: m.id,
+          pricebreaks: m.pricebreaks
+        }));
 
         updateAll(store, options, data => {
-          checkSupplierPrices(data, 'Louisyen', done);
+          checkSupplierPrices(data, "Louisyen", done);
         });
       } else {
         const options = {
           basketPrice: totalPrice,
-          ids: filteredItems.map(m => m.id),
+          ids: filteredItems.map(m => m.id)
         };
 
         if (totalPrice > LOUISYEN_PRICE_LIMIT) {
@@ -252,43 +253,43 @@ export default function App() {
   };
 
   const createNotification = (type, title, text) => {
-    window.log && console.log('createNotification', type, text);
+    window.log && console.log("createNotification", type, text);
 
     switch (type) {
-      case 'info':
+      case "info":
         break;
-      case 'success':
+      case "success":
         store.addNotification({
           title,
           message: text,
-          type: 'default',
-          insert: 'top',
-          container: 'top-right',
-          animationIn: ['animate__animated', 'animate__bounceInRight'],
-          animationOut: ['animate__animated', 'animate__bounceOutRight'],
+          type: "default",
+          insert: "top",
+          container: "top-right",
+          animationIn: ["animate__animated", "animate__bounceInRight"],
+          animationOut: ["animate__animated", "animate__bounceOutRight"],
           dismiss: {
             duration: 20000,
             waitForAnimation: true,
             pauseOnHover: true,
-            onScreen: false,
-          },
+            onScreen: false
+          }
         });
         break;
-      case 'warning':
+      case "warning":
         break;
-      case 'error':
+      case "error":
         break;
     }
   };
 
   const updateCart = (id = null, count = 0, cur = {}, clear = false) => {
-    window.log && console.log('updateCart', id, count);
+    window.log && console.log("updateCart", id, count);
 
     let store = [];
-    let catpartMode = localStorage.getItem('catpart-mode');
-    let catpartStore = localStorage.getItem('catpart');
+    const catpartMode = localStorage.getItem("catpart-mode");
+    const catpartStore = localStorage.getItem("catpart");
 
-    if (catpartStore && catpartStore !== 'undefined') {
+    if (catpartStore && catpartStore !== "undefined") {
       store = getJsonData(catpartStore);
     }
 
@@ -299,10 +300,10 @@ export default function App() {
 
       if (count === 0) {
         if (storeItem) {
-          createNotification('success', `Удален: ${storeItem.name}`, `Количество: ${storeItem.cart}`);
+          createNotification("success", `Удален: ${storeItem.name}`, `Количество: ${storeItem.cart}`);
 
-          if (typeof ym === 'function') {
-            ym(81774553, 'reachGoal', 'removedfromcart');
+          if (typeof ym === "function") {
+            ym(81774553, "reachGoal", "removedfromcart");
           }
 
           store = [...store.filter(f => f.id !== id)];
@@ -312,17 +313,17 @@ export default function App() {
           storeItem.cart = count;
           storeItem.cur = cur;
 
-          createNotification('success', `Обновлен: ${storeItem.name}`, `Количество: ${count}`);
+          createNotification("success", `Обновлен: ${storeItem.name}`, `Количество: ${count}`);
         }
       } else {
         searchData.res.every(query => {
           const item = query.data.find(f => f.id === id);
 
           if (item) {
-            createNotification('success', `Добавлен: ${item.name}`, `Количество: ${count}`);
+            createNotification("success", `Добавлен: ${item.name}`, `Количество: ${count}`);
 
-            if (typeof ym === 'function') {
-              ym(81774553, 'reachGoal', 'addtocart');
+            if (typeof ym === "function") {
+              ym(81774553, "reachGoal", "addtocart");
             }
 
             item.cart = count;
@@ -340,15 +341,15 @@ export default function App() {
     new Promise((res, rej) => {
       if (id < 0) {
         if (profileChecked) {
-          if (profile.hasOwnProperty('id')) {
-            if (catpartMode !== 'auth') {
-              checkSupplierPrices(store, '', res);
+          if (profile.hasOwnProperty("id")) {
+            if (catpartMode !== "auth") {
+              checkSupplierPrices(store, "", res);
             } else {
               res(store);
             }
           } else {
-            if (catpartMode === 'auth') {
-              checkSupplierPrices(store, '', res);
+            if (catpartMode === "auth") {
+              checkSupplierPrices(store, "", res);
             } else {
               res(store);
             }
@@ -356,24 +357,24 @@ export default function App() {
         } else {
           res(store);
         }
-      } else if (window.location.pathname === '/order') {
-        checkSupplierPrices(store, 'Louisyen', res);
+      } else if (window.location.pathname === "/order") {
+        checkSupplierPrices(store, "Louisyen", res);
       } else {
         res(store);
       }
     }).then(store => {
-      localStorage.setItem('catpart', JSON.stringify(store));
+      localStorage.setItem("catpart", JSON.stringify(store));
 
       if (profileChecked) {
-        localStorage.setItem('catpart-mode', profile.hasOwnProperty('id') ? 'auth' : '');
+        localStorage.setItem("catpart-mode", profile.hasOwnProperty("id") ? "auth" : "");
       }
 
       setCartCount(store.length);
 
       if (store.length) {
         setTotalCart(store.reduce((total, c) => total + c.cart * c.pricebreaks[findPriceIndex(c.pricebreaks, c.cart)].price, 0));
-      } else if (window.location.pathname === '/order' && !clear) {
-        history.push('/');
+      } else if (window.location.pathname === "/order" && !clear) {
+        history.push("/");
       }
     });
   };
@@ -384,13 +385,13 @@ export default function App() {
     const form = evt.currentTarget;
 
     if (form) {
-      const art = form.querySelector('#art-number');
-      const quantity = form.querySelector('#quantity');
+      const art = form.querySelector("#art-number");
+      const quantity = form.querySelector("#quantity");
 
-      window.log && console.log('onSubmitSearchForm', art.value);
+      window.log && console.log("onSubmitSearchForm", art.value);
 
       if (art.value.length) {
-        const requestURL = '/search';
+        const requestURL = "/search";
         setSearchResult(true);
         setFormBusy(true);
 
@@ -398,15 +399,15 @@ export default function App() {
 
         setSearchCount(quantity.value || 1);
 
-        history.push(`/search/?art=${encodeURIComponent(art.value) || ''}&q=${encodeURIComponent(quantity.value || 1)}`);
+        history.push(`/search/?art=${encodeURIComponent(art.value) || ""}&q=${encodeURIComponent(quantity.value || 1)}`);
 
         const options = {
           q: art.value,
-          c: quantity.value || 1,
+          c: quantity.value || 1
         };
 
-        if (typeof ym === 'function') {
-          ym(81774553, 'reachGoal', 'usedsearch');
+        if (typeof ym === "function") {
+          ym(81774553, "reachGoal", "usedsearch");
         }
 
         apiGET(requestURL, options, data => {
@@ -421,8 +422,8 @@ export default function App() {
 
   const appHeight = () => {
     const doc = document.documentElement;
-    const sab = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--sab')) || 0;
-    doc.style.setProperty('--app-height', `${Math.max(700, window.innerHeight - sab)}px`);
+    const sab = parseInt(getComputedStyle(document.documentElement).getPropertyValue("--sab")) || 0;
+    doc.style.setProperty("--app-height", `${Math.max(700, window.innerHeight - sab)}px`);
   };
 
   const handleScroll = event => {
@@ -434,27 +435,27 @@ export default function App() {
   useEffect(() => {
     updateLocationParams(window.location);
 
-    const profileLS = localStorage.getItem('catpart-profile');
+    const profileLS = localStorage.getItem("catpart-profile");
 
     if (profileLS) {
       if (validateJSON(profileLS)) {
         setProfile(getJsonData(profileLS));
       } else {
-        localStorage.removeItem('catpart-profile');
+        localStorage.removeItem("catpart-profile");
       }
     }
 
-    document.body.addEventListener('scroll', handleScroll);
+    document.body.addEventListener("scroll", handleScroll);
 
-    window.addEventListener('resize', appHeight);
+    window.addEventListener("resize", appHeight);
 
     appHeight();
 
-    if ('ontouchstart' in document.documentElement) {
-      document.body.style.cursor = 'pointer';
+    if ("ontouchstart" in document.documentElement) {
+      document.body.style.cursor = "pointer";
     }
 
-    const dropContainer = document.getElementById('app');
+    const dropContainer = document.getElementById("app");
 
     dropContainer.ondragover = dropContainer.ondragenter = function(evt) {
       evt.preventDefault();
@@ -469,7 +470,7 @@ export default function App() {
     dropContainer.ondrop = function(evt) {
       evt.preventDefault();
 
-      const fileInput = document.getElementById('file');
+      const fileInput = document.getElementById("file");
 
       setAppDrag(false);
 
@@ -479,14 +480,14 @@ export default function App() {
 
       fileInput.files = dT.files;
 
-      fileInput.dispatchEvent(new Event('change', { bubbles: true }));
+      fileInput.dispatchEvent(new Event("change", { bubbles: true }));
     };
 
     setProfileChecked(true);
 
     return () => {
-      document.body.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('resize', appHeight);
+      document.body.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", appHeight);
 
       dropContainer.ondragover = null;
 
@@ -503,28 +504,43 @@ export default function App() {
   };
 
   useEffect(() => {
-    document.body.classList[formBusy || busyOrder ? 'add' : 'remove']('__busy');
+    document.body.classList[openCatalogue ? "add" : "remove"]("__no-overflow");
+
+    // if (openCatalogue) {
+    //   disableScroll();
+    // } else {
+    //   enableScroll();
+    // }
+  }, [openCatalogue]);
+
+  useEffect(() => {
+    document.body.classList[formBusy || busyOrder ? "add" : "remove"]("__busy");
   }, [formBusy, busyOrder]);
 
   useEffect(() => {
     setAsideOpen(openProfile);
-    updateAsideContent(openProfile ? <Profile notificationFunc={createNotification} logOut={logOut} profile={profile} setProfile={setProfile} /> : null);
+    updateAsideContent(openProfile ? <Profile notificationFunc={createNotification} logOut={logOut} profile={profile}
+                                              setProfile={setProfile} /> : null);
   }, [openProfile]);
 
   useEffect(() => {
     setAsideOpen(openRequisites);
 
-    updateAsideContent(openRequisites ? <ProfileRequisites notificationFunc={createNotification} requisitesId={openRequisites ? openRequisites.id : null} profile={profile} requisites={openRequisites} setProfileRequisites={setProfile} /> : null);
+    updateAsideContent(openRequisites ?
+      <ProfileRequisites notificationFunc={createNotification} requisitesId={openRequisites ? openRequisites.id : null}
+                         profile={profile} requisites={openRequisites} setProfileRequisites={setProfile} /> : null);
   }, [openRequisites]);
 
   useEffect(() => {
     setAsideOpen(openDetails && openDetails.id);
 
-    updateAsideContent(openDetails ? <OrderDetails RUB={RUB} notificationFunc={createNotification} detailsId={openDetails ? openDetails.id : null} profile={profile} order={openDetails} setProfileRequisites={setProfile} /> : null);
+    updateAsideContent(openDetails ?
+      <OrderDetails RUB={RUB} notificationFunc={createNotification} detailsId={openDetails ? openDetails.id : null}
+                    profile={profile} order={openDetails} setProfileRequisites={setProfile} /> : null);
   }, [openDetails]);
 
   useEffect(() => {
-    if (!profile.hasOwnProperty('id')) {
+    if (!profile.hasOwnProperty("id")) {
       setOpenProfile(false);
     }
   }, [profile]);
@@ -538,21 +554,37 @@ export default function App() {
   }, [asideOpen]);
 
   useEffect(() => {
-    console.log('prev', profile);
-    //if (profileChecked) {
+    console.log("prev", profile);
+    // if (profileChecked) {
     updateCart(-1);
-    //}
+    // }
   }, [profile]);
 
-  window.log = ['localhost', 'html'].indexOf(location.hostname.split('.')[0]) > -1;
+  window.log = ["localhost", "html"].indexOf(location.hostname.split(".")[0]) > -1;
 
   return (
     <>
-      <div className={`app-wrapper${appDrag ? ' __over' : ''}`}>
-        <Header setOpenAuthPopup={setOpenAuthPopup} openAuthPopup={openAuthPopup} notificationFunc={createNotification} setProfile={setProfile} history={history} profile={profile} cartCount={cartCount} openMobMenu={openMobMenu} setOpenMobMenu={setOpenMobMenu} />
+      <div className={`app-wrapper${appDrag ? " __over" : ""}`}>
+        <Header
+          setOpenAuthPopup={setOpenAuthPopup}
+          openAuthPopup={openAuthPopup}
+          notificationFunc={createNotification}
+          setProfile={setProfile}
+          history={history}
+          profile={profile}
+          cartCount={cartCount}
+          openMobMenu={openMobMenu}
+          setOpenMobMenu={setOpenMobMenu}
+          setOpenCatalogue={setOpenCatalogue}
+          openCatalogue={openCatalogue}
+        />
 
-        <main className={`main${centeredForm ? ' __center' : ''}`}>
-          <SearchForm setFormBusy={setFormBusy} history={history} setSearchData={setSearchData} setOpenMobMenu={setOpenMobMenu} busyOrder={busyOrder} busy={formBusy} onSubmitForm={onSubmitSearchForm} notificationFunc={createNotification} />
+        {openCatalogue ? <Catalogue setOpenCatalogue={setOpenCatalogue} history={history} /> : null}
+
+        <main className={`main${centeredForm ? " __center" : ""}`}>
+          <SearchForm setFormBusy={setFormBusy} history={history} setSearchData={setSearchData}
+                      setOpenMobMenu={setOpenMobMenu} busyOrder={busyOrder} busy={formBusy}
+                      onSubmitForm={onSubmitSearchForm} notificationFunc={createNotification} />
 
           <div className="main-content">
             {orderSent ? (
@@ -575,17 +607,20 @@ export default function App() {
                   )}
                 />
 
-                {/*<Route path="/about" render={routeProps => <FeaturePage updateCart={updateCart} notificationFunc={createNotification} setOrderSent={setOrderSent} totalCart={totalCart} currency={currency} setOpenMobMenu={setOpenMobMenu} {...routeProps} />} />*/}
+                {/* <Route path="/about" render={routeProps => <FeaturePage updateCart={updateCart} notificationFunc={createNotification} setOrderSent={setOrderSent} totalCart={totalCart} currency={currency} setOpenMobMenu={setOpenMobMenu} {...routeProps} />} /> */}
 
-                {/*<Route path="/delivery" render={routeProps => <DeliveryPage setOpenMobMenu={setOpenMobMenu} {...routeProps} />} />*/}
+                {/* <Route path="/delivery" render={routeProps => <DeliveryPage setOpenMobMenu={setOpenMobMenu} {...routeProps} />} /> */}
 
-                {/*<Route path="/contacts" render={routeProps => <ContactsPage setOpenMobMenu={setOpenMobMenu} {...routeProps} />} />*/}
+                {/* <Route path="/contacts" render={routeProps => <ContactsPage setOpenMobMenu={setOpenMobMenu} {...routeProps} />} /> */}
 
-                {/*<Route path="/privacy-policy" render={routeProps => <PolicyPage setOpenMobMenu={setOpenMobMenu} {...routeProps} />} />*/}
+                {/* <Route path="/privacy-policy" render={routeProps => <PolicyPage setOpenMobMenu={setOpenMobMenu} {...routeProps} />} /> */}
 
                 <Route
-                  path={['/contacts', '/about', '/test', '/delivery', '/privacy-policy']}
-                  render={routeProps => <FeaturePage setTableHeadFixed={setTableHeadFixed} updateCart={updateCart} notificationFunc={createNotification} setOrderSent={setOrderSent} totalCart={totalCart} currency={currency} setOpenMobMenu={setOpenMobMenu} {...routeProps} />}
+                  path={["/contacts", "/about", "/test", "/delivery", "/privacy-policy"]}
+                  render={routeProps => <FeaturePage setTableHeadFixed={setTableHeadFixed} updateCart={updateCart}
+                                                     notificationFunc={createNotification} setOrderSent={setOrderSent}
+                                                     totalCart={totalCart} currency={currency}
+                                                     setOpenMobMenu={setOpenMobMenu} {...routeProps} />}
                 />
 
                 <Route
@@ -686,7 +721,8 @@ export default function App() {
                   )}
                 />
 
-                <Route path="" render={routeProps => <NotFoundPage setOpenMobMenu={setOpenMobMenu} {...routeProps} />} />
+                <Route path=""
+                       render={routeProps => <NotFoundPage setOpenMobMenu={setOpenMobMenu} {...routeProps} />} />
               </Switch>
             )}
           </div>
@@ -696,7 +732,7 @@ export default function App() {
         <Footer />
       </div>
 
-      <AsideContainer className={asideOpen ? ' __opened' : ''} setAsideOpen={setAsideOpen}>
+      <AsideContainer className={asideOpen ? " __opened" : ""} setAsideOpen={setAsideOpen}>
         {asideContent}
       </AsideContainer>
 

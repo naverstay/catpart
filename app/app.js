@@ -17,17 +17,11 @@ import FontFaceObserver from 'fontfaceobserver';
 import history from 'utils/history';
 import './styles/app.scss';
 
-Number.prototype.toFixedCustom = function(decimals) {
-  let base = Math.pow(10, decimals);
-  //console.log('toFixedCustom', this, decimals, Math.round((this + Number.EPSILON) * base) / base);
-  return Math.round((this + Number.EPSILON) * base) / base;
-};
-
 // Import root app
 import App from 'containers/App';
 
 // Import Language Provider
-//import LanguageProvider from 'containers/LanguageProvider';
+// import LanguageProvider from 'containers/LanguageProvider';
 
 // Load the favicon and the .htaccess file
 import '!file-loader?name=[name].[ext]!./favicon.ico';
@@ -37,7 +31,7 @@ import '!file-loader?name=[name].[ext]!./favicon-32x32.png';
 import '!file-loader?name=[name].[ext]!./safari-pinned-tab.svg';
 import '!file-loader?name=[name].[ext]!./site.webmanifest';
 import '!file-loader?name=[name].[ext]!./mstile-150x150.png';
-import '!file-loader?name=[name].[ext]!./browserconfig.xml';
+
 import '!file-loader?name=[name].[ext]!./apple-touch-icon-152x152.png';
 import '!file-loader?name=[name].[ext]!./android-chrome-192x192.png';
 import '!file-loader?name=[name].[ext]!./apple-touch-icon-60x60.png';
@@ -57,6 +51,12 @@ import 'file-loader?name=.htaccess!./.htaccess';
 
 import configureStore from './configureStore';
 
+Number.prototype.toFixedCustom = function(decimals) {
+  const base = Math.pow(10, decimals);
+  // console.log('toFixedCustom', this, decimals, Math.round((this + Number.EPSILON) * base) / base);
+  return Math.round((this + Number.EPSILON) * base) / base;
+};
+
 // Observe loading of Open Sans (to remove open sans, remove the <link> tag in
 // the index.html file and this observer)
 const openSansObserver = new FontFaceObserver('Open Sans', {});
@@ -74,11 +74,11 @@ const MOUNT_NODE = document.getElementById('app');
 const render = messages => {
   ReactDOM.render(
     <Provider store={store}>
-      {/*<LanguageProvider messages={messages}>*/}
+      {/* <LanguageProvider messages={messages}> */}
       <ConnectedRouter history={history}>
         <App />
       </ConnectedRouter>
-      {/*</LanguageProvider>*/}
+      {/* </LanguageProvider> */}
     </Provider>,
     MOUNT_NODE,
   );
@@ -121,5 +121,5 @@ if (process.env.NODE_ENV === 'production') {
     },
   });
 
-  //require('offline-plugin/runtime').install(); // eslint-disable-line global-require
+  // require('offline-plugin/runtime').install(); // eslint-disable-line global-require
 }

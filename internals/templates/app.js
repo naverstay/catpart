@@ -31,7 +31,7 @@ import '!file-loader?name=[name].[ext]!./favicon-32x32.png';
 import '!file-loader?name=[name].[ext]!./safari-pinned-tab.svg';
 import '!file-loader?name=[name].[ext]!./site.webmanifest';
 import '!file-loader?name=[name].[ext]!./mstile-150x150.png';
-import '!file-loader?name=[name].[ext]!./browserconfig.xml';
+
 import '!file-loader?name=[name].[ext]!./apple-touch-icon-152x152.png';
 import '!file-loader?name=[name].[ext]!./android-chrome-192x192.png';
 import '!file-loader?name=[name].[ext]!./apple-touch-icon-60x60.png';

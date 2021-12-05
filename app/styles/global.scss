@@ -42,6 +42,8 @@ body {
   width: 100%;
   line-height: 1.2;
   overflow-x: hidden;
+  text-size-adjust: 100%;
+  text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -webkit-touch-callout: none;
 }
@@ -50,6 +52,15 @@ body {
   overflow-y: scroll;
   font-family: 'Open Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
   touch-action: pan-y pan-x;
+
+  &.__no-overflow {
+    overflow-y: scroll;
+
+    #app {
+      height: 100%;
+      overflow: hidden;
+    }
+  }
 
   &.__busy {
     cursor: not-allowed;
@@ -84,6 +95,7 @@ ul {
 }
 
 .app-wrapper {
+  position: relative;
   width: 100%;
   margin: 0 auto;
   display: flex;

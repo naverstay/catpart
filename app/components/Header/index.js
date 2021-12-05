@@ -8,7 +8,7 @@ import apiPOST from '../../utils/upload';
 import apiGET from '../../utils/search';
 import { getJsonData } from '../../utils/getJsonData';
 
-function Header({ history, notificationFunc, openAuthPopup, setOpenAuthPopup, openMobMenu, cartCount, profile, setProfile, setOpenMobMenu }) {
+function Header({ history, notificationFunc, openAuthPopup, setOpenAuthPopup, openMobMenu, openCatalogue, cartCount, profile, setProfile, setOpenMobMenu, setOpenCatalogue }) {
   const headerRef = useDetectClickOutside({
     onTriggered: () => {
       setOpenMobMenu(false);
@@ -88,7 +88,7 @@ function Header({ history, notificationFunc, openAuthPopup, setOpenAuthPopup, op
         break;
     }
 
-    //localStorage.setItem('catpart-user', JSON.stringify(fields));
+    // localStorage.setItem('catpart-user', JSON.stringify(fields));
 
     setErrors(errors);
 
@@ -108,7 +108,7 @@ function Header({ history, notificationFunc, openAuthPopup, setOpenAuthPopup, op
         break;
     }
 
-    //localStorage.setItem('catpart-user', JSON.stringify(fields));
+    // localStorage.setItem('catpart-user', JSON.stringify(fields));
 
     setResetErrors(resetErrors);
 
@@ -141,20 +141,20 @@ function Header({ history, notificationFunc, openAuthPopup, setOpenAuthPopup, op
 
     setOpenAuthPopup(false);
 
-    //const url = '/set/deal';
+    // const url = '/set/deal';
     //
-    //let store = localStorage.getItem('catpart');
+    // let store = localStorage.getItem('catpart');
     //
-    //if (store) {
+    // if (store) {
     //  store = JSON.parse(store);
-    //} else {
+    // } else {
     //  store = {};
-    //}
+    // }
     //
-    //if (!store.hasOwnProperty('order')) {
+    // if (!store.hasOwnProperty('order')) {
     //  store.order = [];
     //  localStorage.setItem('catpart', JSON.stringify(store));
-    //}
+    // }
   };
 
   const resetSubmit = e => {
@@ -182,12 +182,12 @@ function Header({ history, notificationFunc, openAuthPopup, setOpenAuthPopup, op
     });
   };
 
-  //useEffect(() => {
+  // useEffect(() => {
   //  if (openAuthPopup) {
   //    handleChange('auth-login', { target: loginInput.current });
   //    handleChange('auth-password', { target: passwordInput.current });
   //  }
-  //}, [openAuthPopup]);
+  // }, [openAuthPopup]);
 
   useEffect(() => {
     let userFields = {};
@@ -228,12 +228,23 @@ function Header({ history, notificationFunc, openAuthPopup, setOpenAuthPopup, op
         <Link to="/" className="header-logo">
           catpart.ru
         </Link>
+        <Ripples
+          during={1000}
+          className="btn __blue btn-catalogue"
+          onClick={() => {
+            setOpenCatalogue(!openCatalogue);
+          }}
+        >
+          <span className="btn-inner">
+            {openCatalogue ? <span className="catalogue-close icon icon-close" /> : null}
+            <span className="__dotted">Каталог</span>
+          </span>
+        </Ripples>
         <a href="tel:88005057388" className="header-phone __blue">
           <span className="btn__icon icon icon-call" />
           <span>8-800-505-73-88</span>
         </a>
       </div>
-
       <div className="header-navbar">
         <ul className="header-navbar__list">
           <li>
@@ -241,11 +252,11 @@ function Header({ history, notificationFunc, openAuthPopup, setOpenAuthPopup, op
               О компании
             </Link>
           </li>
-          {/*<li>*/}
-          {/*  <Link className="header-navbar__link" to="/distributors">*/}
-          {/*    Поставщики*/}
-          {/*  </Link>*/}
-          {/*</li>*/}
+          {/* <li> */}
+          {/*  <Link className="header-navbar__link" to="/distributors"> */}
+          {/*    Поставщики */}
+          {/*  </Link> */}
+          {/* </li> */}
           <li>
             <Link className="header-navbar__link" to="/delivery">
               Доставка
@@ -256,55 +267,55 @@ function Header({ history, notificationFunc, openAuthPopup, setOpenAuthPopup, op
               Контакты
             </Link>
           </li>
-          {/*<li>*/}
-          {/*  <Link className="header-navbar__link" to="/conditions">*/}
-          {/*    Условия*/}
-          {/*  </Link>*/}
-          {/*</li>*/}
-          {/*<li>*/}
-          {/*  <Link className="header-navbar__link" to="/requisites">*/}
-          {/*    Реквизиты*/}
-          {/*  </Link>*/}
-          {/*</li>*/}
-          {/*<li>*/}
-          {/*  <Link className="header-navbar__link" to="/vacancies ">*/}
-          {/*    Вакансии*/}
-          {/*  </Link>*/}
-          {/*</li>*/}
+          {/* <li> */}
+          {/*  <Link className="header-navbar__link" to="/conditions"> */}
+          {/*    Условия */}
+          {/*  </Link> */}
+          {/* </li> */}
+          {/* <li> */}
+          {/*  <Link className="header-navbar__link" to="/requisites"> */}
+          {/*    Реквизиты */}
+          {/*  </Link> */}
+          {/* </li> */}
+          {/* <li> */}
+          {/*  <Link className="header-navbar__link" to="/vacancies "> */}
+          {/*    Вакансии */}
+          {/*  </Link> */}
+          {/* </li> */}
         </ul>
       </div>
 
-      <div className={'header-right __auth'}>
+      <div className="header-right __auth">
         {profile.hasOwnProperty('id') ? (
-          <Ripples during={1000} className={'btn __blue'}>
+          <Ripples during={1000} className="btn __blue">
             {history.location.pathname === '/orders' ? (
               <span className="btn-inner">
-                <span className={'__dotted'}>{profile.contact_name}</span>
+                <span className="__dotted">{profile.contact_name}</span>
               </span>
             ) : (
-              <Link to={'/orders'} className="btn-inner">
-                <span className={'__dotted'}>{profile.contact_name}</span>
+              <Link to="/orders" className="btn-inner">
+                <span className="__dotted">{profile.contact_name}</span>
               </Link>
             )}
           </Ripples>
         ) : (
-          <div ref={popupRef} className={'header-popup__holder'}>
+          <div ref={popupRef} className="header-popup__holder">
             <Ripples
               onClick={() => {
                 setOpenAuthPopup(!openAuthPopup);
                 window.log && console.log('open', openAuthPopup);
               }}
               during={1000}
-              className={'btn __blue'}
+              className="btn __blue"
             >
               <span className="btn-inner">
-                <span className={'__dotted'}>Личный кабинет</span>
+                <span className="__dotted">Личный кабинет</span>
               </span>
             </Ripples>
 
             {openAuthPopup || openResetPassword ? (
               <div className="header-popup">
-                <h3 className={'header-popup__title'}>{openResetPassword ? 'Восстановление пароля' : 'Авторизация'}</h3>
+                <h3 className="header-popup__title">{openResetPassword ? 'Восстановление пароля' : 'Авторизация'}</h3>
                 <p>{openResetPassword ? 'Укажите вашу электронную почту или логин для восстановления пароля' : 'Введите логин и пароль для входа в систему'}</p>
 
                 {openAuthPopup ? (
@@ -324,7 +335,7 @@ function Header({ history, notificationFunc, openAuthPopup, setOpenAuthPopup, op
                       name="auth-password"
                       //
                       error={errors['auth-password']}
-                      //defaultValue={'12345678'}
+                      // defaultValue={'12345678'}
                       className="__lg"
                       inputRef={passwordInput}
                     />
@@ -376,10 +387,10 @@ function Header({ history, notificationFunc, openAuthPopup, setOpenAuthPopup, op
         )}
 
         <div className="header-order">
-          <Ripples during={1000} className={'btn __blue' + (cartCount ? '' : ' __disabled')}>
-            <Link to={'/order'} className="btn-inner">
-              <span className={'header-order__label'}>Заказ</span>
-              <span className={'header-order__count'}>{cartCount}</span>
+          <Ripples during={1000} className={`btn __blue${cartCount ? '' : ' __disabled'}`}>
+            <Link to="/order" className="btn-inner">
+              <span className="header-order__label">Заказ</span>
+              <span className="header-order__count">{cartCount}</span>
             </Link>
           </Ripples>
         </div>
