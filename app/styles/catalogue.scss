@@ -1,3 +1,5 @@
+@import 'node_modules/swiper/swiper';
+
 .catalogue {
   position: absolute;
   right: 0;
@@ -6,6 +8,16 @@
   top: 102px;
   z-index: 10;
   background: #fff;
+  transition: transform .3s, opacity .3s;
+  transform: translateX(100%);
+  opacity: 0;
+  pointer-events: none;
+
+  &.__open {
+    opacity: 1;
+    pointer-events: all;
+    transform: translateX(0);
+  }
 
   &__inner {
     overflow-y: hidden;
@@ -18,233 +30,6 @@
 
   @include respond-to-min($tablet) {
     top: 80px;
-  }
-
-  /** appearance **/
-  .bmenu {
-    font-size: 14px;
-  }
-
-  nav.bmenu {
-    position: relative;
-    display: flex;
-    flex-flow: column wrap;
-    overflow-y: hidden;
-    overflow-x: auto;
-    padding: 1.25rem 0 1.25rem 1.25rem;
-    max-width: fit-content;
-    box-sizing: border-box;
-    height: 100%;
-  }
-
-  nav.bmenu a:link,
-  nav.bmenu a:visited {
-    color: inherit;
-    text-decoration: none;
-  }
-
-  nav.bmenu > * {
-    vertical-align: top;
-  }
-
-  nav.bmenu > a {
-    float: left;
-    clear: both;
-    width: 270px;
-  }
-
-  .bmenu header {
-    display: block;
-    font-weight: bold;
-    margin: 0;
-    height: 2em;
-    line-height: 2em;
-  }
-
-  nav.bmenu article.panel::before {
-    content: "";
-    display: block;
-    z-index: 2000;
-    width: 0;
-    border-left: 1px solid white;
-    border-color: inherit;
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    box-sizing: border-box;
-  }
-
-  nav.bmenu a {
-    position: relative;
-    display: block;
-    padding: 10px 30px;
-    min-width: 270px;
-    color: #878787;
-    line-height: 1.167;
-    cursor: pointer;
-    transition: background .3s, color .3s;
-
-    &:hover {
-      color: #fff;
-      background: $main_blue;
-    }
-  }
-
-  nav.bmenu article.panel {
-    display: none;
-    position: relative;
-  }
-
-  nav.bmenu article.panel section.titled-group {
-    min-width: 160px;
-  }
-
-  nav.bmenu section.titled-group:not(:first-of-type) {
-    margin-top: 2em;
-  }
-
-  nav.bmenu div.column {
-    min-width: 270px;
-  }
-
-  label.bmenu.toggle {
-    display: inline-block;
-    padding: 0 0.75rem;
-    border: 1px solid black;
-  }
-
-  .hidden {
-    display: none;
-  }
-
-  /** behaviour **/
-  .bmenu a,
-  label.bmenu {
-    cursor: pointer;
-  }
-
-  article.panel {
-    display: none;
-  }
-
-  @for $i from 1 through 12 {
-    nav.bmenu > a:nth-of-type(#{$i}) {
-      &:hover,
-      &:focus {
-        ~ article.panel:nth-of-type(#{$i}) {
-          display: inline-flex;
-        }
-      }
-    }
-
-    nav.bmenu > a:hover:not(.no-panel) ~ a:focus:nth-of-type(#{$i}) ~ article.panel:nth-of-type(#{$i}),
-    nav.bmenu > a:focus:nth-of-type(#{$i}) ~ a:hover:not(.no-panel) ~ article.panel:nth-of-type(#{$i}) {
-      display: none;
-    }
-
-    nav.bmenu > a:nth-of-type(#{$i}):focus ~ article.panel:hover ~ article.panel:nth-of-type(#{$i}) {
-      display: none;
-    }
-  }
-
-  nav.bmenu > article.panel:hover {
-    display: inline-flex;
-  }
-
-  nav.bmenu > article.panel:hover ~ article.panel {
-    display: none;
-  }
-
-  nav.bmenu > a:not(.no-panel):hover::before,
-  nav.bmenu > a:not(.no-panel):focus::before {
-    content: "";
-    position: absolute;
-    z-index: 1000;
-    display: block;
-    left: -1.25rem;
-    top: 0;
-    height: 100%;
-    width: 0.3em;
-    background-color: white;
-  }
-
-  nav.bmenu > a:not(.no-panel)::after {
-    //content: "";
-    position: absolute;
-    z-index: 1000;
-    display: block;
-    height: 0.5em;
-    width: 0.5em;
-    border: 1px solid grey;
-    border-bottom: 0;
-    border-left: 0;
-    /* centered vertically and pointing right */
-    /* just maths, bitches, MATHS */
-    right: calc(0.5 * 0.5em + 1.25em);
-    top: calc(50% + 0.5 * 0.5 * 0.5em);
-    -ms-transform: rotate(45deg) translate(-50%, -50%);
-    -webkit-transform: rotate(45deg) translate(-50%, -50%);
-    transform: rotate(45deg) translate(-50%, -50%);
-  }
-
-  nav.bmenu.animated > a::after {
-    transition: border-color 0.2s ease;
-  }
-
-  /** triangular hover regions **/
-  nav.bmenu.panel > a {
-    position: relative;
-  }
-
-  nav.bmenu.panel > a > span.triangle-origin {
-    display: inline-block;
-    width: 100%;
-    height: 100%;
-  }
-
-  nav.bmenu.panel > a > span.triangle-origin:hover::after {
-    background: transparent;
-    z-index: 1001;
-    display: block;
-    position: absolute;
-    width: 200px;
-    height: 200px;
-    right: -300px;
-    top: 0;
-    content: "";
-    /**
-    outline: 1px solid lime;
-    **/
-    -ms-transform: rotate(-45deg) skew(20deg, 20deg) translate(0, -100%);
-    -webkit-transform: rotate(-45deg) skew(20deg, 20deg) translate(0, -100%);
-    transform: rotate(-45deg) skew(20deg, 20deg) translate(0, -100%);
-  }
-
-  nav.bmenu.panel > article.panel {
-    position: relative;
-    z-index: 1002;
-    height: 100%;
-    overflow-x: hidden;
-    overflow-y: auto;
-    width: 270px;
-  }
-
-  /** specific cross browser **/
-  @supports (-ms-ime-align: auto) {
-    nav.bmenu.panel {
-      display: table;
-    }
-    nav.bmenu.animated > a::after {
-      transition: 0s;
-    }
-  }
-  @media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
-    nav.bmenu.panel {
-      display: table;
-    }
-    nav.bmenu.animated > a::after {
-      transition: 0s;
-    }
   }
 
   &__list {
@@ -277,9 +62,10 @@
       text-decoration: none;
       position: relative;
       display: block;
-      padding: 10px 30px;
+      padding: 8px 30px;
       min-width: 270px;
       color: #878787;
+      font-size: 12px;
       line-height: 1.167;
       cursor: pointer;
       transition: background .3s, color .3s;
@@ -310,4 +96,140 @@
     }
   }
 
+  &-page {
+
+    &__scroller {
+      margin: 10px 0;
+      overflow-y: hidden;
+      overflow-x: auto;
+    }
+
+    &__analogue {
+      position: relative;
+      padding-left: 115px;
+
+      &::before {
+        right: 100%;
+        background: #fff;
+      }
+
+      &::after {
+        left: 100%;
+        background: -moz-linear-gradient(left, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 1) 100%);
+        background: -webkit-linear-gradient(left, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 1) 100%);
+        background: linear-gradient(to right, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 1) 100%);
+        filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#00ffffff', endColorstr='#ffffff', GradientType=1);
+      }
+
+      &::after,
+      &::before {
+        z-index: 2;
+        content: '';
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: calc((100vw - 100%) / 2);
+      }
+
+      .analogue-slider__button {
+        @extend .icon;
+        @extend .icon-chevron-up;
+        z-index: 3;
+        position: absolute;
+        top: 50%;
+        margin-top: -15px;
+        right: -5px;
+        padding: 0;
+        font-size: 16px;
+
+        &.swiper-button-disabled {
+          color: #fff;
+          background: #c6c6c6;
+          box-shadow: none !important;
+          pointer-events: none;
+        }
+
+        &--next {
+          margin-right: -32px;
+
+          &::before {
+            transform: rotate(90deg);
+          }
+        }
+
+        &--prev {
+          &::before {
+            transform: rotate(-90deg);
+          }
+        }
+      }
+
+      &-title {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 110px;
+        bottom: 0;
+        z-index: 2;
+        background: #fff;
+        text-align: right;
+      }
+
+      &-param {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        color: #646464;
+        padding: 5px;
+        min-height: 58px;
+      }
+
+      &-item {
+        height: 100%;
+        display: grid;
+        grid-template-columns: 1fr;
+      }
+
+      &-slider {
+        position: relative;
+
+        .swiper-slide {
+          .catalogue-page__analogue-param {
+            border-radius: 4px;
+
+            &.__odd {
+              background: $main_gray_light;
+            }
+          }
+        }
+      }
+
+      @include respond-to-max($tablet + 40px) {
+        .analogue-slider__button {
+          top: -35px;
+          right: 30px;
+        }
+      }
+    }
+
+    &__full {
+      padding: 0 3px;
+      margin: 80px calc((100vw - 100%) / -2) 40px calc(130px + (100vw - 100%) / -2);
+
+      @include respond-to-max($wide) {
+        margin: 40px calc((100vw - 100%) / -2);
+      }
+    }
+
+    &__table {
+      width: 15000px;
+    }
+
+    &__snippet {
+      min-width: 1080px;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+    }
+  }
 }

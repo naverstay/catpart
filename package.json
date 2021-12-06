@@ -93,6 +93,7 @@
     "react-file-drop": "^3.1.2",
     "react-helmet": "6.0.0-beta",
     "react-hook-form": "^7.9.0",
+    "react-id-swiper": "^4.0.0",
     "react-infinite-scroll-component": "^6.1.0",
     "react-intl": "2.8.0",
     "react-notifications": "^1.7.2",
@@ -110,6 +111,7 @@
     "sanitize.css": "8.0.0",
     "sass-loader": "^10.1.1",
     "styled-components": "4.2.0",
+    "swiper": "^7.3.1",
     "tsv-json": "^2.0.0",
     "xlsx": "^0.17.0"
   },

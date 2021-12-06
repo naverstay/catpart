@@ -1,34 +1,46 @@
-import React, { useEffect, useState } from 'react';
-import { useDetectClickOutside } from 'react-detect-click-outside';
-import { Link } from 'react-router-dom';
-import Ripples from 'react-ripples';
-import FormInput from '../FormInput';
-import { validateEmail } from '../../utils/validateEmail';
-import apiPOST from '../../utils/upload';
-import apiGET from '../../utils/search';
-import { getJsonData } from '../../utils/getJsonData';
+import React, { useEffect, useState } from "react";
+import { useDetectClickOutside } from "react-detect-click-outside";
+import { Link } from "react-router-dom";
+import Ripples from "react-ripples";
+import FormInput from "../FormInput";
+import { validateEmail } from "../../utils/validateEmail";
+import apiPOST from "../../utils/upload";
+import apiGET from "../../utils/search";
+import { getJsonData } from "../../utils/getJsonData";
 
-function Header({ history, notificationFunc, openAuthPopup, setOpenAuthPopup, openMobMenu, openCatalogue, cartCount, profile, setProfile, setOpenMobMenu, setOpenCatalogue }) {
+function Header({
+  history,
+  notificationFunc,
+  openAuthPopup,
+  setOpenAuthPopup,
+  openMobMenu,
+  openCatalogue,
+  cartCount,
+  profile,
+  setProfile,
+  setOpenMobMenu,
+  setOpenCatalogue
+}) {
   const headerRef = useDetectClickOutside({
     onTriggered: () => {
       setOpenMobMenu(false);
-    },
+    }
   });
 
   const [fields, setFields] = useState({
-    'auth-login': '',
-    'auth-password': '',
+    "auth-login": "",
+    "auth-password": ""
   });
   const [errors, setErrors] = useState({
-    'auth-login': null,
-    'auth-password': null,
+    "auth-login": null,
+    "auth-password": null
   });
 
   const [resetFields, setResetFields] = useState({
-    'auth-email': '',
+    "auth-email": ""
   });
   const [resetErrors, setResetErrors] = useState({
-    'auth-email': null,
+    "auth-email": null
   });
 
   const authRef = React.createRef();
@@ -42,49 +54,49 @@ function Header({ history, notificationFunc, openAuthPopup, setOpenAuthPopup, op
 
   const [justRedraw, setJustRedraw] = useState(0);
   const [validResetForm, setValidResetForm] = useState(false);
-  let userEmail = '';
+  let userEmail = "";
 
   const popupRef = useDetectClickOutside({
     onTriggered: () => {
       setOpenResetPassword(false);
       setOpenAuthPopup(false);
-    },
+    }
   });
 
   const getUserData = () => {
-    const requestURL = '/auth/me';
+    const requestURL = "/auth/me";
 
     apiGET(requestURL, {}, data => {
-      const user = localStorage.getItem('catpart-user');
+      const user = localStorage.getItem("catpart-user");
       let userFields = {};
 
       if (user) {
         userFields = getJsonData(user);
       }
 
-      userFields['order-name'] = data.contact_name;
-      userFields['order-email'] = data.email;
-      userFields['order-phone'] = data.contact_phone;
+      userFields["order-name"] = data.contact_name;
+      userFields["order-email"] = data.email;
+      userFields["order-phone"] = data.contact_phone;
 
-      localStorage.setItem('catpart-user', JSON.stringify(userFields));
-      localStorage.setItem('catpart-profile', JSON.stringify(data));
+      localStorage.setItem("catpart-user", JSON.stringify(userFields));
+      localStorage.setItem("catpart-profile", JSON.stringify(data));
 
       setProfile(data);
-      history.push('/orders');
+      history.push("/orders");
     });
   };
 
   const handleChange = (field, e) => {
-    window.log && console.log('handleChange', field, e);
+    window.log && console.log("handleChange", field, e);
     fields[field] = e.target.value;
     setFields(fields);
 
     switch (field) {
-      case 'auth-login':
-        errors[field] = e.target.value.length ? '' : 'Не может быть пустым';
+      case "auth-login":
+        errors[field] = e.target.value.length ? "" : "Не может быть пустым";
         break;
-      case 'auth-password':
-        errors[field] = e.target.value.length >= 8 ? '' : 'Минимум 8 символов';
+      case "auth-password":
+        errors[field] = e.target.value.length >= 8 ? "" : "Минимум 8 символов";
         break;
     }
 
@@ -98,13 +110,13 @@ function Header({ history, notificationFunc, openAuthPopup, setOpenAuthPopup, op
   };
 
   const handleResetChange = (field, e) => {
-    window.log && console.log('handleResetChange', field, e);
+    window.log && console.log("handleResetChange", field, e);
     resetFields[field] = e.target.value;
     setResetFields(resetFields);
 
     switch (field) {
-      case 'auth-email':
-        resetErrors[field] = e.target.value.length && validateEmail(e.target.value) ? '' : 'Проверьте формат e-mail';
+      case "auth-email":
+        resetErrors[field] = e.target.value.length && validateEmail(e.target.value) ? "" : "Проверьте формат e-mail";
         break;
     }
 
@@ -118,23 +130,23 @@ function Header({ history, notificationFunc, openAuthPopup, setOpenAuthPopup, op
   const authSubmit = e => {
     e.preventDefault();
 
-    window.log && console.log('authSubmit');
+    window.log && console.log("authSubmit");
 
-    const requestURL = '/auth/login';
+    const requestURL = "/auth/login";
 
     const formData = new FormData();
     const options = {};
 
-    formData.append('email', loginInput.current.value);
-    formData.append('password', passwordInput.current.value);
+    formData.append("email", loginInput.current.value);
+    formData.append("password", passwordInput.current.value);
 
     apiPOST(requestURL, formData, options, data => {
-      window.log && console.log('access_token', data);
+      window.log && console.log("access_token", data);
 
       if (data.error) {
-        notificationFunc('success', `Авторизация не удалась. `, 'Проверьте логин/пароль.');
+        notificationFunc("success", `Авторизация не удалась. `, "Проверьте логин/пароль.");
       } else {
-        localStorage.setItem('access_token', data.access_token);
+        localStorage.setItem("access_token", data.access_token);
         getUserData();
       }
     });
@@ -160,24 +172,24 @@ function Header({ history, notificationFunc, openAuthPopup, setOpenAuthPopup, op
   const resetSubmit = e => {
     e.preventDefault();
 
-    window.log && console.log('resetSubmit');
+    window.log && console.log("resetSubmit");
 
     setOpenResetPassword(false);
 
-    const requestURL = '/auth/restore';
+    const requestURL = "/auth/restore";
 
     const formData = new FormData();
     const options = {};
 
-    formData.append('email', emailInput.current.value);
+    formData.append("email", emailInput.current.value);
 
     apiPOST(requestURL, formData, options, data => {
-      window.log && console.log('data', data);
+      window.log && console.log("data", data);
 
       if (data.error) {
-        notificationFunc('success', `Письмо не отправлено. `, 'Такого аккаунта не существует.');
+        notificationFunc("success", `Письмо не отправлено. `, "Такого аккаунта не существует.");
       } else {
-        notificationFunc('success', `Письмо отправлено. `, 'Проверьте почту.');
+        notificationFunc("success", `Письмо отправлено. `, "Проверьте почту.");
       }
     });
   };
@@ -193,27 +205,27 @@ function Header({ history, notificationFunc, openAuthPopup, setOpenAuthPopup, op
     let userFields = {};
 
     if (loginInput && loginInput.current) {
-      const user = localStorage.getItem('catpart-user');
+      const user = localStorage.getItem("catpart-user");
 
-      if (history.location.pathname === '/order' && user) {
+      if (history.location.pathname === "/order" && user) {
         userFields = getJsonData(user);
 
-        if (userFields.hasOwnProperty('order-email')) {
-          userEmail = userFields['order-email'];
+        if (userFields.hasOwnProperty("order-email")) {
+          userEmail = userFields["order-email"];
           loginInput.current.value = userEmail;
-          handleChange('auth-login', { target: loginInput.current });
+          handleChange("auth-login", { target: loginInput.current });
         }
       } else {
         setErrors({
-          'auth-login': null,
-          'auth-password': null,
+          "auth-login": null,
+          "auth-password": null
         });
       }
     }
   }, [openAuthPopup]);
 
   return (
-    <header ref={headerRef} className={`header${openMobMenu ? ' __open-mob-menu' : ''}`}>
+    <header ref={headerRef} className={`header${openMobMenu ? " __open-mob-menu" : ""}`}>
       <div className="header-left">
         <div
           onClick={() => {
@@ -236,7 +248,11 @@ function Header({ history, notificationFunc, openAuthPopup, setOpenAuthPopup, op
           }}
         >
           <span className="btn-inner">
-            {openCatalogue ? <span className="catalogue-close icon icon-close" /> : null}
+            <span className={"catalogue-close" + (openCatalogue ? " __open" : "")}>
+                <span />
+                <span />
+                <span />
+            </span>
             <span className="__dotted">Каталог</span>
           </span>
         </Ripples>
@@ -248,7 +264,9 @@ function Header({ history, notificationFunc, openAuthPopup, setOpenAuthPopup, op
       <div className="header-navbar">
         <ul className="header-navbar__list">
           <li>
-            <Link className="header-navbar__link" to="/about">
+            <Link onClick={(e) => {
+              // setOpenMobMenu(false);
+            }} className="header-navbar__link" to="/about/">
               О компании
             </Link>
           </li>
@@ -258,12 +276,16 @@ function Header({ history, notificationFunc, openAuthPopup, setOpenAuthPopup, op
           {/*  </Link> */}
           {/* </li> */}
           <li>
-            <Link className="header-navbar__link" to="/delivery">
+            <Link onClick={(e) => {
+              // setOpenMobMenu(false);
+            }} className="header-navbar__link" to="/delivery/">
               Доставка
             </Link>
           </li>
           <li>
-            <Link className="header-navbar__link" to="/contacts">
+            <Link onClick={(e) => {
+              // setOpenMobMenu(false);
+            }} className="header-navbar__link" to="/contacts/">
               Контакты
             </Link>
           </li>
@@ -286,14 +308,14 @@ function Header({ history, notificationFunc, openAuthPopup, setOpenAuthPopup, op
       </div>
 
       <div className="header-right __auth">
-        {profile.hasOwnProperty('id') ? (
+        {profile.hasOwnProperty("id") ? (
           <Ripples during={1000} className="btn __blue">
-            {history.location.pathname === '/orders' ? (
+            {history.location.pathname === "/orders" ? (
               <span className="btn-inner">
                 <span className="__dotted">{profile.contact_name}</span>
               </span>
             ) : (
-              <Link to="/orders" className="btn-inner">
+              <Link to="/orders/" className="btn-inner">
                 <span className="__dotted">{profile.contact_name}</span>
               </Link>
             )}
@@ -303,7 +325,7 @@ function Header({ history, notificationFunc, openAuthPopup, setOpenAuthPopup, op
             <Ripples
               onClick={() => {
                 setOpenAuthPopup(!openAuthPopup);
-                window.log && console.log('open', openAuthPopup);
+                window.log && console.log("open", openAuthPopup);
               }}
               during={1000}
               className="btn __blue"
@@ -315,33 +337,33 @@ function Header({ history, notificationFunc, openAuthPopup, setOpenAuthPopup, op
 
             {openAuthPopup || openResetPassword ? (
               <div className="header-popup">
-                <h3 className="header-popup__title">{openResetPassword ? 'Восстановление пароля' : 'Авторизация'}</h3>
-                <p>{openResetPassword ? 'Укажите вашу электронную почту или логин для восстановления пароля' : 'Введите логин и пароль для входа в систему'}</p>
+                <h3 className="header-popup__title">{openResetPassword ? "Восстановление пароля" : "Авторизация"}</h3>
+                <p>{openResetPassword ? "Укажите вашу электронную почту или логин для восстановления пароля" : "Введите логин и пароль для входа в систему"}</p>
 
                 {openAuthPopup ? (
                   <form ref={authRef} className="form-content" onSubmit={authSubmit}>
                     <FormInput
-                      onChange={handleChange.bind(this, 'auth-login')}
+                      onChange={handleChange.bind(this, "auth-login")}
                       placeholder="Логин"
                       name="auth-login"
                       //
-                      error={errors['auth-login']}
+                      error={errors["auth-login"]}
                       className="__lg"
                       inputRef={loginInput}
                     />
                     <FormInput
-                      onChange={handleChange.bind(this, 'auth-password')}
+                      onChange={handleChange.bind(this, "auth-password")}
                       placeholder="Пароль"
                       name="auth-password"
                       //
-                      error={errors['auth-password']}
+                      error={errors["auth-password"]}
                       // defaultValue={'12345678'}
                       className="__lg"
                       inputRef={passwordInput}
                     />
 
                     <div className="form-control">
-                      <Ripples className={`__w-100p btn __blue __lg${!validForm ? ' __disabled' : ''}`} during={1000}>
+                      <Ripples className={`__w-100p btn __blue __lg${!validForm ? " __disabled" : ""}`} during={1000}>
                         <button name="auth-submit" className="btn-inner">
                           <span>Войти</span>
                         </button>
@@ -351,17 +373,18 @@ function Header({ history, notificationFunc, openAuthPopup, setOpenAuthPopup, op
                 ) : (
                   <form ref={resetRef} className="form-content" onSubmit={resetSubmit}>
                     <FormInput
-                      onChange={handleResetChange.bind(this, 'auth-email')}
+                      onChange={handleResetChange.bind(this, "auth-email")}
                       placeholder="Электронная почта"
                       name="auth-email"
                       //
-                      error={resetErrors['auth-email']}
+                      error={resetErrors["auth-email"]}
                       className="__lg"
                       inputRef={emailInput}
                     />
 
                     <div className="form-control">
-                      <Ripples className={`__w-100p btn __blue __lg${!validResetForm ? ' __disabled' : ''}`} during={1000}>
+                      <Ripples className={`__w-100p btn __blue __lg${!validResetForm ? " __disabled" : ""}`}
+                               during={1000}>
                         <button name="auth-submit" className="btn-inner">
                           <span>Восстановить</span>
                         </button>
@@ -378,7 +401,7 @@ function Header({ history, notificationFunc, openAuthPopup, setOpenAuthPopup, op
                     }}
                     className="header-navbar__link"
                   >
-                    {openResetPassword ? 'Авторизоваться' : 'Забыли пароль?'}
+                    {openResetPassword ? "Авторизоваться" : "Забыли пароль?"}
                   </span>
                 </p>
               </div>
@@ -387,8 +410,8 @@ function Header({ history, notificationFunc, openAuthPopup, setOpenAuthPopup, op
         )}
 
         <div className="header-order">
-          <Ripples during={1000} className={`btn __blue${cartCount ? '' : ' __disabled'}`}>
-            <Link to="/order" className="btn-inner">
+          <Ripples during={1000} className={`btn __blue${cartCount ? "" : " __disabled"}`}>
+            <Link to="/order/" className="btn-inner">
               <span className="header-order__label">Заказ</span>
               <span className="header-order__count">{cartCount}</span>
             </Link>

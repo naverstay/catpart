@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import apiGET from "../../utils/search";
 
-function Catalogue({ history, setOpenCatalogue }) {
+function CatalogueMenu({ history, setOpenCatalogue, openCatalogue }) {
+  let menuTimer;
   const subMenu2 = [
     { name: "Быстродействующие" },
     { name: "Варикапы" },
@@ -137,15 +138,23 @@ function Catalogue({ history, setOpenCatalogue }) {
     let sub = [];
 
     menu.forEach((m, mi) => {
-      ret.push(<div onMouseEnter={() => {
-        setMenuPath(`${parent}-${mi}`);
-      }} className={"catalogue__list-item"} key={`key_${parent}_${level}_${mi}`}>
-        <span onClick={() => {
-          setOpenCatalogue(false);
-          history.push(m.link || "#");
-          return false;
-        }}
-              className={"catalogue__list-link" + (JSON.stringify(menuPath.split("-").slice(0, level + 2)) === JSON.stringify(`${parent}-${mi}`.split("-")) ? " __active" : "")}>{parent} {m.name}</span>
+      ret.push(<div className={"catalogue__list-item"} key={`key_${parent}_${level}_${mi}`}
+                    onMouseEnter={() => {
+                      clearTimeout(menuTimer);
+                      menuTimer = setTimeout(() => {
+                        setMenuPath(`${parent}-${mi}`);
+                      }, 300);
+                    }}>
+        <span
+          className={"catalogue__list-link" + (JSON.stringify(menuPath.split("-").slice(0, level + 2)) === JSON.stringify(`${parent}-${mi}`.split("-")) ? " __active" : "")}
+          onClick={(e) => {
+            if (e.target.classList.contains("__active")) {
+              setOpenCatalogue(false);
+              history.push("/" + (m.link || "#"));
+            }
+            return false;
+          }}
+        >{parent} {m.name}</span>
       </div>);
 
       if (m.submenu) {
@@ -161,7 +170,7 @@ function Catalogue({ history, setOpenCatalogue }) {
   };
 
   return (
-    <div className="catalogue">
+    <div className={"catalogue" + (openCatalogue ? " __open" : "")}>
       <div className="catalogue__inner">
         {menuTreeBuilder(menuJson)}
       </div>
@@ -169,4 +178,4 @@ function Catalogue({ history, setOpenCatalogue }) {
   );
 }
 
-export default Catalogue;
+export default CatalogueMenu;

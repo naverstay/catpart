@@ -7,10 +7,6 @@ import React, { useEffect } from 'react';
 import { Helmet } from 'react-helmet';
 
 export default function DeliveryPage(props) {
-  useEffect(() => {
-    props.setOpenMobMenu(false);
-  }, []);
-
   return (
     <div className="row">
       <Helmet>

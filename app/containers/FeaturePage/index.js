@@ -12,7 +12,6 @@ export default function FeaturePage(props) {
   const [page, setPage] = useState(null);
 
   useEffect(() => {
-    props.setOpenMobMenu(false);
     props.setTableHeadFixed(null);
 
     if (!page || page.url !== props.match.path) {

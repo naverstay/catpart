@@ -14,7 +14,7 @@ import SearchForm from "containers/SearchForm/Loadable";
 import FilterForm from "containers/FilterForm/Loadable";
 import FeaturePage from "containers/FeaturePage/Loadable";
 import NotFoundPage from "containers/NotFoundPage/Loadable";
-import Catalogue from "components/Catalogue";
+import CatalogueMenu from "components/CatalogueMenu";
 import Header from "components/Header";
 import Footer from "components/Footer";
 
@@ -29,8 +29,11 @@ import AsideContainer from "../AsideContainer";
 import Profile from "../Profile";
 import ProfileRequisites from "../ProfileRequisites";
 import OrderDetails from "../OrderDetails";
+import CataloguePage from "../CataloguePage";
+import CatalogueItem from "../CatalogueItem";
 import { OrdersPage } from "../OrdersPage";
 import apiPOST from "../../utils/upload";
+import { smoothScrollTo } from "../../utils/smoothScrollTo";
 // import ContactsPage from '../ContactsPage';
 
 export default function App() {
@@ -429,6 +432,7 @@ export default function App() {
   const handleScroll = event => {
     setOpenMobMenu(false);
 
+    document.body.classList[document.body.scrollTop > 0 ? "add" : "remove"]("__show-gotop");
     // setPageY(event.target.scrollTop);
   };
 
@@ -505,17 +509,23 @@ export default function App() {
 
   useEffect(() => {
     document.body.classList[openCatalogue ? "add" : "remove"]("__no-overflow");
-
-    // if (openCatalogue) {
-    //   disableScroll();
-    // } else {
-    //   enableScroll();
-    // }
   }, [openCatalogue]);
 
   useEffect(() => {
     document.body.classList[formBusy || busyOrder ? "add" : "remove"]("__busy");
   }, [formBusy, busyOrder]);
+
+  useEffect(() => {
+    if (openMobMenu) {
+      setOpenCatalogue(false);
+    }
+  }, [openMobMenu]);
+
+  useEffect(() => {
+    if (openCatalogue) {
+      setOpenMobMenu(false);
+    }
+  }, [openCatalogue]);
 
   useEffect(() => {
     setAsideOpen(openProfile);
@@ -579,7 +589,11 @@ export default function App() {
           openCatalogue={openCatalogue}
         />
 
-        {openCatalogue ? <Catalogue setOpenCatalogue={setOpenCatalogue} history={history} /> : null}
+        <div className="btn btn__gotop icon icon-chevron-up" onClick={() => {
+          smoothScrollTo(document.body, document.body.scrollTop, 0, 600);
+        }} />
+
+        <CatalogueMenu openCatalogue={openCatalogue} setOpenCatalogue={setOpenCatalogue} history={history} />
 
         <main className={`main${centeredForm ? " __center" : ""}`}>
           <SearchForm setFormBusy={setFormBusy} history={history} setSearchData={setSearchData}
@@ -721,7 +735,65 @@ export default function App() {
                   )}
                 />
 
-                <Route path=""
+                <Route
+                  exact
+                  path="/catalogue/:id"
+                  render={routeProps => (
+                    <CataloguePage
+                      profile={profile}
+                      history={history}
+                      busy={formBusy}
+                      setBusyOrder={setBusyOrder}
+                      currency={currency}
+                      setCurrency={setCurrency}
+                      currencyList={currencyList}
+                      setCurrencyList={setCurrencyList}
+                      RUB={RUB}
+                      setShowTableHeadFixed={setShowTableHeadFixed}
+                      setTableHeadFixed={setTableHeadFixed}
+                      setOpenAuthPopup={setOpenAuthPopup}
+                      setOrderSent={setOrderSent}
+                      totalCart={totalCart}
+                      updateCart={updateCart}
+                      notificationFunc={createNotification}
+                      setOpenMobMenu={setOpenMobMenu}
+                      showResults={!formBusy}
+                      cart
+                      props={{ ...routeProps }}
+                    />
+                  )}
+                />
+
+                <Route
+                  exact
+                  path="/part/:id"
+                  render={routeProps => (
+                    <CatalogueItem
+                      profile={profile}
+                      history={history}
+                      busy={formBusy}
+                      setBusyOrder={setBusyOrder}
+                      currency={currency}
+                      setCurrency={setCurrency}
+                      currencyList={currencyList}
+                      setCurrencyList={setCurrencyList}
+                      RUB={RUB}
+                      setShowTableHeadFixed={setShowTableHeadFixed}
+                      setTableHeadFixed={setTableHeadFixed}
+                      setOpenAuthPopup={setOpenAuthPopup}
+                      setOrderSent={setOrderSent}
+                      totalCart={totalCart}
+                      updateCart={updateCart}
+                      notificationFunc={createNotification}
+                      setOpenMobMenu={setOpenMobMenu}
+                      showResults={!formBusy}
+                      cart
+                      props={{ ...routeProps }}
+                    />
+                  )}
+                />
+
+                <Route path="*"
                        render={routeProps => <NotFoundPage setOpenMobMenu={setOpenMobMenu} {...routeProps} />} />
               </Switch>
             )}

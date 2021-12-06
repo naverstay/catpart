@@ -12,10 +12,6 @@ import { Helmet } from 'react-helmet';
 // import messages from './messages';
 
 export default function NotFound(props) {
-  useEffect(() => {
-    props.setOpenMobMenu(false);
-  }, []);
-
   return (
     <>
       <Helmet>
