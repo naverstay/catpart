@@ -42,6 +42,7 @@ export default function App() {
   const RUB = { name: "RUB", exChange: 1, precision: 2 };
   const [currency, setCurrency] = useState(RUB);
   const [currencyList, setCurrencyList] = useState([RUB]);
+  const [categories, setCategories] = useState([]);
   const [tableHeadFixed, setTableHeadFixed] = useState(null);
   const [showTableHeadFixed, setShowTableHeadFixed] = useState(false);
   const [searchData, setSearchData] = useState({});
@@ -169,6 +170,14 @@ export default function App() {
     window.log && console.log("needLogin", profile);
     logOut();
     createNotification("success", `Требуется авторизация`, " ");
+  };
+
+  const getCategories = () => {
+    const requestURL = "/catalog";
+
+    apiGET(requestURL, {}, data => {
+      setCategories(data.map(item => item.title));
+    });
   };
 
   const updateStore = (store, options, cb) => {
@@ -454,6 +463,8 @@ export default function App() {
     window.addEventListener("resize", appHeight);
 
     appHeight();
+
+    getCategories();
 
     if ("ontouchstart" in document.documentElement) {
       document.body.style.cursor = "pointer";
@@ -764,9 +775,9 @@ export default function App() {
                   )}
                 />
 
-                <Route
+                {categories.length && <Route
                   exact
-                  path="/part/:id"
+                  path={categories.map(c => "/" + c)}
                   render={routeProps => (
                     <CatalogueItem
                       profile={profile}
@@ -791,7 +802,7 @@ export default function App() {
                       props={{ ...routeProps }}
                     />
                   )}
-                />
+                />}
 
                 <Route path="*"
                        render={routeProps => <NotFoundPage setOpenMobMenu={setOpenMobMenu} {...routeProps} />} />

@@ -4,14 +4,18 @@
  * This is the page we show when the user visits a url that doesn't have a route
  */
 
-import React, { useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import Swiper from "react-id-swiper";
 import { Navigation, Manipulation } from "swiper";
 import { Helmet } from "react-helmet";
 import Breadcrumbs from "../../components/Breadcrumbs";
+import apiGET from "../../utils/search";
+import NoImage from "../../images/no-image.png";
 
 export default function CatalogueItem(props) {
+  const [itemData, setItemData] = useState(null);
+
   let title = "";
   let breadcrumbs = ["Электротехника", "Лампы"];
   const navigationPrevRef = useRef();
@@ -25,10 +29,19 @@ export default function CatalogueItem(props) {
   };
 
   try {
-    title = props.props.match.params.id;
+    title = props.props.match.path.replace("/", "");
   } catch (e) {
-    title = "Catalogue 404";
+
   }
+
+  useEffect(() => {
+    const requestURL = "/catalog/" + title;
+
+    apiGET(requestURL, {}, data => {
+      console.log("item", data);
+      setItemData(data);
+    });
+  }, [title]);
 
   let titles = ["Производитель", "Номер детали", "Case/Package", "Number of Pins", "Number of Circuits"];
 
@@ -92,8 +105,31 @@ export default function CatalogueItem(props) {
       <div className="row">
         <div className="column sm-col-12 xl-col-9">
           <article className="article __catalogue">
-            <h1 className="article-title">SY89832UMG-TR</h1>
+            <h1 className="article-title">{title}</h1>
 
+            {itemData && <div className={"catalogue-page__item"}>
+              <div className="catalogue-page__item-image">
+                <img src={itemData.image || NoImage} alt="" />
+              </div>
+              <dl className="catalogue-page__item-info">
+                <div className={"description"}>
+                  <dt><b>Производитель:</b></dt>
+                  <dd>{itemData.snippet.manufacturer.name || ""}</dd>
+                </div>
+                <div className={"description"}>
+                  <dt><b>Поставщики:</b></dt>
+                  <dd></dd>
+                </div>
+                {itemData.descriptions && itemData.descriptions.length && <div className={"description"}>
+                  <dt><b>Описание:</b></dt>
+                  <dd>{itemData.descriptions.map((d, di) => <p key={di}>{d}</p>)}</dd>
+                </div>}
+                <div className={"description"}>
+                  <dt><b>Аналоги:</b></dt>
+                  <dd></dd>
+                </div>
+              </dl>
+            </div>}
 
           </article>
         </div>
@@ -101,6 +137,16 @@ export default function CatalogueItem(props) {
 
       <article className="article __catalogue">
         <h2>Технические спецификации</h2>
+
+        <div className={"catalogue-page__specs"}>
+          <div className="catalogue-page__analogue-param __odd">
+            <span>Lifecycle Status</span>
+          </div>
+          <div className="catalogue-page__analogue-param __even">
+            <span>Mount</span>
+          </div>
+        </div>
+
       </article>
 
       <article className="article __catalogue">

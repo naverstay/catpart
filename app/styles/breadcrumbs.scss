@@ -5,6 +5,8 @@
     list-style: none;
     font-size: 12px;
     color: #878787;
+    display: flex;
+    flex-flow: row wrap;
 
     li {
       position: relative;
@@ -13,6 +15,7 @@
       &::after {
         content: '/';
         padding-left: 5px;
+        padding-right: 2px;
       }
     }
   }
