@@ -3,32 +3,46 @@
  *
  */
 
-import React, { useEffect, memo, useState } from 'react';
-import { useParams, useLocation } from 'react-router-dom';
-import PropTypes from 'prop-types';
+import React, { useEffect, memo, useState } from "react";
+import { useParams, useLocation } from "react-router-dom";
+import PropTypes from "prop-types";
 
-import { connect } from 'react-redux';
-import { compose } from 'redux';
-import { createStructuredSelector } from 'reselect';
-import Ripples from 'react-ripples';
+import { connect } from "react-redux";
+import { compose } from "redux";
+import { createStructuredSelector } from "reselect";
+import Ripples from "react-ripples";
 
-import { useInjectReducer } from 'utils/injectReducer';
-import { useInjectSaga } from 'utils/injectSaga';
-import { makeSelectRepos, makeSelectLoading, makeSelectError } from 'containers/App/selectors';
+import { useInjectReducer } from "utils/injectReducer";
+import { useInjectSaga } from "utils/injectSaga";
+import { makeSelectRepos, makeSelectLoading, makeSelectError } from "containers/App/selectors";
 
-import { readFile } from '../../utils/fileReader';
+import { readFile } from "../../utils/fileReader";
 
-import { changeArtNumber } from './actions';
-import { makeSelectArtNumber } from './selectors';
-import { setInputFilter } from '../../utils/inputFilter';
+import { changeArtNumber } from "./actions";
+import { makeSelectArtNumber } from "./selectors";
+import { setInputFilter } from "../../utils/inputFilter";
 // import reducer from './reducer';
 // import saga from './saga';
-import apiPOST from '../../utils/upload';
-import FormInput from '../../components/FormInput';
+import apiPOST from "../../utils/upload";
+import FormInput from "../../components/FormInput";
 
 // const key = 'home';
 
-export function SearchForm({ notificationFunc, busy, busyOrder, setFormBusy, history, setSearchData, location, onSubmitForm, artNumber, loading, error, repos, onChangeUsername }) {
+export function SearchForm({
+  notificationFunc,
+  busy,
+  busyOrder,
+  setFormBusy,
+  history,
+  setSearchData,
+  location,
+  onSubmitForm,
+  artNumber,
+  loading,
+  error,
+  repos,
+  onChangeUsername
+}) {
   // useInjectReducer({ key, reducer });
   // useInjectSaga({ key, saga });
 
@@ -39,21 +53,21 @@ export function SearchForm({ notificationFunc, busy, busyOrder, setFormBusy, his
 
   const query = new URLSearchParams(useLocation().search);
 
-  const searchArt = decodeURIComponent(query.get('art') || '');
-  const searchQ = (decodeURIComponent(query.get('q')) || '1').replace(/\D/g, '');
+  const searchArt = decodeURIComponent(query.get("art") || "");
+  const searchQ = (decodeURIComponent(query.get("q")) || "1").replace(/\D/g, "");
 
   const [fields, setFields] = useState({
-    quantity: '',
-    'art-number': '',
+    quantity: "",
+    "art-number": ""
   });
   const [justRedraw, setJustRedraw] = useState(0);
   const [errors, setErrors] = useState({
     quantity: null,
-    'art-number': null,
+    "art-number": null
   });
   const [validForm, setValidForm] = useState(false);
 
-  const searchBtnText = useLocation().pathname === '/' ? 'Искать' : 'Продолжить искать';
+  const searchBtnText = useLocation().pathname === "/" ? "Искать" : "Продолжить искать";
 
   useEffect(() => {
     setInputFilter(formQuantity.current, function(value) {
@@ -61,8 +75,13 @@ export function SearchForm({ notificationFunc, busy, busyOrder, setFormBusy, his
     });
 
     if (formArtNumber.current.value.length) {
-      handleChange('art-number', { target: formArtNumber.current });
-      onSubmitForm({ currentTarget: formRef.current });
+      handleChange("art-number", { target: formArtNumber.current });
+
+      const form = formRef.current;
+      const art = form.querySelector("#art-number");
+      const quantity = form.querySelector("#quantity");
+
+      onSubmitForm(art.value, quantity.value);
     }
 
     return () => {
@@ -76,13 +95,19 @@ export function SearchForm({ notificationFunc, busy, busyOrder, setFormBusy, his
   const reposListProps = {
     loading,
     error,
-    repos,
+    repos
   };
 
   const handleSubmit = evt => {
-    handleChange('art-number', { target: formArtNumber.current });
+    handleChange("art-number", { target: formArtNumber.current });
 
-    onSubmitForm(evt);
+    if (evt !== undefined && evt.preventDefault) evt.preventDefault();
+
+    const form = evt.currentTarget;
+    const art = form.querySelector("#art-number");
+    const quantity = form.querySelector("#quantity");
+
+    onSubmitForm(art.value, quantity.value);
   };
 
   const handleChange = (field, e) => {
@@ -90,15 +115,15 @@ export function SearchForm({ notificationFunc, busy, busyOrder, setFormBusy, his
     setFields(fields);
 
     switch (field) {
-      case 'art-number':
-      case 'quantity':
-        errors[field] = e.target.value.length ? '' : 'Не может быть пустым';
+      case "art-number":
+      case "quantity":
+        errors[field] = e.target.value.length ? "" : "Не может быть пустым";
         break;
     }
 
     setErrors(errors);
 
-    setValidForm(errors['art-number'] !== null && !errors['art-number']);
+    setValidForm(errors["art-number"] !== null && !errors["art-number"]);
 
     setJustRedraw(justRedraw + 1);
   };
@@ -107,7 +132,7 @@ export function SearchForm({ notificationFunc, busy, busyOrder, setFormBusy, his
     <div className="form-search" itemScope itemType="https://schema.org/WebSite">
       <meta itemProp="url" content="https://catpart.ru/" />
       <form ref={formRef} className="form-content" onSubmit={handleSubmit}>
-        <meta itemProp="target" content={'https://catpart.ru/search/?art={art-number}&q={quantity}'} />
+        <meta itemProp="target" content={"https://catpart.ru/search/?art={art-number}&q={quantity}"} />
         <div className="form-search__title">
           Поиск электронных <br /> компонентов
         </div>
@@ -119,7 +144,7 @@ export function SearchForm({ notificationFunc, busy, busyOrder, setFormBusy, his
             </label>
 
             <FormInput
-              onChange={handleChange.bind(this, 'art-number')}
+              onChange={handleChange.bind(this, "art-number")}
               onBlur={e => {
                 e.target.value = e.target.value.trim();
               }}
@@ -128,7 +153,7 @@ export function SearchForm({ notificationFunc, busy, busyOrder, setFormBusy, his
               //
               disabled={busy}
               defaultValue={searchArt}
-              className={`__lg${errors['art-number'] === null ? '' : errors['art-number'] ? ' __error' : ''}`}
+              className={`__lg${errors["art-number"] === null ? "" : errors["art-number"] ? " __error" : ""}`}
               error={null}
               id="art-number"
               inputRef={formArtNumber}
@@ -139,8 +164,8 @@ export function SearchForm({ notificationFunc, busy, busyOrder, setFormBusy, his
               <span
                 className="form-tip__example"
                 onClick={() => {
-                  formArtNumber.current.value = '15C01M';
-                  handleChange('art-number', { target: formArtNumber.current });
+                  formArtNumber.current.value = "15C01M";
+                  handleChange("art-number", { target: formArtNumber.current });
                 }}
               >
                 15C01M
@@ -154,11 +179,11 @@ export function SearchForm({ notificationFunc, busy, busyOrder, setFormBusy, his
             </label>
 
             <FormInput
-              onChange={handleChange.bind(this, 'quantity')}
+              onChange={handleChange.bind(this, "quantity")}
               onBlur={e => {
                 if (!e.target.value.length) {
-                  e.target.value = '1';
-                  handleChange('quantity', e);
+                  e.target.value = "1";
+                  handleChange("quantity", e);
                 }
               }}
               itemprop="query-input"
@@ -166,7 +191,7 @@ export function SearchForm({ notificationFunc, busy, busyOrder, setFormBusy, his
               //
               disabled={busy}
               defaultValue={searchQ}
-              className={`__lg${errors.quantity === null ? '' : errors.quantity ? ' __error' : ''}`}
+              className={`__lg${errors.quantity === null ? "" : errors.quantity ? " __error" : ""}`}
               error={null}
               id="quantity"
               inputRef={formQuantity}
@@ -176,8 +201,8 @@ export function SearchForm({ notificationFunc, busy, busyOrder, setFormBusy, his
               <span
                 className="form-tip__example"
                 onClick={() => {
-                  formQuantity.current.value = '100';
-                  handleChange('quantity', { target: formQuantity.current });
+                  formQuantity.current.value = "100";
+                  handleChange("quantity", { target: formQuantity.current });
                 }}
               >
                 100
@@ -185,8 +210,8 @@ export function SearchForm({ notificationFunc, busy, busyOrder, setFormBusy, his
               <span
                 className="form-tip__example"
                 onClick={() => {
-                  formQuantity.current.value = '250';
-                  handleChange('quantity', { target: formQuantity.current });
+                  formQuantity.current.value = "250";
+                  handleChange("quantity", { target: formQuantity.current });
                 }}
               >
                 250
@@ -194,8 +219,8 @@ export function SearchForm({ notificationFunc, busy, busyOrder, setFormBusy, his
               <span
                 className="form-tip__example"
                 onClick={() => {
-                  formQuantity.current.value = '500';
-                  handleChange('quantity', { target: formQuantity.current });
+                  formQuantity.current.value = "500";
+                  handleChange("quantity", { target: formQuantity.current });
                 }}
               >
                 500
@@ -206,8 +231,8 @@ export function SearchForm({ notificationFunc, busy, busyOrder, setFormBusy, his
           <div className="form-cell form-cell__search column sm-col-12 md-col-4 lg-col-2_5 xl-col-2">
             <span className="form-label">&nbsp;</span>
             <div className="form-control">
-              <Ripples className={'__w-100p btn __blue __lg' + (busy ? ' __loader' : '')} during={1000}>
-                <button name="search-submit" disabled={busy} className={'btn-inner __abs'}>
+              <Ripples className={"__w-100p btn __blue __lg" + (busy ? " __loader" : "")} during={1000}>
+                <button name="search-submit" disabled={busy} className={"btn-inner __abs"}>
                   <span>{searchBtnText}</span>
                 </button>
               </Ripples>
@@ -226,7 +251,7 @@ export function SearchForm({ notificationFunc, busy, busyOrder, setFormBusy, his
                     id="file"
                     type="file"
                     onChange={() => {
-                      const requestURL = '/search/bom';
+                      const requestURL = "/search/bom";
                       const file = formFile.current.files[0];
 
                       if (file && file.name.match(/\.(xls[x]?)$/)) {
@@ -236,23 +261,23 @@ export function SearchForm({ notificationFunc, busy, busyOrder, setFormBusy, his
                         setSearchData({});
                         setFormBusy(true);
 
-                        formData.append('file', file);
+                        formData.append("file", file);
 
-                        history.push('/search');
+                        history.push("/search");
 
                         apiPOST(requestURL, formData, options, data => {
                           if (data.error) {
                             setFormBusy(false);
-                            notificationFunc('success', `Файл: ${file.name}`, 'ошибка обработки');
+                            notificationFunc("success", `Файл: ${file.name}`, "ошибка обработки");
                           } else {
                             setFormBusy(false);
                             setSearchData(data);
                           }
                         });
 
-                        notificationFunc('success', `Файл: ${file.name}`, 'отправлен');
+                        notificationFunc("success", `Файл: ${file.name}`, "отправлен");
                       } else {
-                        file && notificationFunc('success', `Файл: ${file.name}`, 'не соответствует формату .xls, . xlsx');
+                        file && notificationFunc("success", `Файл: ${file.name}`, "не соответствует формату .xls, . xlsx");
                       }
 
                       // readFile(formFile.current.files[0], ret => {
@@ -289,19 +314,19 @@ SearchForm.propTypes = {
   notificationFunc: PropTypes.func,
   onSubmitForm: PropTypes.func,
   artNumber: PropTypes.string,
-  onChangeUsername: PropTypes.func,
+  onChangeUsername: PropTypes.func
 };
 
 const mapStateToProps = createStructuredSelector({
   repos: makeSelectRepos(),
   artNumber: makeSelectArtNumber(),
   loading: makeSelectLoading(),
-  error: makeSelectError(),
+  error: makeSelectError()
 });
 
 export function mapDispatchToProps(dispatch) {
   return {
-    onChangeUsername: evt => dispatch(changeArtNumber(evt.target.value)),
+    onChangeUsername: evt => dispatch(changeArtNumber(evt.target.value))
     // onSubmitForm: evt => {
     // window.log &&   console.log('## dispatch onSubmitForm');
     //  if (evt !== undefined && evt.preventDefault) evt.preventDefault();
@@ -312,10 +337,10 @@ export function mapDispatchToProps(dispatch) {
 
 const withConnect = connect(
   mapStateToProps,
-  mapDispatchToProps,
+  mapDispatchToProps
 );
 
 export default compose(
   withConnect,
-  memo,
+  memo
 )(SearchForm);

@@ -27,6 +27,9 @@ require valid-user
   # Enable rewriting
   RewriteEngine On
 
+  # Redirect to the same URL with trailing slash
+  RewriteCond %{REQUEST_URI} /+[^\.]+$
+  RewriteRule ^(.+[^/])$ %{REQUEST_URI}/ [R=301,L]
   # If its not HTTPS
   RewriteCond %{HTTPS} off
 

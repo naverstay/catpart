@@ -3,11 +3,12 @@ import { Link } from "react-router-dom";
 
 function Breadcrumbs({ bread }) {
   return (
-    <div className={"breadcrumbs"}>
+    bread && bread.length ? <div className={"breadcrumbs"}>
       <ul className="breadcrumbs__list">
-        {bread.map((b, bi) => <li key={bi}><Link className={"breadcrumbs__link"} to={"/"}>{b}</Link></li>)}
+        {bread.map((b, bi) => <li key={bi}><Link className={"breadcrumbs__link"} to={"/" + b.slug}>{b.name}</Link>
+        </li>)}
       </ul>
-    </div>
+    </div> : null
   );
 }
 

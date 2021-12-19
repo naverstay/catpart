@@ -1,4 +1,8 @@
 .dropdown {
+  &-holder {
+    position: relative;
+  }
+
   &-container {
     position: absolute;
     top: 100%;

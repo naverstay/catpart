@@ -1,8 +1,8 @@
-import React, { createRef, useEffect, useState } from 'react';
-import Ripples from 'react-ripples';
-import priceFormatter from '../../utils/priceFormatter';
-import { findPriceIndex } from '../../utils/findPriceIndex';
-import { setInputFilter } from '../../utils/inputFilter';
+import React, { createRef, useEffect, useState } from "react";
+import Ripples from "react-ripples";
+import priceFormatter from "../../utils/priceFormatter";
+import { findPriceIndex } from "../../utils/findPriceIndex";
+import { setInputFilter } from "../../utils/inputFilter";
 
 const CartRow = props => {
   const { rowIndex, tableHeader, currency, row, highlight, notificationFunc, defaultCount, updateCart } = props;
@@ -27,11 +27,12 @@ const CartRow = props => {
   }
 
   return (
-    <div className={`cart-results__row ${rowIndex % 2 === 0 ? '__odd' : '__even' + row.supplier === 'Louisyen' ? ' __lilu' : ''}`}>
+    <div
+      className={`cart-results__row ${(rowIndex % 2 === 0 ? "__odd" : "__even") + (row.supplier === "Louisyen" ? " __lilu" : "")}`}>
       {Object.keys(tableHeader).map((cell, ci) =>
-        cell === 'manufacturer' ? null : (
+        cell === "manufacturer" ? null : (
           <div key={ci} className={`cart-results__cell __${cell}`}>
-            {cell === 'supplier' ? (
+            {cell === "supplier" ? (
               <>
                 <p>
                   <span className="cart-results__label __show">{tableHeader[cell]}:</span>
@@ -44,7 +45,7 @@ const CartRow = props => {
               </>
             ) : (
               <>
-                {cell === 'name' ? null : cell === 'quantity' ? (
+                {cell === "name" ? null : cell === "quantity" ? (
                   <label className="cart-results__label" htmlFor={`cart-row-${rowIndex}`}>
                     {tableHeader[cell]}
                   </label>
@@ -52,9 +53,10 @@ const CartRow = props => {
                   <span className="cart-results__label">{tableHeader[cell]}</span>
                 )}
                 <span className="cart-results__value">
-                  {cell === 'pricebreaks' ? (
-                    <span className="cart-results__item">{priceFormatter(parseFloat(row.pricebreaks[priceMatch].price / currency.exChange).toFixedCustom(currency.precision), currency.precision)}</span>
-                  ) : cell === 'quantity' ? (
+                  {cell === "pricebreaks" ? (
+                    <span
+                      className="cart-results__item">{priceFormatter(parseFloat(row.pricebreaks[priceMatch].price / currency.exChange).toFixedCustom(currency.precision), currency.precision)}</span>
+                  ) : cell === "quantity" ? (
                     <div className="cart-results__count">
                       <input
                         id={`cart-row-${rowIndex}`}
@@ -69,21 +71,21 @@ const CartRow = props => {
                           const val = +e.target.value;
                           if (val > 0) {
                           } else {
-                            e.target.value = '1';
+                            e.target.value = "1";
                           }
 
                           if (e.target.value.length && +e.target.value < row.moq) {
                             e.target.value = `${row.moq}`;
                             setCartCount(row.moq);
 
-                            notificationFunc('success', `Для ${row.name}`, `минимальное количество: ${row.moq}`);
+                            notificationFunc("success", `Для ${row.name}`, `минимальное количество: ${row.moq}`);
                           }
 
                           if (e.target.value.length && +e.target.value > row.quantity) {
                             e.target.value = `${row.quantity}`;
                             setCartCount(row.quantity);
 
-                            notificationFunc('success', `Для ${row.name}`, `максимальное количество: ${row.quantity}`);
+                            notificationFunc("success", `Для ${row.name}`, `максимальное количество: ${row.quantity}`);
                           }
 
                           setCartCount(parseFloat(e.target.value));
@@ -95,9 +97,10 @@ const CartRow = props => {
                         className="input"
                       />
                     </div>
-                  ) : cell === 'total' ? (
-                    <span className="cart-results__item">{priceFormatter(parseFloat((cartCount * row.pricebreaks[priceMatch].price) / currency.exChange).toFixedCustom(currency.precision), currency.precision)}</span>
-                  ) : cell === 'supplier' ? (
+                  ) : cell === "total" ? (
+                    <span
+                      className="cart-results__item">{priceFormatter(parseFloat((cartCount * row.pricebreaks[priceMatch].price) / currency.exChange).toFixedCustom(currency.precision), currency.precision)}</span>
+                  ) : cell === "supplier" ? (
                     row.supplierAlias
                   ) : (
                     row[cell] || <span data-empty={cell} />
@@ -106,7 +109,7 @@ const CartRow = props => {
               </>
             )}
           </div>
-        ),
+        )
       )}
 
       <div className="cart-results__cell __cart">

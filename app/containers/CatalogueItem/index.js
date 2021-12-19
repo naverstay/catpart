@@ -12,68 +12,70 @@ import { Helmet } from "react-helmet";
 import Breadcrumbs from "../../components/Breadcrumbs";
 import apiGET from "../../utils/search";
 import NoImage from "../../images/no-image.png";
+import FormCheck from "../../components/FormCheck";
+import innValidation from "../../utils/innValidation";
+import { validateEmail } from "../../utils/validateEmail";
+import checkEmailExist from "../../utils/checkEmailExist";
 
 export default function CatalogueItem(props) {
-  const [itemData, setItemData] = useState(null);
+  const { breadcrumbs, itemData } = props;
 
-  let title = "";
-  let breadcrumbs = ["Электротехника", "Лампы"];
+  const snippetCheckData = itemData && itemData.hasOwnProperty("snippet") && itemData.snippet.specs && itemData.snippet.specs.length ? itemData.snippet.specs.map(m => m.attribute.id) : [];
+  const [snippetCheckValue, setSnippetCheckValue] = useState([]);
+
+  const handleCheckAll = (target) => {
+    console.log("handleCheckAll", target.target.value, snippetCheckData, target.target.value ? snippetCheckData : []);
+
+    return setSnippetCheckValue(target.target.value ? snippetCheckData : []);
+  };
+  const handleChange = (value, target) => {
+    let newVal = snippetCheckValue.slice(0);
+
+    if (target.target.value) {
+      newVal.push(value);
+    } else {
+      let index = snippetCheckValue.findIndex(f => f === value);
+      console.log("index", index);
+      newVal.splice(index, 1);
+    }
+
+    console.log("handleChange", value, newVal);
+
+    return setSnippetCheckValue(newVal);
+  };
+
+  let title = itemData.hasOwnProperty("snippet") ? itemData.snippet.name || "" : "";
+
   const navigationPrevRef = useRef();
   const navigationNextRef = useRef();
   const slideData = {
-    "manufacturer": "Microchip",
-    "part_no": "SY54020RMG",
-    "case_package": "-",
-    "pins": "16",
-    "circuits": "1"
+    "manufacturer": "Microchip", "part_no": "SY54020RMG", "case_package": "-", "pins": "16", "circuits": "1"
   };
-
-  try {
-    title = props.props.match.path.replace("/", "");
-  } catch (e) {
-
-  }
-
-  useEffect(() => {
-    const requestURL = "/catalog/" + title;
-
-    apiGET(requestURL, {}, data => {
-      console.log("item", data);
-      setItemData(data);
-    });
-  }, [title]);
 
   let titles = ["Производитель", "Номер детали", "Case/Package", "Number of Pins", "Number of Circuits"];
 
   let slides = Array.from({ length: 10 }, (_, i) => slideData);
 
   const swiperParams = {
-    modules: [Navigation, Manipulation],
-    slidesPerView: 1,
-    breakpoints: {
+    modules: [Navigation, Manipulation], slidesPerView: 1, breakpoints: {
       // when window width is >= 480px
       600: {
         slidesPerView: 2
-      },
-      900: {
+      }, 900: {
         slidesPerView: 4
-      },
-      1200: {
+      }, 1200: {
         slidesPerView: 6
       }
-    },
-    navigation: {
+    }, navigation: {
       enabled: true
-    },
-    on: {
+    }, on: {
       init: (swiper) => {
         swiper.params.navigation.prevEl = navigationPrevRef.current;
         swiper.params.navigation.nextEl = navigationNextRef.current;
         swiper.navigation.destroy();
         swiper.navigation.init();
         swiper.navigation.update();
-      },
-      reachEnd: (swiper) => {
+      }, reachEnd: (swiper) => {
         setTimeout(() => {
           swiper.appendSlide([...Array(6)].map((m, mi) => `<div class="swiper-slide">` + slideBuilder(slideData, swiper.slides.length + mi + 1) + "</div>"));
         }, 1000);
@@ -91,63 +93,92 @@ export default function CatalogueItem(props) {
     return ret + "</div>";
   };
 
-  return (
-    <>
-      <Helmet>
-        <title>{title}</title>
-        <meta name="description" content={title} />
-        <meta name="keywords" content={title} />
-        <link rel="canonical" href="https://catpart.ru/" />
-      </Helmet>
+  const handleSpecChange = (field, e) => {
+    console.log("handleSpecChange", field, e);
+  };
 
-      <Breadcrumbs bread={breadcrumbs} />
+  return (<>
+    <Helmet>
+      <title>{title}</title>
+      <meta name="description" content={title} />
+      <meta name="keywords" content={title} />
+      <link rel="canonical" href="https://catpart.ru/" />
+    </Helmet>
 
-      <div className="row">
-        <div className="column sm-col-12 xl-col-9">
-          <article className="article __catalogue">
-            <h1 className="article-title">{title}</h1>
+    <Breadcrumbs bread={breadcrumbs} />
 
-            {itemData && <div className={"catalogue-page__item"}>
-              <div className="catalogue-page__item-image">
-                <img src={itemData.image || NoImage} alt="" />
+    <div className="row">
+      <div className="column sm-col-12 xl-col-9">
+        {itemData ? <article className="article __catalogue">
+          <h1 className="article-title">{itemData.snippet.name}</h1>
+
+          <div className={"catalogue-page__item"}>
+            <div className="catalogue-page__item-image">
+              <img src={itemData.image || NoImage} alt="" />
+            </div>
+            {itemData.snippet && itemData.snippet.hasOwnProperty("id") ? <dl className="catalogue-page__item-info">
+              {itemData.snippet.manufacturer ? <div className={"description"}>
+                <dt><b>Производитель:</b></dt>
+                <dd>{itemData.snippet.manufacturer.name || ""}</dd>
+              </div> : null}
+              {itemData.snippet.sellers && itemData.snippet.sellers.length ? <div className={"description"}>
+                <dt><b>Поставщики:</b></dt>
+                <dd>{itemData.snippet.sellers.reduce((acc, el) => `${acc + ", " + ((el.company && el.company.name) ? el.company.name : "")}`, "").substring(2)}</dd>
+              </div> : null}
+              {itemData.snippet.descriptions && itemData.snippet.descriptions.length ? <div className={"description"}>
+                <dt><b>Описание:</b></dt>
+                <dd>{itemData.snippet.descriptions.reduce((acc, el) => `${acc + "\n" + (el.text || "")}`, "").substring(1)}</dd>
+              </div> : null}
+              <div className={"description"}>
+                <dt><b>Аналоги:</b></dt>
+                <dd></dd>
               </div>
-              <dl className="catalogue-page__item-info">
-                <div className={"description"}>
-                  <dt><b>Производитель:</b></dt>
-                  <dd>{itemData.snippet.manufacturer.name || ""}</dd>
-                </div>
-                <div className={"description"}>
-                  <dt><b>Поставщики:</b></dt>
-                  <dd></dd>
-                </div>
-                {itemData.descriptions && itemData.descriptions.length && <div className={"description"}>
-                  <dt><b>Описание:</b></dt>
-                  <dd>{itemData.descriptions.map((d, di) => <p key={di}>{d}</p>)}</dd>
-                </div>}
-                <div className={"description"}>
-                  <dt><b>Аналоги:</b></dt>
-                  <dd></dd>
-                </div>
-              </dl>
-            </div>}
-
-          </article>
-        </div>
+            </dl> : null}
+          </div>
+        </article> : null}
       </div>
-
-      <article className="article __catalogue">
-        <h2>Технические спецификации</h2>
-
+    </div>
+    {itemData && itemData.hasOwnProperty("snippet") ? <React.Fragment>
+      {itemData.snippet.specs && itemData.snippet.specs.length ? <article className="article __catalogue">
         <div className={"catalogue-page__specs"}>
-          <div className="catalogue-page__analogue-param __odd">
-            <span>Lifecycle Status</span>
+          <div className={"catalogue-page__analogue-param"}>
+            <h2>Технические спецификации</h2>
+            <span className={"catalogue-page__specs--check"}>
+                  <FormCheck
+                    indeterminate={snippetCheckValue.length > 0 && snippetCheckValue.length < snippetCheckData.length}
+                    checked={snippetCheckValue.length === snippetCheckData.length}
+                    onChange={handleCheckAll.bind(this)}
+                    // defaultChecked={false}
+                    name={"0"}
+                    value={"0"}
+                    error={null}
+                    label={snippetCheckValue.length === snippetCheckData.length ? "Убрать из фильтра" :  "Добавить в фильтр"}
+                    inputRef={null}
+                  />
+            </span>
           </div>
-          <div className="catalogue-page__analogue-param __even">
-            <span>Mount</span>
-          </div>
-        </div>
 
-      </article>
+          {itemData.snippet.specs.map((s, si) => {
+            let id = `${si + 1}`;
+
+            return <div key={si}
+                        className={"catalogue-page__analogue-param " + ((si % 2 === 0 ? "__odd" : "__even"))}>
+              <span>{s.hasOwnProperty("attribute") && (s.attribute.name || s.attribute.id || "")}</span>
+              <span>{s.display_value}</span>
+              <span className={"catalogue-page__specs--check"}>
+                  <FormCheck
+                    onChange={handleChange.bind(this, s.attribute.id)}
+                    checked={snippetCheckValue.indexOf(s.attribute.id) > -1}
+                    name={id}
+                    value={s.attribute.id}
+                    error={null}
+                    label={snippetCheckValue.indexOf(s.attribute.id) > -1 ? "Убрать из фильтра" :  "Добавить в фильтр"}
+                    inputRef={null}
+                  /></span>
+            </div>;
+          })}
+        </div>
+      </article> : null}
 
       <article className="article __catalogue">
         <h2>Аналоги</h2>
@@ -181,6 +212,6 @@ export default function CatalogueItem(props) {
           </Swiper>
         </div>
       </div>
-    </>
-  );
+    </React.Fragment> : null}
+  </>);
 }

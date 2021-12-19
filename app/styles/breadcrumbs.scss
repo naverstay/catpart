@@ -17,6 +17,12 @@
         padding-left: 5px;
         padding-right: 2px;
       }
+
+      &:last-child {
+        &::after {
+          display: none;
+        }
+      }
     }
   }
 

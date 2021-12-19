@@ -8,7 +8,7 @@
 
 import React, { useEffect, useState } from "react";
 import { Helmet } from "react-helmet";
-import { Switch, Route, useHistory } from "react-router-dom";
+import { Switch, Route, useHistory, Redirect } from "react-router-dom";
 import ReactNotification, { store } from "react-notifications-component";
 import SearchForm from "containers/SearchForm/Loadable";
 import FilterForm from "containers/FilterForm/Loadable";
@@ -34,15 +34,22 @@ import CatalogueItem from "../CatalogueItem";
 import { OrdersPage } from "../OrdersPage";
 import apiPOST from "../../utils/upload";
 import { smoothScrollTo } from "../../utils/smoothScrollTo";
+import { flatDeep } from "../../utils/flatDeep";
 // import ContactsPage from '../ContactsPage';
 
-export default function App() {
-  const history = useHistory();
+export default function App({ history }) {
+  // const history = useHistory();
 
   const RUB = { name: "RUB", exChange: 1, precision: 2 };
   const [currency, setCurrency] = useState(RUB);
   const [currencyList, setCurrencyList] = useState([RUB]);
-  const [categories, setCategories] = useState([]);
+  const [categoryItems, setCategoryItems] = useState([]);
+  const [categorySlugLinks, setCategorySlugLinks] = useState([]);
+  const [itemSlugLinks, setItemSlugLinks] = useState([]);
+  const [menuJson, setMenuJson] = useState([]);
+  const [nestedCategories, setNestedCategories] = useState([]);
+  const [prevRequest, setPrevRequest] = useState("");
+
   const [tableHeadFixed, setTableHeadFixed] = useState(null);
   const [showTableHeadFixed, setShowTableHeadFixed] = useState(false);
   const [searchData, setSearchData] = useState({});
@@ -62,6 +69,7 @@ export default function App() {
   const [centeredForm, setCenteredForm] = useState(true);
   const [formBusy, setFormBusy] = useState(false);
   const [busyOrder, setBusyOrder] = useState(false);
+  const [errorPage, setErrorPage] = useState(false);
   const [profileChecked, setProfileChecked] = useState(false);
   const [profile, setProfile] = useState({});
   const [profileRequisites, setProfileRequisites] = useState({});
@@ -80,12 +88,15 @@ export default function App() {
   };
 
   const updateLocationParams = loc => {
+    // console.log("updateLocationParams", loc);
     setCenteredForm(loc.pathname === "/");
   };
 
   history.listen(function(loc) {
+    setOpenMobMenu(false);
+    setOpenCatalogue(false);
     updateLocationParams(loc);
-    setOrderSent(false);
+    // setOrderSent(false);
   });
 
   const ordersList = [
@@ -172,13 +183,17 @@ export default function App() {
     createNotification("success", `Требуется авторизация`, " ");
   };
 
-  const getCategories = () => {
-    const requestURL = "/catalog";
+  // useEffect(() => {
+  //   console.log("categoryItems", categoryItems);
+  // }, [categoryItems]);
 
-    apiGET(requestURL, {}, data => {
-      setCategories(data.map(item => item.title));
-    });
-  };
+  // useEffect(() => {
+  //   console.log("categorySlugLinks", categorySlugLinks);
+  // }, [categorySlugLinks]);
+
+  useEffect(() => {
+    console.log("itemSlugLinks", itemSlugLinks);
+  }, [itemSlugLinks]);
 
   const updateStore = (store, options, cb) => {
     const requestURL = "/search/check_price";
@@ -280,7 +295,7 @@ export default function App() {
           animationIn: ["animate__animated", "animate__bounceInRight"],
           animationOut: ["animate__animated", "animate__bounceOutRight"],
           dismiss: {
-            duration: 20000,
+            duration: 2000,
             waitForAnimation: true,
             pauseOnHover: true,
             onScreen: false
@@ -391,44 +406,35 @@ export default function App() {
     });
   };
 
-  const onSubmitSearchForm = evt => {
-    if (evt !== undefined && evt.preventDefault) evt.preventDefault();
+  const sendSearchRequest = options => {
+    const requestURL = "/search";
+    setSearchResult(true);
+    setFormBusy(true);
 
-    const form = evt.currentTarget;
+    setSearchData({});
 
-    if (form) {
-      const art = form.querySelector("#art-number");
-      const quantity = form.querySelector("#quantity");
+    setSearchCount(options.c || 1);
 
-      window.log && console.log("onSubmitSearchForm", art.value);
-
-      if (art.value.length) {
-        const requestURL = "/search";
-        setSearchResult(true);
-        setFormBusy(true);
-
-        setSearchData({});
-
-        setSearchCount(quantity.value || 1);
-
-        history.push(`/search/?art=${encodeURIComponent(art.value) || ""}&q=${encodeURIComponent(quantity.value || 1)}`);
-
-        const options = {
-          q: art.value,
-          c: quantity.value || 1
-        };
-
-        if (typeof ym === "function") {
-          ym(81774553, "reachGoal", "usedsearch");
-        }
-
-        apiGET(requestURL, options, data => {
-          setSearchData(data);
-          setFormBusy(false);
-        });
-      }
+    if (typeof ym === "function") {
+      ym(81774553, "reachGoal", "usedsearch");
     }
 
+    apiGET(requestURL, options, data => {
+      setFormBusy(false);
+      setSearchData(data);
+    });
+  };
+
+  const onSubmitSearchForm = (art, quantity) => {
+    window.log && console.log("onSubmitSearchForm", art, quantity);
+
+    if (art.length) {
+      history.push(`/search/?art=${encodeURIComponent(art)}&q=${encodeURIComponent(quantity || 1)}`);
+      sendSearchRequest({
+        q: art,
+        c: quantity || 1
+      });
+    }
     return false;
   };
 
@@ -448,6 +454,24 @@ export default function App() {
   useEffect(() => {
     updateLocationParams(window.location);
 
+    // TODO catalogue menu list
+    const requestURL = "/catalog/categories";
+
+    apiGET(requestURL, {}, data => {
+      let cat = flatDeep(data);
+
+      let uniqueArray = cat.filter(function(item, pos, self) {
+        let ret = self.indexOf(item) === pos;
+        if (!ret) {
+          console.log("WARN DUPLICATE", item, pos);
+        }
+        return ret;
+      });
+
+      setCategorySlugLinks(uniqueArray);
+      setMenuJson(data);
+    });
+
     const profileLS = localStorage.getItem("catpart-profile");
 
     if (profileLS) {
@@ -463,8 +487,6 @@ export default function App() {
     window.addEventListener("resize", appHeight);
 
     appHeight();
-
-    getCategories();
 
     if ("ontouchstart" in document.documentElement) {
       document.body.style.cursor = "pointer";
@@ -521,6 +543,10 @@ export default function App() {
   useEffect(() => {
     document.body.classList[openCatalogue ? "add" : "remove"]("__no-overflow");
   }, [openCatalogue]);
+
+  useEffect(() => {
+    console.log("nestedCategories APP", nestedCategories);
+  }, [nestedCategories]);
 
   useEffect(() => {
     document.body.classList[formBusy || busyOrder ? "add" : "remove"]("__busy");
@@ -604,11 +630,13 @@ export default function App() {
           smoothScrollTo(document.body, document.body.scrollTop, 0, 600);
         }} />
 
-        <CatalogueMenu openCatalogue={openCatalogue} setOpenCatalogue={setOpenCatalogue} history={history} />
+        <CatalogueMenu openCatalogue={openCatalogue} setOpenCatalogue={setOpenCatalogue} history={history}
+                       menuJson={menuJson} />
 
         <main className={`main${centeredForm ? " __center" : ""}`}>
           <SearchForm setFormBusy={setFormBusy} history={history} setSearchData={setSearchData}
-                      setOpenMobMenu={setOpenMobMenu} busyOrder={busyOrder} busy={formBusy}
+                      setOpenCatalogue={setOpenCatalogue} setOpenMobMenu={setOpenMobMenu} busyOrder={busyOrder}
+                      busy={formBusy}
                       onSubmitForm={onSubmitSearchForm} notificationFunc={createNotification} />
 
           <div className="main-content">
@@ -631,20 +659,22 @@ export default function App() {
                     </Helmet>
                   )}
                 />
+                <Route exact strict path="/:url*" render={props => <Redirect
+                  to={`${props.location.pathname}/`.replace(/\/\/$/, "/") + props.location.search} />} />
+                {/* <Route path="/about" render={routeProps => <FeaturePage updateCart={updateCart} notificationFunc={createNotification} setOrderSent={setOrderSent} totalCart={totalCart} currency={currency}  setOpenCatalogue={setOpenCatalogue}  setOpenMobMenu={setOpenMobMenu} {...routeProps} />} /> */}
 
-                {/* <Route path="/about" render={routeProps => <FeaturePage updateCart={updateCart} notificationFunc={createNotification} setOrderSent={setOrderSent} totalCart={totalCart} currency={currency} setOpenMobMenu={setOpenMobMenu} {...routeProps} />} /> */}
+                {/* <Route path="/delivery" render={routeProps => <DeliveryPage  setOpenCatalogue={setOpenCatalogue}  setOpenMobMenu={setOpenMobMenu} {...routeProps} />} /> */}
 
-                {/* <Route path="/delivery" render={routeProps => <DeliveryPage setOpenMobMenu={setOpenMobMenu} {...routeProps} />} /> */}
+                {/* <Route path="/contacts" render={routeProps => <ContactsPage  setOpenCatalogue={setOpenCatalogue}  setOpenMobMenu={setOpenMobMenu} {...routeProps} />} /> */}
 
-                {/* <Route path="/contacts" render={routeProps => <ContactsPage setOpenMobMenu={setOpenMobMenu} {...routeProps} />} /> */}
-
-                {/* <Route path="/privacy-policy" render={routeProps => <PolicyPage setOpenMobMenu={setOpenMobMenu} {...routeProps} />} /> */}
+                {/* <Route path="/privacy-policy" render={routeProps => <PolicyPage  setOpenCatalogue={setOpenCatalogue}  setOpenMobMenu={setOpenMobMenu} {...routeProps} />} /> */}
 
                 <Route
                   path={["/contacts", "/about", "/test", "/delivery", "/privacy-policy"]}
                   render={routeProps => <FeaturePage setTableHeadFixed={setTableHeadFixed} updateCart={updateCart}
                                                      notificationFunc={createNotification} setOrderSent={setOrderSent}
                                                      totalCart={totalCart} currency={currency}
+                                                     setOpenCatalogue={setOpenCatalogue}
                                                      setOpenMobMenu={setOpenMobMenu} {...routeProps} />}
                 />
 
@@ -689,14 +719,59 @@ export default function App() {
                   )}
                 />
 
+                {/*<Route*/}
+                {/*  exact*/}
+                {/*  path={categorySlugLinks.map(c => "/" + c)}*/}
+                {/*  render={routeProps => (*/}
+                {/*    <CataloguePage*/}
+                {/*      setCategorySlugLinks={setCategorySlugLinks}*/}
+                {/*      categorySlugLinks={categorySlugLinks}*/}
+                {/*      setItemSlugLinks={setItemSlugLinks}*/}
+                {/*      itemSlugLinks={itemSlugLinks}*/}
+                {/*      setCategoryItems={setCategoryItems}*/}
+                {/*      categoryItems={categoryItems}*/}
+                {/*      profile={profile}*/}
+                {/*      history={history}*/}
+                {/*      busy={formBusy}*/}
+                {/*      setBusyOrder={setBusyOrder}*/}
+                {/*      currency={currency}*/}
+                {/*      setCurrency={setCurrency}*/}
+                {/*      currencyList={currencyList}*/}
+                {/*      setCurrencyList={setCurrencyList}*/}
+                {/*      RUB={RUB}*/}
+                {/*      setShowTableHeadFixed={setShowTableHeadFixed}*/}
+                {/*      setTableHeadFixed={setTableHeadFixed}*/}
+                {/*      setOpenAuthPopup={setOpenAuthPopup}*/}
+                {/*      setOrderSent={setOrderSent}*/}
+                {/*      totalCart={totalCart}*/}
+                {/*      updateCart={updateCart}*/}
+                {/*      notificationFunc={createNotification}*/}
+                {/*      setOpenCatalogue={setOpenCatalogue} setOpenMobMenu={setOpenMobMenu}*/}
+                {/*      showResults={!formBusy}*/}
+                {/*      cart*/}
+                {/*      {...routeProps}*/}
+                {/*    />*/}
+                {/*  )}*/}
+                {/*/>*/}
+
                 <Route
-                  path="/search"
-                  render={routeProps => (
-                    <FilterForm
+                  path={["/order", "/search", "*"]}
+                  render={routeProps => {
+                    return errorPage ? <NotFoundPage setOpenMobMenu={setOpenMobMenu} {...routeProps} /> : <FilterForm
+                      cart={routeProps.match.path === "/order"}
+                      someCategoryUrl={!(routeProps.match.path === "/search" || routeProps.match.path === "/order")}
+                      sendSearchRequest={sendSearchRequest}
+                      setErrorPage={setErrorPage}
+                      prevRequest={prevRequest}
+                      setPrevRequest={setPrevRequest}
+                      setCategoryItems={setCategoryItems}
+                      nestedCategories={nestedCategories}
+                      setNestedCategories={setNestedCategories}
                       profile={profile}
                       history={history}
                       busy={formBusy}
                       setBusyOrder={setBusyOrder}
+                      categoryItems={categoryItems}
                       currency={currency}
                       setCurrency={setCurrency}
                       currencyList={currencyList}
@@ -709,103 +784,17 @@ export default function App() {
                       totalCart={totalCart}
                       updateCart={updateCart}
                       notificationFunc={createNotification}
+                      setOpenCatalogue={setOpenCatalogue}
                       setOpenMobMenu={setOpenMobMenu}
                       searchData={searchData}
                       showResults={!formBusy}
-                      cart={false}
+                      onSubmitSearchForm={onSubmitSearchForm}
                       props={{ ...routeProps }}
-                    />
-                  )}
+                    />;
+                  }}
                 />
 
-                <Route
-                  path="/order"
-                  render={routeProps => (
-                    <FilterForm
-                      profile={profile}
-                      history={history}
-                      busy={formBusy}
-                      setBusyOrder={setBusyOrder}
-                      currency={currency}
-                      setCurrency={setCurrency}
-                      currencyList={currencyList}
-                      setCurrencyList={setCurrencyList}
-                      RUB={RUB}
-                      setShowTableHeadFixed={setShowTableHeadFixed}
-                      setTableHeadFixed={setTableHeadFixed}
-                      setOpenAuthPopup={setOpenAuthPopup}
-                      setOrderSent={setOrderSent}
-                      totalCart={totalCart}
-                      updateCart={updateCart}
-                      notificationFunc={createNotification}
-                      setOpenMobMenu={setOpenMobMenu}
-                      showResults={!formBusy}
-                      cart
-                      props={{ ...routeProps }}
-                    />
-                  )}
-                />
-
-                <Route
-                  exact
-                  path="/catalogue/:id"
-                  render={routeProps => (
-                    <CataloguePage
-                      profile={profile}
-                      history={history}
-                      busy={formBusy}
-                      setBusyOrder={setBusyOrder}
-                      currency={currency}
-                      setCurrency={setCurrency}
-                      currencyList={currencyList}
-                      setCurrencyList={setCurrencyList}
-                      RUB={RUB}
-                      setShowTableHeadFixed={setShowTableHeadFixed}
-                      setTableHeadFixed={setTableHeadFixed}
-                      setOpenAuthPopup={setOpenAuthPopup}
-                      setOrderSent={setOrderSent}
-                      totalCart={totalCart}
-                      updateCart={updateCart}
-                      notificationFunc={createNotification}
-                      setOpenMobMenu={setOpenMobMenu}
-                      showResults={!formBusy}
-                      cart
-                      props={{ ...routeProps }}
-                    />
-                  )}
-                />
-
-                {categories.length && <Route
-                  exact
-                  path={categories.map(c => "/" + c)}
-                  render={routeProps => (
-                    <CatalogueItem
-                      profile={profile}
-                      history={history}
-                      busy={formBusy}
-                      setBusyOrder={setBusyOrder}
-                      currency={currency}
-                      setCurrency={setCurrency}
-                      currencyList={currencyList}
-                      setCurrencyList={setCurrencyList}
-                      RUB={RUB}
-                      setShowTableHeadFixed={setShowTableHeadFixed}
-                      setTableHeadFixed={setTableHeadFixed}
-                      setOpenAuthPopup={setOpenAuthPopup}
-                      setOrderSent={setOrderSent}
-                      totalCart={totalCart}
-                      updateCart={updateCart}
-                      notificationFunc={createNotification}
-                      setOpenMobMenu={setOpenMobMenu}
-                      showResults={!formBusy}
-                      cart
-                      props={{ ...routeProps }}
-                    />
-                  )}
-                />}
-
-                <Route path="*"
-                       render={routeProps => <NotFoundPage setOpenMobMenu={setOpenMobMenu} {...routeProps} />} />
+                {/*<Route path="*" render={routeProps => <NotFoundPage setOpenMobMenu={setOpenMobMenu} {...routeProps} />} />*/}
               </Switch>
             )}
           </div>

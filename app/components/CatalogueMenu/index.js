@@ -1,138 +1,9 @@
 import React, { useEffect, useState } from "react";
 import apiGET from "../../utils/search";
 
-function CatalogueMenu({ history, setOpenCatalogue, openCatalogue }) {
+function CatalogueMenu({ history, setOpenCatalogue, openCatalogue, menuJson }) {
   let menuTimer;
-  const subMenu2 = [
-    { name: "Быстродействующие" },
-    { name: "Варикапы" },
-    { name: "Выпрямительные" },
-    { name: "Высоковольтные" },
-    { name: "Диодные мосты" },
-    { name: "Диоды лавинные" },
-    { name: "Защитные" },
-    { name: "Импульсные" },
-    { name: "Прочие диоды" },
-    { name: "СВЧ, туннельные" },
-    { name: "Силовые" },
-    { name: "Стабилитроны" },
-    { name: "Быстродействующие" },
-    { name: "Варикапы" },
-    { name: "Выпрямительные" },
-    { name: "Высоковольтные" },
-    { name: "Диодные мосты" },
-    { name: "Диоды лавинные" },
-    { name: "Защитные" },
-    { name: "Импульсные" },
-    { name: "Прочие диоды" },
-    { name: "СВЧ, туннельные" },
-    { name: "Силовые" },
-    { name: "Стабилитроны" },
-    { name: "Быстродействующие" },
-    { name: "Варикапы" },
-    { name: "Выпрямительные" },
-    { name: "Высоковольтные" },
-    { name: "Диодные мосты" },
-    { name: "Диоды лавинные" },
-    { name: "Защитные" },
-    { name: "Импульсные" },
-    { name: "Прочие диоды" },
-    { name: "СВЧ, туннельные" },
-    { name: "Силовые" },
-    { name: "Стабилитроны" },
-    { name: "Быстродействующие" },
-    { name: "Варикапы" },
-    { name: "Выпрямительные" },
-    { name: "Высоковольтные" },
-    { name: "Диодные мосты" },
-    { name: "Диоды лавинные" },
-    { name: "Защитные" },
-    { name: "Импульсные" },
-    { name: "Прочие диоды" },
-    { name: "СВЧ, туннельные" },
-    { name: "Силовые" },
-    { name: "Стабилитроны" },
-    { name: "Шоттки" }
-  ];
-  const subMenu = [
-    { name: "Акустика", submenu: subMenu2 },
-    { name: "Диоды", submenu: subMenu2 },
-    { name: "Запчасти для Apple", submenu: subMenu2 },
-    { name: "Запчасти для бытовой техники", submenu: subMenu2 },
-    { name: "Запчасти для ноутбуков", submenu: subMenu2 },
-    { name: "Запчасти для планшетов", submenu: subMenu2 },
-    { name: "Запчасти для смартфонов", submenu: subMenu2 },
-    { name: "Индуктивные компоненты", submenu: subMenu2 },
-    { name: "Компенсация реактивной мощности", submenu: subMenu2 },
-    { name: "Конденсаторы", submenu: subMenu2 },
-    { name: "Микросхемы", submenu: subMenu2 },
-    { name: "Оптопары и изоляторы", submenu: subMenu2 },
-    { name: "Полупроводниковые модули", submenu: subMenu2 },
-    { name: "Предохранители", submenu: subMenu2 },
-    { name: "Радиолампы", submenu: subMenu2 },
-    { name: "Резисторы", submenu: subMenu2 },
-    { name: "Резонаторы и фильтры", submenu: subMenu2 },
-    { name: "Тиристоры и Триаки", submenu: subMenu2 },
-    { name: "Транзисторы", submenu: subMenu2 },
-    { name: "Трансформаторы", submenu: subMenu2 },
-    { name: "Устройства защиты", submenu: subMenu2 },
-    { name: "Акустика", submenu: subMenu2 },
-    { name: "Диоды", submenu: subMenu2 },
-    { name: "Запчасти для Apple", submenu: subMenu2 },
-    { name: "Запчасти для бытовой техники", submenu: subMenu2 },
-    { name: "Запчасти для ноутбуков", submenu: subMenu2 },
-    { name: "Запчасти для планшетов", submenu: subMenu2 },
-    { name: "Запчасти для смартфонов", submenu: subMenu2 },
-    { name: "Индуктивные компоненты", submenu: subMenu2 },
-    { name: "Компенсация реактивной мощности", submenu: subMenu2 },
-    { name: "Конденсаторы", submenu: subMenu2 },
-    { name: "Микросхемы", submenu: subMenu2 },
-    { name: "Оптопары и изоляторы", submenu: subMenu2 },
-    { name: "Полупроводниковые модули", submenu: subMenu2 },
-    { name: "Предохранители", submenu: subMenu2 },
-    { name: "Радиолампы", submenu: subMenu2 },
-    { name: "Резисторы", submenu: subMenu2 },
-    { name: "Резонаторы и фильтры", submenu: subMenu2 },
-    { name: "Тиристоры и Триаки", submenu: subMenu2 },
-    { name: "Транзисторы", submenu: subMenu2 },
-    { name: "Трансформаторы", submenu: subMenu2 },
-    { name: "Устройства защиты", submenu: subMenu2 },
-    { name: "Ферриты, магниты, СВЧ приборы", submenu: subMenu2 }
-  ];
-
   const [menuPath, setMenuPath] = useState("0");
-  const [menuJson, setMenuJson] = useState([
-    // {
-    //   name: "Электронные компоненты",
-    //   submenu: subMenu
-    // },
-    // {
-    //   name: "Измерительные приборы",
-    //   submenu: subMenu
-    // },
-    // {
-    //   name: "Оптоэлектроника",
-    //   submenu: subMenu
-    // }
-  ]);
-
-  useEffect(() => {
-    const requestURL = "/catalog/categories";
-
-    apiGET(requestURL, {}, data => {
-      setMenuJson(data.map(d => {
-        return {
-          name: d.name,
-          link: d.link,
-          submenu: subMenu
-        };
-      }));
-    });
-  }, []);
-
-  // useEffect(() => {
-  //   console.log("menuPath", menuPath);
-  // }, [menuPath]);
 
   const menuTreeBuilder = (menu, level = 0, parent = "0", ret = []) => {
     let sub = [];
@@ -150,15 +21,17 @@ function CatalogueMenu({ history, setOpenCatalogue, openCatalogue }) {
           onClick={(e) => {
             if (e.target.classList.contains("__active")) {
               setOpenCatalogue(false);
-              history.push("/" + (m.link || "#"));
+              history.push("/" + (m.slug || "#"));
             }
             return false;
           }}
-        >{parent} {m.name}</span>
+        >
+          {/*{parent}*/}
+          {m.name}</span>
       </div>);
 
-      if (m.submenu) {
-        sub.push(menuTreeBuilder(m.submenu, level + 1, `${parent}-${mi}`));
+      if (m.children) {
+        sub.push(menuTreeBuilder(m.children, level + 1, `${parent}-${mi}`));
       }
     });
 
@@ -170,11 +43,11 @@ function CatalogueMenu({ history, setOpenCatalogue, openCatalogue }) {
   };
 
   return (
-    <div className={"catalogue" + (openCatalogue ? " __open" : "")}>
+    menuJson.length ? <div className={"catalogue" + (openCatalogue ? " __open" : "")}>
       <div className="catalogue__inner">
         {menuTreeBuilder(menuJson)}
       </div>
-    </div>
+    </div> : null
   );
 }
 

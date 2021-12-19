@@ -1,17 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
 
-import { Link } from 'react-router-dom';
-import apiGET from '../../utils/search';
-import { getJsonData } from '../../utils/getJsonData';
+import { Link } from "react-router-dom";
+import apiGET from "../../utils/search";
+import { getJsonData } from "../../utils/getJsonData";
 
 function Footer() {
-  const [offerLink, setOfferLink] = useState('#');
+  const [offerLink, setOfferLink] = useState("#");
 
   useEffect(() => {
-    const requestURL = '/settings';
+    const requestURL = "/settings";
 
     apiGET(requestURL, {}, data => {
-      if (data && data.hasOwnProperty('offer_file')) {
+      if (data && data.hasOwnProperty("offer_file")) {
         setOfferLink(data.offer_file.value);
       }
     });
@@ -23,7 +23,7 @@ function Footer() {
         <div className="footer-content">
           <div className="footer-copyright">
             2012-2021 © ООО «Катпарт», ИНН&nbsp;5406814289 <br />
-            Для повышения удобства сайт использует cookies. Оставаясь на сайте, вы соглашаетесь с{' '}
+            Для повышения удобства сайт использует cookies. Оставаясь на сайте, вы соглашаетесь с{" "}
             <Link className="footer-link" to="/privacy-policy/">
               политикой конфиденциальности
             </Link>

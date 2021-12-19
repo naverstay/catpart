@@ -16,6 +16,7 @@ export default function FeaturePage(props) {
 
     if (!page || page.url !== props.match.path) {
       const requestURL = '/pages?url=' + props.match.path;
+      props.setOpenCatalogue(false);
 
       apiGET(requestURL, {}, data => {
         if (data.error) {

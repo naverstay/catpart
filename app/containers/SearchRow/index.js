@@ -1,12 +1,12 @@
-import React, { createRef, useEffect, useState } from 'react';
-import Ripples from 'react-ripples';
-import priceFormatter from '../../utils/priceFormatter';
+import React, { createRef, useEffect, useState } from "react";
+import Ripples from "react-ripples";
+import priceFormatter from "../../utils/priceFormatter";
 
-import { setInputFilter } from '../../utils/inputFilter';
-import { findPriceIndex } from '../../utils/findPriceIndex';
+import { setInputFilter } from "../../utils/inputFilter";
+import { findPriceIndex } from "../../utils/findPriceIndex";
 
 function escapeRegExp(string) {
-  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // $& means the whole matched string
+  return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // $& means the whole matched string
 }
 
 const SearchRow = props => {
@@ -25,7 +25,7 @@ const SearchRow = props => {
   const inputRef = createRef();
   const [disableAddBtn, setDisableAddBtn] = useState(false);
   const [itemCount, setItemCount] = useState(defaultCount || 1);
-  const extraSymbols = [',', '.', '-', ' ', '#', '_', '+', ')', '(', '[', ']'];
+  const extraSymbols = [",", ".", "-", " ", "#", "_", "+", ")", "(", "[", "]"];
 
   const textHighlighter = (txt, bold) => {
     let ret = <>{txt}</>;
@@ -61,27 +61,28 @@ const SearchRow = props => {
   }
 
   return (
-    <div className={`search-results__row ${rowIndex % 2 === 0 ? '__odd' : '__even' + row.supplier === 'Louisyen' ? ' __lilu' : ''}`}>
+    <div
+      className={`search-results__row ${(rowIndex % 2 === 0 ? "__odd" : "__even") + (row.supplier === "Louisyen" ? " __lilu" : "")}`}>
       {Object.keys(tableHeader).map((cell, ci) => (
         <div key={ci} className={`search-results__cell __${cell}`}>
-          {cell === 'name' ? null : <span className="search-results__label">{tableHeader[cell]}</span>}
+          {cell === "name" ? null : <span className="search-results__label">{tableHeader[cell]}</span>}
           <span className="search-results__value">
-            {cell === 'pricebreaks' ? (
+            {cell === "pricebreaks" ? (
               row.pricebreaks.map((p, pi) => (
                 <span key={pi} className="search-results__item">
                   {priceHighlighter(pi, priceFormatter(parseFloat(p.price / currency.exChange).toFixedCustom(currency.precision), currency.precision))}
                 </span>
               ))
-            ) : cell === 'total' ? (
+            ) : cell === "total" ? (
               row.pricebreaks.map((p, pi) => (
                 <span key={pi} className="search-results__item">
                   {priceHighlighter(pi, `x${pi === priceMatch ? itemCount : p.quant}=${priceFormatter(parseFloat(((pi === priceMatch ? itemCount : p.quant) * p.price) / currency.exChange).toFixedCustom(currency.precision), currency.precision)}`)}
                 </span>
               ))
-            ) : cell === 'supplier' ? (
+            ) : cell === "supplier" ? (
               row.supplierAlias
             ) : row[cell] ? (
-              cell === 'name' ? (
+              cell === "name" ? (
                 textHighlighter(row[cell], row.bold)
               ) : (
                 row[cell]
@@ -111,12 +112,12 @@ const SearchRow = props => {
               if (e.target.value.length && val < row.moq) {
                 e.target.value = `${row.moq}`;
                 setItemCount(row.moq);
-                notificationFunc('success', `Для ${row.name}`, `минимальное количество: ${row.moq}`);
+                notificationFunc("success", `Для ${row.name}`, `минимальное количество: ${row.moq}`);
               }
               if (e.target.value.length && val > row.quantity) {
                 e.target.value = `${row.quantity}`;
                 setItemCount(row.quantity);
-                notificationFunc('success', `Для ${row.name}`, `максимальное количество: ${row.quantity}`);
+                notificationFunc("success", `Для ${row.name}`, `максимальное количество: ${row.quantity}`);
               }
             }}
             // value={itemCount}
@@ -130,9 +131,10 @@ const SearchRow = props => {
                 updateCart(row.id, +inputRef.current.value || itemCount, currency);
               }}
               during={1000}
-              className={`btn __blue${disableAddBtn ? ' __disabled' : ''}`}
+              className={`btn __blue${disableAddBtn ? " __disabled" : ""}`}
             >
-              <button aria-label={row.name} name={`search-add-${row.id}`} disabled={disableAddBtn} className="btn-inner">
+              <button aria-label={row.name} name={`search-add-${row.id}`} disabled={disableAddBtn}
+                      className="btn-inner">
                 <span className="btn__icon icon icon-cart" />
               </button>
             </Ripples>
