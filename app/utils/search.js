@@ -1,7 +1,8 @@
-import axios from 'axios';
+import axios from "axios";
+import qs from "qs";
 
 const CancelToken = axios.CancelToken;
-const API = 'https://dev.catpart.ru/api';
+const API = "https://dev.catpart.ru/api";
 let cancel;
 
 /**
@@ -26,7 +27,7 @@ function parseJSON(response) {
  * @return {object|undefined} Returns either the response, or throws an error
  */
 function checkStatus(response) {
-  window.log && console.log('checkStatus', response);
+  window.log && console.log("checkStatus", response);
 
   if (response.status >= 200 && response.status < 300) {
     return response;
@@ -47,31 +48,34 @@ function checkStatus(response) {
  * @return {object}             The response data
  */
 
-export default function apiGET(url, options, cb) {
-  return axios(API + url, {
+export default function apiGET(url, options, cb, attr = "") {
+  return axios(API + url + attr, {
     headers: {
-      'Content-Type': 'application/json',
-      Accept: 'application/json',
-      Authorization: `Bearer ${localStorage.getItem('access_token') || ''}`,
+      "Content-Type": "application/json",
+      Accept: "application/json",
+      Authorization: `Bearer ${localStorage.getItem("access_token") || ""}`
     },
     data: {},
     params: options,
+    paramsSerializer: params => {
+      return qs.stringify(params);
+    },
     cancelToken: new CancelToken(function executor(c) {
       // An executor function receives a cancel function as a parameter
       cancel = c;
-    }),
+    })
   })
     .then(checkStatus)
     .then(parseJSON)
     .then(data => {
       cancel = null;
 
-      if (typeof cb === 'function') {
+      if (typeof cb === "function") {
         cb(data);
       }
     })
     .catch(e => {
-      if (typeof cb === 'function') {
+      if (typeof cb === "function") {
         cb({ error: e });
       }
     });

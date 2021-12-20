@@ -108,42 +108,48 @@ export default function CatalogueItem(props) {
     <Breadcrumbs bread={breadcrumbs} />
 
     <div className="row">
-      <div className="column sm-col-12 xl-col-9">
+      <div itemScope itemType="http://schema.org/Product" className="column sm-col-12 xl-col-9">
         {itemData ? <article className="article __catalogue">
-          <h1 className="article-title">{itemData.snippet.name}</h1>
+          <h1 itemProp="name" className="article-title">{itemData.snippet.name}</h1>
 
           <div className={"catalogue-page__item"}>
             <div className="catalogue-page__item-image">
-              <img src={itemData.image || NoImage} alt="" />
+              <img itemProp="image" src={itemData.image || NoImage} alt="" />
             </div>
-            {itemData.snippet && itemData.snippet.hasOwnProperty("id") ? <dl className="catalogue-page__item-info">
-              {itemData.snippet.manufacturer ? <div className={"description"}>
-                <dt><b>Производитель:</b></dt>
-                <dd>{itemData.snippet.manufacturer.name || ""}</dd>
-              </div> : null}
-              {itemData.snippet.sellers && itemData.snippet.sellers.length ? <div className={"description"}>
-                <dt><b>Поставщики:</b></dt>
-                <dd>{itemData.snippet.sellers.reduce((acc, el) => `${acc + ", " + ((el.company && el.company.name) ? el.company.name : "")}`, "").substring(2)}</dd>
-              </div> : null}
-              {itemData.snippet.descriptions && itemData.snippet.descriptions.length ? <div className={"description"}>
-                <dt><b>Описание:</b></dt>
-                <dd>{itemData.snippet.descriptions.reduce((acc, el) => `${acc + "\n" + (el.text || "")}`, "").substring(1)}</dd>
-              </div> : null}
-              <div className={"description"}>
-                <dt><b>Аналоги:</b></dt>
-                <dd></dd>
-              </div>
-            </dl> : null}
+            {itemData.snippet && itemData.snippet.hasOwnProperty("id") ?
+              <dl className="catalogue-page__item-info">
+                {itemData.snippet.manufacturer ? <div className={"description"}>
+                  <dt><b>Производитель:</b></dt>
+                  <dd>{itemData.snippet.manufacturer.name || ""}</dd>
+                </div> : null}
+                {itemData.snippet.sellers && itemData.snippet.sellers.length ?
+                  <div itemProp="offers" itemScope itemType="http://schema.org/Offer" className={"description"}>
+                    <dt><b>Поставщики:</b></dt>
+                    <dd>{itemData.snippet.sellers.reduce((acc, el) => `${acc + ", " + ((el.company && el.company.name) ? el.company.name : "")}`, "").substring(2)}</dd>
+                  </div> : null}
+                {itemData.snippet.descriptions && itemData.snippet.descriptions.length ?
+                  <div itemProp="description" className={"description"}>
+                    <dt><b>Описание:</b></dt>
+                    <dd>{itemData.snippet.descriptions.reduce((acc, el) => `${acc + "\n" + (el.text || "")}`, "").substring(1)}</dd>
+                  </div> : null}
+                <div className={"description"}>
+                  <dt><b>Аналоги:</b></dt>
+                  <dd></dd>
+                </div>
+              </dl> : null}
           </div>
         </article> : null}
       </div>
     </div>
-    {itemData && itemData.hasOwnProperty("snippet") ? <React.Fragment>
-      {itemData.snippet.specs && itemData.snippet.specs.length ? <article className="article __catalogue">
-        <div className={"catalogue-page__specs"}>
-          <div className={"catalogue-page__analogue-param"}>
-            <h2>Технические спецификации</h2>
-            <span className={"catalogue-page__specs--check"}>
+    {itemData && itemData.hasOwnProperty("snippet") ?
+      <React.Fragment>
+        {itemData.snippet.specs && itemData.snippet.specs.length ?
+          <>
+            <article className="article __catalogue">
+              <div className={"catalogue-page__specs"}>
+                <div className={"catalogue-page__analogue-param"}>
+                  <h2>Технические спецификации</h2>
+                  <span className={"catalogue-page__specs--check"}>
                   <FormCheck
                     indeterminate={snippetCheckValue.length > 0 && snippetCheckValue.length < snippetCheckData.length}
                     checked={snippetCheckValue.length === snippetCheckData.length}
@@ -152,66 +158,72 @@ export default function CatalogueItem(props) {
                     name={"0"}
                     value={"0"}
                     error={null}
-                    label={snippetCheckValue.length === snippetCheckData.length ? "Убрать из фильтра" :  "Добавить в фильтр"}
+                    label={snippetCheckValue.length === snippetCheckData.length ? "Убрать из фильтра" : "Добавить в фильтр"}
                     inputRef={null}
                   />
             </span>
-          </div>
+                </div>
 
-          {itemData.snippet.specs.map((s, si) => {
-            let id = `${si + 1}`;
+                {itemData.snippet.specs.map((s, si) => {
+                  let id = `${si + 1}`;
 
-            return <div key={si}
-                        className={"catalogue-page__analogue-param " + ((si % 2 === 0 ? "__odd" : "__even"))}>
-              <span>{s.hasOwnProperty("attribute") && (s.attribute.name || s.attribute.id || "")}</span>
-              <span>{s.display_value}</span>
-              <span className={"catalogue-page__specs--check"}>
+                  return <div key={si}
+                              className={"catalogue-page__analogue-param " + ((si % 2 === 0 ? "__odd" : "__even"))}>
+                    <span>{s.hasOwnProperty("attribute") && (s.attribute.name || s.attribute.id || "")}</span>
+                    <span>{s.display_value}</span>
+                    <span className={"catalogue-page__specs--check"}>
                   <FormCheck
                     onChange={handleChange.bind(this, s.attribute.id)}
                     checked={snippetCheckValue.indexOf(s.attribute.id) > -1}
                     name={id}
                     value={s.attribute.id}
                     error={null}
-                    label={snippetCheckValue.indexOf(s.attribute.id) > -1 ? "Убрать из фильтра" :  "Добавить в фильтр"}
+                    label={snippetCheckValue.indexOf(s.attribute.id) > -1 ? "Убрать из фильтра" : "Добавить в фильтр"}
                     inputRef={null}
                   /></span>
-            </div>;
-          })}
-        </div>
-      </article> : null}
+                  </div>;
+                })}
+              </div>
+            </article>
 
-      <article className="article __catalogue">
-        <h2>Аналоги</h2>
-      </article>
+            <div className="text-center">
+              <div className="btn __blue">Подобрать аналоги</div>
+            </div>
+          </>
+          : null}
 
-      <div className="catalogue-page__analogue">
-        <div ref={navigationPrevRef} className="btn __blue analogue-slider__button analogue-slider__button--prev" />
-        <div ref={navigationNextRef} className="btn __blue analogue-slider__button analogue-slider__button--next" />
-        <div className="catalogue-page__analogue-title">
-          <div className="catalogue-page__analogue-item">
-            {titles.map((t, ti) => {
-              return <div key={ti} className="catalogue-page__analogue-param">{t}</div>;
-            })}
+        <article className="article __catalogue">
+          <h2>Аналоги</h2>
+        </article>
+
+        <div className="catalogue-page__analogue">
+          <div ref={navigationPrevRef} className="btn __blue analogue-slider__button analogue-slider__button--prev" />
+          <div ref={navigationNextRef} className="btn __blue analogue-slider__button analogue-slider__button--next" />
+          <div className="catalogue-page__analogue-title">
+            <div className="catalogue-page__analogue-item">
+              {titles.map((t, ti) => {
+                return <div key={ti} className="catalogue-page__analogue-param">{t}</div>;
+              })}
+            </div>
+          </div>
+          <div className="catalogue-page__analogue-slider">
+            <Swiper {...swiperParams} navigation spaceBetween={10} onInit={(swiper) => {
+              console.log("init", swiper);
+              navigationPrevRef.current.onClick = () => {
+                console.log("prev", swiper);
+              };
+
+              navigationNextRef.current.onClick = () => {
+                console.log("next", swiper);
+              };
+            }}>
+              {slides.map((s, si) => {
+                return <div key={si} className={"swiper-slide"}
+                            dangerouslySetInnerHTML={{ __html: slideBuilder(s, si + 1) }} />;
+              })}
+            </Swiper>
           </div>
         </div>
-        <div className="catalogue-page__analogue-slider">
-          <Swiper {...swiperParams} navigation spaceBetween={10} onInit={(swiper) => {
-            console.log("init", swiper);
-            navigationPrevRef.current.onClick = () => {
-              console.log("prev", swiper);
-            };
-
-            navigationNextRef.current.onClick = () => {
-              console.log("next", swiper);
-            };
-          }}>
-            {slides.map((s, si) => {
-              return <div key={si} className={"swiper-slide"}
-                          dangerouslySetInnerHTML={{ __html: slideBuilder(s, si + 1) }} />;
-            })}
-          </Swiper>
-        </div>
-      </div>
-    </React.Fragment> : null}
+      </React.Fragment> : null}
   </>);
 }

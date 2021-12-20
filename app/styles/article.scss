@@ -3,12 +3,16 @@
   padding-bottom: 15px;
   color: $main_gray;
 
+  &-title,
   h1 {
+    font-weight: 700;
     font-size: 36px;
     margin: 0 0 15px;
   }
 
+  &-subtitle,
   h2 {
+    font-weight: 700;
     font-size: 24px;
     margin: 15px 0 8px;
   }

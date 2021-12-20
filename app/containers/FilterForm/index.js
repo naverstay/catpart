@@ -40,6 +40,7 @@ import CatalogueItem from "../CatalogueItem";
 import { Link } from "react-router-dom";
 import CataloguePage from "../CataloguePage";
 import { getButtonsMap } from "../../utils/getPaginationMap";
+import { flatDeep } from "../../utils/flatDeep";
 
 // const key = 'home';
 const TRIGGER_DROPDOWN_LIMIT = 11;
@@ -86,6 +87,7 @@ export function FilterForm({
   const query = new URLSearchParams(props.location.search);
   const [nestedCategories, setNestedCategories] = useState([]);
   const [categoryInfo, setCategoryInfo] = useState(null);
+  const [categoryFilter, setCategoryFilter] = useState([]);
 
   const [openPaginationDropdown, setOpenPaginationDropdown] = useState(false);
 
@@ -114,6 +116,7 @@ export function FilterForm({
   const [breadcrumbs, setBreadcrumbs] = useState([]);
   const [pagination, setPagination] = useState({ pages: 1 });
   const [itemData, setItemData] = useState(null);
+  const [showCatPreloader, setShowCatPreloader] = useState(false);
 
   const plural = (n, str1, str2, str5) => `${n} ${n % 10 == 1 && n % 100 != 11 ? str1 : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? str2 : str5}`;
 
@@ -266,10 +269,28 @@ export function FilterForm({
 
     let options = {
       page: catPage,
-      limit: catPageLimit
-      // sort: {},
-      // category: category
+      limit: catPageLimit,
+      attributes: categoryFilter.map(m => {
+        return {
+          id: m.id,
+          values: m.values
+        };
+      })
+      // attributes: (categoryFilter.reduce((acc, m) => {
+      //   let ret = [];
+      //
+      //   for (let i = 0; i < m.value.length; i++) {
+      //     ret.push({
+      //       id: m.id,
+      //       value: m.value[i]
+      //     });
+      //   }
+      //
+      //   return acc.concat(ret);
+      // }, []))
     };
+
+    console.log("getCategoryList", options, categoryFilter);
 
     if (prevRequest !== requestURL + JSON.stringify(options)) {
       setPrevRequest(requestURL + JSON.stringify(options));
@@ -285,7 +306,7 @@ export function FilterForm({
         } else {
           setErrorPage(false);
 
-          let cols = [];
+          let catColumnNames = [];
 
           if (data.hasOwnProperty("product")) {
             setCategoryPage(false);
@@ -305,8 +326,8 @@ export function FilterForm({
 
                 if (d.snippet.specs && d.snippet.specs.length) {
                   d.snippet.specs.forEach((s, si) => {
-                    cols.push({
-                      Header: s.attribute.name,
+                    catColumnNames.push({
+                      attributeId: s.attribute.id,
                       accessor: s.attribute.name
                     });
                     params[s.attribute.name] = s.display_value;
@@ -326,7 +347,7 @@ export function FilterForm({
               setNodataText(`Нет данных ${props.match.url} страница ${catPage} лимит ${catPageLimit}`);
             }
 
-            setCatColumnsList(cols);
+            setCatColumnsList(catColumnNames);
           } else {
             setNodataText(`Что-то пошло не так и не туда ${props.match.url} страница ${catPage} лимит ${catPageLimit}`);
           }
@@ -353,25 +374,68 @@ export function FilterForm({
             setNestedCategories([]);
           }
         }
+
+        setShowCatPreloader(false);
       });
+    } else {
+      setShowCatPreloader(false);
     }
   };
 
   useEffect(() => {
     if (someCategoryUrl) {
+      setShowCatPreloader(true);
       setItemData(null);
       setCategoryPage(true);
       getCategoryList(props.match.url.replace(/\//g, ""));
     } else {
+      setShowCatPreloader(false);
       setItemData(null);
       setErrorPage(false);
       setCategoryPage(false);
     }
-  }, [catPage, catPageLimit, props.match.url]);
+  }, [catPage, catPageLimit, props.match.url, categoryFilter]);
+
+  const removeFilter = (param, index) => {
+    setCategoryFilter(categoryFilter.reduce((acc, f, fi) => {
+      if (fi === param) {
+        if (f.values.length > 1) {
+          f.values.splice(index, 1);
+          return acc.concat(f);
+        } else {
+          return acc;
+        }
+      } else {
+        return acc.concat(f);
+      }
+    }, []));
+  };
+
+  const filterItemsHTML = useMemo(() => {
+    let ret = null;
+
+    if (categoryFilter.length) {
+      ret = categoryFilter.map((f, fi) => {
+        return <li key={fi}>
+          <span className={"catalogue-page__filter-item"}>{f.name}</span>
+          {f.values.map((m, mi) => <span key={mi} className={"catalogue-page__filter-item"}>
+            <span>{m}</span>
+             <span className={"filter-remove-btn btn __gray"} onClick={() => {
+               removeFilter(fi, mi);
+             }}>
+              <span className={"icon icon-close"} />
+            </span>
+          </span>)}
+        </li>;
+      });
+    }
+
+    return ret;
+  }, [props.match.url, categoryFilter]);
 
   useEffect(() => {
     setCatPage(1);
-  }, [catPageLimit]);
+  }, [props.match.url, catPageLimit, categoryFilter]);
 
   const paginationHTML = useMemo(() => {
     let pages = getButtonsMap(pagination.pages, catPage);
@@ -391,10 +455,9 @@ export function FilterForm({
     }) : null;
   }, [pagination, catPage]);
 
-  console.log("itemData", someCategoryUrl, itemData, categoryPage, someCategoryUrl && itemData !== null && !categoryPage);
-
   return (
     <>
+      <div id="rtCellSizer" />
       {cart ? (
         <Helmet>
           <title>Оформление заказа - CATPART.RU</title>
@@ -411,6 +474,8 @@ export function FilterForm({
         </Helmet>
       ) : null}
 
+
+      {/* todo search and any category/product page */}
       {!cart && someCategoryUrl ? <>
           {itemData ? <CatalogueItem
             profile={profile}
@@ -434,104 +499,108 @@ export function FilterForm({
             props={{ ...props }}
           /> : categoryPage ?
             <>
+              {showCatPreloader ? <span>Skeleton here</span> : <>
+                <CataloguePage
+                  filterItemsHTML={filterItemsHTML}
+                  categoryItems={categoryItems}
+                  catPage={catPage}
+                  setCatPage={setCatPage}
+                  breadcrumbs={breadcrumbs}
+                  catColumnsList={catColumnsList}
+                  noDataText={noDataText}
+                  nestedCategories={nestedCategories.slice(0)}
+                  categoryInfo={categoryInfo}
+                  profile={profile}
+                  history={history}
+                  // busy={formBusy}
+                  categoryFilter={categoryFilter}
+                  setCategoryFilter={setCategoryFilter}
+                  setBusyOrder={setBusyOrder}
+                  currency={currency}
+                  setCurrency={setCurrency}
+                  currencyList={currencyList}
+                  setCurrencyList={setCurrencyList}
+                  RUB={RUB}
+                  setShowTableHeadFixed={setShowTableHeadFixed}
+                  setTableHeadFixed={setTableHeadFixed}
+                  setOpenAuthPopup={setOpenAuthPopup}
+                  setOrderSent={setOrderSent}
+                  totalCart={totalCart}
+                  updateCart={updateCart}
+                  // notificationFunc={createNotification}
+                  // setOpenCatalogue={setOpenCatalogue}
+                  // setOpenMobMenu={setOpenMobMenu}
+                  {...props}
+                />
 
-              <CataloguePage
-                categoryItems={categoryItems}
-                catPage={catPage}
-                setCatPage={setCatPage}
-                breadcrumbs={breadcrumbs}
-                catColumnsList={catColumnsList}
-                noDataText={noDataText}
-                nestedCategories={nestedCategories.slice(0)}
-                categoryInfo={categoryInfo}
-                profile={profile}
-                history={history}
-                // busy={formBusy}
-                setBusyOrder={setBusyOrder}
-                currency={currency}
-                setCurrency={setCurrency}
-                currencyList={currencyList}
-                setCurrencyList={setCurrencyList}
-                RUB={RUB}
-                setShowTableHeadFixed={setShowTableHeadFixed}
-                setTableHeadFixed={setTableHeadFixed}
-                setOpenAuthPopup={setOpenAuthPopup}
-                setOrderSent={setOrderSent}
-                totalCart={totalCart}
-                updateCart={updateCart}
-                // notificationFunc={createNotification}
-                // setOpenCatalogue={setOpenCatalogue}
-                // setOpenMobMenu={setOpenMobMenu}
-                {...props}
-              />
+                {noDataText ? <div className="catalogue-page__nodata">
+                  {noDataText}
+                </div> : null}
 
-              {noDataText ? <div className="catalogue-page__nodata">
-                {noDataText}
-              </div> : null}
-
-              <div className="catalogue-page__pagination">
-                <ul className={"catalogue-page__pagination-list"}>
-                  <li className={"catalogue-page__pagination-item"}>
-                    <div ref={openPaginationRef} className="dropdown-holder">
-                      <Ripples
-                        onClick={() => {
-                          setOpenPaginationDropdown(!openPaginationDropdown);
-                        }}
-                        className={"btn __gray" + (openPaginationDropdown ? " __opened" : "")}
-                        during={1000}
-                      >
+                {categoryItems.length ? <div className="catalogue-page__pagination">
+                  <ul className={"catalogue-page__pagination-list"}>
+                    <li className={"catalogue-page__pagination-item"}>
+                      <div ref={openPaginationRef} className="dropdown-holder">
+                        <Ripples
+                          onClick={() => {
+                            setOpenPaginationDropdown(!openPaginationDropdown);
+                          }}
+                          className={"btn __gray" + (openPaginationDropdown ? " __opened" : "")}
+                          during={1000}
+                        >
                       <span className="btn-inner">
                         <span>{catPageLimit}</span>
                         <span className={"icon icon-chevron-up"} />
                       </span>
+                        </Ripples>
+                        {openPaginationDropdown && (
+                          <div className="dropdown-container">
+                            <ul className="dropdown-list">
+                              {[1, 2, 3, 10, 20, 50, 100].map((t, ti) => (
+                                <li key={ti}><Ripples
+                                  onClick={() => {
+                                    setOpenPaginationDropdown(false);
+                                    setCatPageLimit(t);
+                                  }}
+                                  className="dropdown-link"
+                                  during={1000}
+                                >{t}</Ripples></li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </div>
+                    </li>
+                  </ul>
+                  {paginationHTML ? <ul className={"catalogue-page__pagination-list"}>
+                    {paginationHTML}
+                  </ul> : null}
+                  <ul className={"catalogue-page__pagination-list"}>
+                    <li className={"catalogue-page__pagination-item"}>
+                      <Ripples
+                        onClick={() => {
+                          setCatPage(Math.max(1, catPage - 1));
+                        }}
+                        className={"btn __gray" + (catPage === 1 ? " __disabled" : "")}
+                        during={1000}
+                      >
+                        <span className="btn-inner">Пред.</span>
                       </Ripples>
-                      {openPaginationDropdown && (
-                        <div className="dropdown-container">
-                          <ul className="dropdown-list">
-                            {[1, 2, 3, 10, 20, 50, 100].map((t, ti) => (
-                              <li key={ti}><Ripples
-                                onClick={() => {
-                                  setOpenPaginationDropdown(false);
-                                  setCatPageLimit(t);
-                                }}
-                                className="dropdown-link"
-                                during={1000}
-                              >{t}</Ripples></li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
-                    </div>
-                  </li>
-                </ul>
-                {paginationHTML ? <ul className={"catalogue-page__pagination-list"}>
-                  {paginationHTML}
-                </ul> : null}
-                <ul className={"catalogue-page__pagination-list"}>
-                  <li className={"catalogue-page__pagination-item"}>
-                    <Ripples
-                      onClick={() => {
-                        setCatPage(Math.max(1, catPage - 1));
-                      }}
-                      className="btn __gray"
-                      during={1000}
-                    >
-                      <span className="btn-inner">Пред.</span>
-                    </Ripples>
-                  </li>
-                  <li className={"catalogue-page__pagination-item"}>
-                    <Ripples
-                      onClick={() => {
-                        setCatPage((catPage + (categoryItems.length ? 1 : 0)));
-                      }}
-                      className="btn __gray"
-                      during={1000}
-                    >
-                      <span className="btn-inner">След.</span>
-                    </Ripples>
-                  </li>
-                </ul>
-              </div>
+                    </li>
+                    <li className={"catalogue-page__pagination-item"}>
+                      <Ripples
+                        onClick={() => {
+                          setCatPage((catPage + (catPage < pagination.pages ? 1 : 0)));
+                        }}
+                        className={"btn __gray" + (catPage === pagination.pages ? " __disabled" : "")}
+                        during={1000}
+                      >
+                        <span className="btn-inner">След.</span>
+                      </Ripples>
+                    </li>
+                  </ul>
+                </div> : null}
+              </>}
             </> : null}
         </>
         : null}
@@ -729,7 +798,7 @@ export function FilterForm({
               bom={searchData.bom}
               list={searchData.res}
             />
-          ) : totalData < 0 ? null : (
+          ) : (totalData < 0 || categoryPage) ? null : (
             <>
               <DeepElaboration data={elaboration} setElaboration={setElaboration} elaboration={elaboration} />
               <OrderForm

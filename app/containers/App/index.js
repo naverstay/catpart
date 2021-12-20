@@ -35,6 +35,7 @@ import { OrdersPage } from "../OrdersPage";
 import apiPOST from "../../utils/upload";
 import { smoothScrollTo } from "../../utils/smoothScrollTo";
 import { flatDeep } from "../../utils/flatDeep";
+import { uniqArray } from "../../utils/uniqArray";
 // import ContactsPage from '../ContactsPage';
 
 export default function App({ history }) {
@@ -458,16 +459,7 @@ export default function App({ history }) {
     const requestURL = "/catalog/categories";
 
     apiGET(requestURL, {}, data => {
-      let cat = flatDeep(data);
-
-      let uniqueArray = cat.filter(function(item, pos, self) {
-        let ret = self.indexOf(item) === pos;
-        if (!ret) {
-          console.log("WARN DUPLICATE", item, pos);
-        }
-        return ret;
-      });
-
+      let uniqueArray = uniqArray(flatDeep(data));
       setCategorySlugLinks(uniqueArray);
       setMenuJson(data);
     });

@@ -24,6 +24,7 @@
   }
 
   &-link {
+    overflow: hidden;
     width: 100%;
     position: relative;
     text-decoration: none;
@@ -35,6 +36,7 @@
     cursor: pointer;
     transition: background .3s;
 
+    &.__active,
     &:hover {
       background: $main_gray_light;
     }
