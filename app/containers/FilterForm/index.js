@@ -293,16 +293,15 @@ export function FilterForm({
     let manufacturer = categoryFilter.find(f => f.id === "manufacturer");
 
     if (manufacturer) {
-      options.manufacturer = manufacturer.values[0];
+      options.manufacturer = manufacturer.values;
     }
-
-    console.log("getCategoryList", options, categoryFilter);
 
     if (prevRequest !== requestURL + JSON.stringify(options)) {
       setPrevRequest(requestURL + JSON.stringify(options));
 
       // setCategoryPage(false);
       setItemData(null);
+      setNodataText("");
 
       apiGET(requestURL, options, data => {
         if (data.error) {
@@ -388,8 +387,13 @@ export function FilterForm({
     }
   };
 
+  // useEffect(() => {
+  //   setCatPage(1);
+  // }, [catPageLimit, categoryFilter]);
+
   useEffect(() => {
     if (someCategoryUrl) {
+      setNodataText("");
       setShowCatPreloader(true);
       setItemData(null);
       setCategoryPage(true);
@@ -438,10 +442,6 @@ export function FilterForm({
 
     return ret;
   }, [props.match.url, categoryFilter]);
-
-  useEffect(() => {
-    setCatPage(1);
-  }, [props.match.url, catPageLimit, categoryFilter]);
 
   const paginationHTML = useMemo(() => {
     let pages = getButtonsMap(pagination.pages, catPage);
@@ -566,6 +566,7 @@ export function FilterForm({
                                 <li key={ti}><Ripples
                                   onClick={() => {
                                     setOpenPaginationDropdown(false);
+                                    setCatPage(1);
                                     setCatPageLimit(t);
                                   }}
                                   className="dropdown-link"
@@ -804,7 +805,7 @@ export function FilterForm({
               bom={searchData.bom}
               list={searchData.res}
             />
-          ) : (totalData < 0 || categoryPage) ? null : (
+          ) : (totalData < 0 || someCategoryUrl) ? null : (
             <>
               <DeepElaboration data={elaboration} setElaboration={setElaboration} elaboration={elaboration} />
               <OrderForm

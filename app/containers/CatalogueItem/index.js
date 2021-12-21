@@ -4,7 +4,7 @@
  * This is the page we show when the user visits a url that doesn't have a route
  */
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import Swiper from "react-id-swiper";
 import { Navigation, Manipulation } from "swiper";
@@ -16,12 +16,15 @@ import FormCheck from "../../components/FormCheck";
 import innValidation from "../../utils/innValidation";
 import { validateEmail } from "../../utils/validateEmail";
 import checkEmailExist from "../../utils/checkEmailExist";
+import { uniqArray } from "../../utils/uniqArray";
 
 export default function CatalogueItem(props) {
   const { breadcrumbs, itemData } = props;
 
   const snippetCheckData = itemData && itemData.hasOwnProperty("snippet") && itemData.snippet.specs && itemData.snippet.specs.length ? itemData.snippet.specs.map(m => m.attribute.id) : [];
   const [snippetCheckValue, setSnippetCheckValue] = useState([]);
+  const [similarSlides, setSimilarSlides] = useState([]);
+  const [analogSliderTitles, setAnalogSliderTitles] = useState([]);
 
   const handleCheckAll = (target) => {
     console.log("handleCheckAll", target.target.value, snippetCheckData, target.target.value ? snippetCheckData : []);
@@ -52,9 +55,48 @@ export default function CatalogueItem(props) {
     "manufacturer": "Microchip", "part_no": "SY54020RMG", "case_package": "-", "pins": "16", "circuits": "1"
   };
 
-  let titles = ["Производитель", "Номер детали", "Case/Package", "Number of Pins", "Number of Circuits"];
+  // let analogSliderTitles = ["Производитель", "Номер детали"];
 
   let slides = Array.from({ length: 10 }, (_, i) => slideData);
+
+  useEffect(() => {
+    console.log();
+
+    if (itemData && itemData.hasOwnProperty("slug")) {
+      const requestURL = `/catalog/${itemData.slug}/similar`;
+
+      apiGET(requestURL, {}, data => {
+
+        let titles = ["Производитель", "Номер детали"];
+        let slides = [];
+
+        for (let i = 0; i < data.length; i++) {
+          const datum = data[i];
+          let slide = { part_no: datum.title, slug: datum.slug };
+
+          if (datum.hasOwnProperty("snippet")) {
+            slide.manufacturer = datum.snippet.manufacturer.name;
+
+            if (datum.snippet.hasOwnProperty("specs")) {
+              for (let j = 0; j < datum.snippet.specs.length; j++) {
+                const spec = datum.snippet.specs[j];
+
+                titles.push(spec.attribute.name);
+                slide[spec.attribute.name] = spec.display_value;
+              }
+            }
+          }
+
+          slides.push(slide);
+        }
+
+        setAnalogSliderTitles(uniqArray(titles));
+        setSimilarSlides(slides);
+
+        console.log("similar", data, slides, uniqArray(titles));
+      });
+    }
+  }, [itemData]);
 
   const swiperParams = {
     modules: [Navigation, Manipulation], slidesPerView: 1, breakpoints: {
@@ -86,16 +128,31 @@ export default function CatalogueItem(props) {
   const slideBuilder = (s, index) => {
     let ret = `<div class="catalogue-page__analogue-item">`;
 
-    Object.keys(s).map((v, vi) => {
-      ret += `<div class="catalogue-page__analogue-param ${(vi % 2 === 0 ? "__odd" : "__even")}">${v === "circuits" ? index : s[v]}</div>`;
+    analogSliderTitles.map((v, vi) => {
+      ret += `<div class="catalogue-page__analogue-param ${(vi % 2 === 0 ? "__odd" : "__even")}">${s[v] || ""}</div>`;
     });
 
     return ret + "</div>";
   };
 
-  const handleSpecChange = (field, e) => {
-    console.log("handleSpecChange", field, e);
-  };
+  const similarSliderHTML = useMemo(() => {
+    return similarSlides.length ?
+      <Swiper {...swiperParams} navigation spaceBetween={10} onInit={(swiper) => {
+        navigationPrevRef.current.onClick = () => {
+          console.log("prev", swiper);
+        };
+
+        navigationNextRef.current.onClick = () => {
+          console.log("next", swiper);
+        };
+      }}>
+        {similarSlides.map((s, si) => {
+          return <div key={si} className={"swiper-slide"}
+                      dangerouslySetInnerHTML={{ __html: slideBuilder(s, si + 1) }} />;
+        })}
+      </Swiper> : null
+      ;
+  }, [similarSlides]);
 
   return (<>
     <Helmet>
@@ -132,10 +189,10 @@ export default function CatalogueItem(props) {
                     <dt><b>Описание:</b></dt>
                     <dd>{itemData.snippet.descriptions.reduce((acc, el) => `${acc + "\n" + (el.text || "")}`, "").substring(1)}</dd>
                   </div> : null}
-                <div className={"description"}>
-                  <dt><b>Аналоги:</b></dt>
-                  <dd></dd>
-                </div>
+                {/*<div className={"description"}>*/}
+                {/*  <dt><b>Аналоги:</b></dt>*/}
+                {/*  <dd></dd>*/}
+                {/*</div>*/}
               </dl> : null}
           </div>
         </article> : null}
@@ -201,27 +258,13 @@ export default function CatalogueItem(props) {
           <div ref={navigationNextRef} className="btn __blue analogue-slider__button analogue-slider__button--next" />
           <div className="catalogue-page__analogue-title">
             <div className="catalogue-page__analogue-item">
-              {titles.map((t, ti) => {
+              {analogSliderTitles.map((t, ti) => {
                 return <div key={ti} className="catalogue-page__analogue-param">{t}</div>;
               })}
             </div>
           </div>
           <div className="catalogue-page__analogue-slider">
-            <Swiper {...swiperParams} navigation spaceBetween={10} onInit={(swiper) => {
-              console.log("init", swiper);
-              navigationPrevRef.current.onClick = () => {
-                console.log("prev", swiper);
-              };
-
-              navigationNextRef.current.onClick = () => {
-                console.log("next", swiper);
-              };
-            }}>
-              {slides.map((s, si) => {
-                return <div key={si} className={"swiper-slide"}
-                            dangerouslySetInnerHTML={{ __html: slideBuilder(s, si + 1) }} />;
-              })}
-            </Swiper>
+            {similarSliderHTML}
           </div>
         </div>
       </React.Fragment> : null}
