@@ -293,7 +293,13 @@ export default function CataloguePage(props) {
                   if (attr) {
                     filterAttr.push({
                       name: filterColumn,
-                      id: parseInt(attr.attributeId),
+                      id: filterColumn === "catManufacturer" ? "manufacturer" : attr.attributeId,
+                      values: filterSelection
+                    });
+                  } else if (filterColumn === "catManufacturer") {
+                    filterAttr.push({
+                      name: filterColumn,
+                      id: "manufacturer",
                       values: filterSelection
                     });
                   }

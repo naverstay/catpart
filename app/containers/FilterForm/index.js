@@ -270,7 +270,7 @@ export function FilterForm({
     let options = {
       page: catPage,
       limit: catPageLimit,
-      attributes: categoryFilter.map(m => {
+      attributes: categoryFilter.filter(f => f.id !== "manufacturer").map(m => {
         return {
           id: m.id,
           values: m.values
@@ -289,6 +289,12 @@ export function FilterForm({
       //   return acc.concat(ret);
       // }, []))
     };
+
+    let manufacturer = categoryFilter.find(f => f.id === "manufacturer");
+
+    if (manufacturer) {
+      options.manufacturer = manufacturer.values[0];
+    }
 
     console.log("getCategoryList", options, categoryFilter);
 
