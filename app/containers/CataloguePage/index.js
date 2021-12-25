@@ -17,6 +17,7 @@ import withFixedColumns from "react-table-hoc-fixed-columns";
 const ReactTableFixedColumns = withFixedColumns(ReactTable);
 import Breadcrumbs from "../../components/Breadcrumbs";
 import Ripples from "react-ripples";
+import { LazyLoadImage } from "react-lazy-load-image-component";
 import { useDetectClickOutside } from "react-detect-click-outside";
 import FormInput from "../../components/FormInput";
 import { uniqArray } from "../../utils/uniqArray";
@@ -167,11 +168,14 @@ export default function CataloguePage(props) {
                   Header: <div className={"text-center"}>Фото</div>,
                   accessor: "catImage",
                   Cell: tableProps => {
-                    return <span
-                      className={"catalogue-page__table-image"}>{tableProps.row.catImage ? <img
-                      src={tableProps.row.catImage}
-                      alt={tableProps.row.catPartNum}
-                    /> : null}</span>;
+                    return <span className={"catalogue-page__table-image"}>
+                      {tableProps.row.catImage ?
+                        <LazyLoadImage
+                          src={tableProps.row.catImage}
+                          placeholder={<span className={"catalogue-page__table-loader"} />}
+                          alt={tableProps.row.catPartNum} />
+                        : null}
+                    </span>;
                   },
                   minWidth: 10,
                   width: 70
@@ -327,7 +331,6 @@ export default function CataloguePage(props) {
           <Ripples
             onClick={() => {
               let filterAttr = [];
-              let update = false;
               let param = catColumnsList.find(f => f.accessor === filterColumn);
 
               if (param) {
@@ -336,7 +339,6 @@ export default function CataloguePage(props) {
 
                 if (filter) {
                   filter.values = filterSelection;
-                  update = true;
                 } else {
                   filterAttr.push({
                     id: attrId,
@@ -349,7 +351,6 @@ export default function CataloguePage(props) {
 
                 if (filter) {
                   filter.values = filterSelection;
-                  update = true;
                 } else {
                   filterAttr.push({
                     id: "m",
@@ -358,6 +359,8 @@ export default function CataloguePage(props) {
                   });
                 }
               }
+
+              console.log('filterAttr', filterAttr);
 
               setCategoryFilter(categoryFilter.concat(filterAttr).filter(f => f.values.length));
 

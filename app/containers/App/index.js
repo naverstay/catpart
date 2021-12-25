@@ -651,8 +651,11 @@ export default function App({ history }) {
                     </Helmet>
                   )}
                 />
-                <Route exact strict path="/:url*" render={props => <Redirect
-                  to={`${props.location.pathname}/${props.location.search}`.replace(/\/\//, "/")} />} />
+                <Route exact strict path="/:url*" render={props => {
+                  console.log("app redirect", props.location);
+                  return <Redirect
+                    to={`${props.location.pathname}/${props.location.search}`.replace(/\/\//, "/")} />;
+                }} />
 
                 {/* <Route path="/about" render={routeProps => <FeaturePage updateCart={updateCart} notificationFunc={createNotification} setOrderSent={setOrderSent} totalCart={totalCart} currency={currency}  setOpenCatalogue={setOpenCatalogue}  setOpenMobMenu={setOpenMobMenu} {...routeProps} />} /> */}
 

@@ -97,6 +97,7 @@
     "react-id-swiper": "^4.0.0",
     "react-infinite-scroll-component": "^6.1.0",
     "react-intl": "2.8.0",
+    "react-lazy-load-image-component": "^1.5.1",
     "react-notifications": "^1.7.2",
     "react-notifications-component": "^3.1.0",
     "react-redux": "7.0.2",

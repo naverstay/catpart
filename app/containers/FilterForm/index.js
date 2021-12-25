@@ -85,6 +85,7 @@ export function FilterForm({
 }) {
   // useInjectReducer({ key, reducer });
   // useInjectSaga({ key, saga });
+  const params = qs.parse((props.location.search.substring(1)));
 
   const pageLimitList = [
     1, 2, 3,
@@ -93,8 +94,29 @@ export function FilterForm({
   const [nestedCategories, setNestedCategories] = useState([]);
   const [categoryInfo, setCategoryInfo] = useState(null);
 
+  let queryAttr = params && params.hasOwnProperty("a") ? (params.a.map(m => {
+    return {
+      id: m.id === "m" ? "Производитель" : m.id,
+      values: m.v
+    };
+  })) : [];
+  const [categoryFilter, setCategoryFilter] = useState(queryAttr);
+  const [categoryFilterNames, setCategoryFilterNames] = useState([]);
 
-  const [categoryFilter, setCategoryFilter] = useState([]);
+  const updateFilterNames = (options, ids) => {
+    const requestURL = "/catalog/attributes";
+
+    apiGET(requestURL, { ids: ids }, data => {
+      console.log("updateFilterNames", options, ids, data);
+      setCategoryFilterNames(options.a.map(m => {
+        return {
+          id: m.id === "m" ? "Производитель" : m.id,
+          name: data[m.id],
+          values: m.v
+        };
+      }));
+    });
+  };
 
   const [openPaginationDropdown, setOpenPaginationDropdown] = useState(false);
 
@@ -117,7 +139,6 @@ export function FilterForm({
   const [openMoreTriggers, setOpenMoreTriggers] = useState(false);
   const [catColumnsList, setCatColumnsList] = useState([]);
 
-  const params = qs.parse((props.location.search.substring(1)));
   const paramsLimit = params.hasOwnProperty("l") ? parseInt(params.l) : 10;
   const [catPageLimit, setCatPageLimit] = useState(pageLimitList.indexOf(paramsLimit) > -1 ? paramsLimit : 10);
 
@@ -288,6 +309,38 @@ export function FilterForm({
     });
   };
 
+  const removeFilter = (param, index) => {
+    setCategoryFilterNames(categoryFilterNames.reduce((acc, f, fi) => {
+      if (index < 0) {
+        return acc;
+      } else if (fi === param) {
+        if (f.values.length > 1) {
+          f.values.splice(index, 1);
+          return acc;
+        } else {
+          return acc;
+        }
+      } else {
+        return acc;
+      }
+    }, []));
+
+    setCategoryFilter(categoryFilter.reduce((acc, f, fi) => {
+      if (index < 0) {
+        return acc;
+      } else if (fi === param) {
+        if (f.values.length > 1) {
+          f.values.splice(index, 1);
+          return acc.concat(f);
+        } else {
+          return acc;
+        }
+      } else {
+        return acc.concat(f);
+      }
+    }, []));
+  };
+
   const getCategoryList = (category, attributes, page) => {
     // setNodataText("");
     setCatPage(page);
@@ -299,7 +352,6 @@ export function FilterForm({
     console.log("attributes", page, attributes);
 
     const requestURL = "/catalog" + category;
-    const attrIds = [];
 
     let options = {
       page: catPage,
@@ -326,7 +378,6 @@ export function FilterForm({
 
     if (attributes && attributes.hasOwnProperty("a")) {
       options.attributes = attributes.a.filter(f => !(f.id === "m" || f.id === "l")).map(m => {
-        attrIds.push(parseInt(m.id));
         return {
           id: m.id,
           values: m.v
@@ -350,10 +401,13 @@ export function FilterForm({
       const paramsLimit = params.hasOwnProperty("l") ? parseInt(params.l) : 10;
       setCatPageLimit(pageLimitList.indexOf(paramsLimit) > -1 ? paramsLimit : 10);
       attributes.l = catPageLimit;
-      history.replace(history.location.pathname + qs.stringify(attributes));
+      // history.replace(history.location.pathname + qs.stringify(attributes));
+      history.replace({
+        pathname: history.location.pathname,
+        search: qs.stringify(attributes),
+        state: { isActive: true }
+      });
     }
-
-    console.log("options", options);
 
     if (prevRequest !== requestURL + JSON.stringify(options)) {
       setPrevRequest(requestURL + JSON.stringify(options));
@@ -389,22 +443,6 @@ export function FilterForm({
             setItemData(null);
 
             // setItemSlugLinks(itemSlugLinks.concat(responseData.items.map(d => d.slug)).concat(responseData.hasOwnProperty("breadcrumbs") ? responseData.breadcrumbs : []));
-
-            const requestURL = "/catalog/attributes";
-
-            if (attrIds.length) {
-              apiGET(requestURL, { ids: attrIds }, data => {
-                setCategoryFilter(attributes.a.map(m => {
-                  return {
-                    id: m.id === "m" ? "Производитель" : m.id,
-                    name: data[m.id],
-                    values: m.v
-                  };
-                }));
-              });
-            } else {
-              setCategoryFilter([]);
-            }
 
             if (data.items.length) {
               setCategoryItems(data.items.map((d, di) => {
@@ -464,6 +502,7 @@ export function FilterForm({
         setShowCatPreloader(false);
       });
     } else {
+      console.log("prevRequest", prevRequest);
       setShowCatPreloader(false);
     }
   };
@@ -471,21 +510,18 @@ export function FilterForm({
   useEffect(() => {
     console.log("catPageLimit 1");
     setCatPage(1);
+    setPagination({ pages: 1 });
+
     setUpdateTrigger(updateTrigger + 1);
   }, [catPageLimit]);
 
   useEffect(() => {
-    console.log("someCategoryUrl", catPage, categoryFilter);
-    console.log("catPageLimit 2");
-
     let url = "";
     let options = {};
 
     if (props.match.params.hasOwnProperty("catalogue") && props.match.params.catalogue !== "catalog") {
-      url = `/${props.match.params.catalogue.replace(/\//g, "")}/`;
+      url = `/${props.match.params.catalogue.replace(/\//g, "")}`;
     }
-
-    console.log("categoryFilter", categoryFilter, qs.stringify({ a: categoryFilter }));
 
     if (categoryFilter.length) {
       options.a = categoryFilter.filter(f => !(f.id === "m" || f.id === "l")).map(m => {
@@ -502,40 +538,57 @@ export function FilterForm({
       }
     }
 
-    console.log("manufacturer", options);
+    if (options && options.hasOwnProperty("a")) {
+      let attrIds = options.a.filter(f => !(f.id === "m" || f.id === "l")).map(m => (parseInt(m.id)));
+
+      if (attrIds.length) {
+        updateFilterNames(options, attrIds);
+      } else {
+        setCategoryFilterNames([]);
+      }
+    } else {
+      setCategoryFilterNames([]);
+    }
 
     history.replace({
-      pathname: url + (catPage > 1 ? `${catPage}/` : ""),
-      search: qs.stringify(options)
+      pathname: url + "/" + (catPage > 1 ? `${catPage}/` : ""),
+      search: qs.stringify(options),
+      state: { isActive: true }
     });
 
-    // setUpdateTrigger(updateTrigger + 1);
+    setShowCatPreloader(true);
+    setItemData(null);
+    setCategoryPage(true);
 
-    // getCategoryList(url, options, catPage);
+    getCategoryList(url, options, catPage);
   }, [catPage, categoryFilter]);
 
   useEffect(() => {
-    console.log("someCategoryUrl", catPage, props.match);
-    console.log("catPageLimit 3", updateTrigger);
-
+    console.log("updateTrigger", updateTrigger);
     if (someCategoryUrl) {
-      // setNodataText("");
-      // setCategoryFilter([]);
       setShowCatPreloader(true);
       setItemData(null);
       setCategoryPage(true);
       let url = "";
-      let page = 1;
+      let options = qs.parse((props.location.search.substring(1)));
 
       if (props.match.params.hasOwnProperty("catalogue") && props.match.params.catalogue !== "catalog") {
         url = "/" + props.match.params.catalogue.replace(/\//g, "");
       }
 
-      if (props.match.params.hasOwnProperty("page")) {
-        page = parseInt(props.match.params.page);
+      if (options && options.hasOwnProperty("a")) {
+        let attrIds = options.a.filter(f => !(f.id === "m" || f.id === "l")).map(m => (parseInt(m.id)));
+
+        if (attrIds.length) {
+          updateFilterNames(options, attrIds);
+        } else {
+          setCategoryFilterNames([]);
+        }
+      } else {
+        setCategoryFilterNames([]);
       }
 
-      getCategoryList(url, qs.parse((props.location.search.substring(1))), catPage);
+      getCategoryList(url, options, catPage);
     } else {
       setShowCatPreloader(false);
       setItemData(null);
@@ -544,28 +597,11 @@ export function FilterForm({
     }
   }, [props.match.url, updateTrigger]);
 
-  const removeFilter = (param, index) => {
-    setCategoryFilter(categoryFilter.reduce((acc, f, fi) => {
-      if (index < 0) {
-        return acc;
-      } else if (fi === param) {
-        if (f.values.length > 1) {
-          f.values.splice(index, 1);
-          return acc.concat(f);
-        } else {
-          return acc;
-        }
-      } else {
-        return acc.concat(f);
-      }
-    }, []));
-  };
-
   const filterItemsHTML = useMemo(() => {
     let ret = null;
 
-    if (categoryFilter.length) {
-      ret = categoryFilter.map((f, fi) => {
+    if (categoryFilterNames.length) {
+      ret = categoryFilterNames.map((f, fi) => {
         return <li key={fi}>
           <span className={"catalogue-page__filter-item"}>
             <span>{f.name}</span>
@@ -588,7 +624,7 @@ export function FilterForm({
     }
 
     return ret;
-  }, [props.match.url, categoryFilter]);
+  }, [props.match.url, categoryFilterNames]);
 
   const paginationHTML = useMemo(() => {
     let pages = getButtonsMap(pagination.pages, catPage);
