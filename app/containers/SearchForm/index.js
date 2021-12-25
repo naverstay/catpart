@@ -92,11 +92,12 @@ export function SearchForm({
     };
   }, []);
 
-  const reposListProps = {
-    loading,
-    error,
-    repos
-  };
+  useEffect(() => {
+    if (busy) {
+      formArtNumber.current.value = decodeURIComponent(query.get("art") || "");
+      formQuantity.current.value = (decodeURIComponent(query.get("q")) || "1").replace(/\D/g, "");
+    }
+  }, [busy]);
 
   const handleSubmit = evt => {
     handleChange("art-number", { target: formArtNumber.current });
