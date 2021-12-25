@@ -46,7 +46,6 @@ export default function CataloguePage(props) {
   const [filterSelection, setFilterSelection] = useState([]);
   const [columnOptions, setColumnOptions] = useState([]);
   const [filterText, setFilterText] = useState("");
-  const [filterHoverCol, setFilterHoverCol] = useState(-1);
 
   const openFilterRef = useDetectClickOutside({
     onTriggered: (e) => {
@@ -113,11 +112,16 @@ export default function CataloguePage(props) {
   }, [categoryItems]);
 
   useEffect(() => {
-    console.log("filterHoverCol", filterHoverCol);
-  }, [filterHoverCol]);
-
-  useEffect(() => {
     setFilterText("");
+
+    let filter = categoryFilter.find(f => f.name === filterColumn);
+
+    console.log("filter", filter, categoryFilter);
+
+    // if (filter && filter.values.indexOf(o) > -1) {
+    //   checked = true;
+    // }
+
     setFilterSelection([]);
   }, [categoryItems, filterColumn]);
 
@@ -127,23 +131,11 @@ export default function CataloguePage(props) {
     })).filter(f => f && f.toLowerCase().indexOf(filterText) === 0));
   }, [filterColumn, filterText]);
 
-  const cellProps = ({ columnIndex }) => ({
-    "data-col-idx": columnIndex,
-    onMouseEnter: () => {
-      const table = tableRef.current.getDOMNode();
-      table.classList.add(`active-col-${columnIndex}`);
-    },
-    onMouseLeave: () => {
-      const table = tableRef.current.getDOMNode();
-      table.classList.remove(`active-col-${columnIndex}`);
-    }
-  });
-
   const catalogHTML = useMemo(() => {
     return categoryItems && categoryItems.length ?
       <>
         <ReactTableFixedColumns
-          key={categoryItems.length + filterHoverCol}
+          key={categoryItems.length}
           data={categoryItems}
           showPagination={false}
           showPageJump={false}
@@ -203,7 +195,7 @@ export default function CataloguePage(props) {
                   accessor: "catManufacturer",
                   Header: tableProps => {
                     return <div
-                      className={"catalogue-page__table-cell text-center" + (2 === filterHoverCol ? " __hovered" : "")}>
+                      className={"catalogue-page__table-cell text-center"}>
                       <span>Производитель</span>
                       {rtSortExtension("catManufacturer")}
                     </div>;
@@ -222,7 +214,7 @@ export default function CataloguePage(props) {
               columns: [].concat(catColumnsList.map((c, ci) => {
                 c.Header = tableProps => {
                   return <div
-                    className={"catalogue-page__table-cell" + (ci + 3 === filterHoverCol ? " __hovered" : "")}>
+                    className={"catalogue-page__table-cell"}>
                     <span>{c.accessor}</span>
                     {rtSortExtension(c.accessor)}
                   </div>;
@@ -302,8 +294,15 @@ export default function CataloguePage(props) {
 
           <ul className="catalogue-page__filter-options">
             {columnOptions.map((o, oi) => {
+              let checked = false;
+              let filter = categoryFilter.find(f => f.name === filterColumn);
+
+              if (filter && filter.values.indexOf(o) > -1) {
+                checked = true;
+              }
+
               return <li key={oi}>
-                <input id={"filter-option_" + oi} className="hide" value={o} type="checkbox" />
+                <input id={"filter-option_" + oi} defaultChecked={checked} className="hide" value={o} type="checkbox" />
                 <Ripples
                   onClick={() => {
                     const filterIndex = filterSelection.findIndex(f => f === o);
@@ -327,50 +326,49 @@ export default function CataloguePage(props) {
 
           <Ripples
             onClick={() => {
-              if (filterSelection.length) {
-                let filterAttr = [];
+              let filterAttr = [];
+              let update = false;
+              let param = catColumnsList.find(f => f.accessor === filterColumn);
 
-                if (filterSelection.length) {
-                  let attr = catColumnsList.find(f => f.accessor === filterColumn);
+              if (param) {
+                let attrId = filterColumn === "catManufacturer" ? "m" : param.attributeId;
+                let filter = categoryFilter.find(f => f.id === attrId);
 
-                  if (attr) {
-                    filterAttr.push({
-                      name: filterColumn,
-                      id: filterColumn === "catManufacturer" ? "m" : attr.attributeId,
-                      values: filterSelection
-                    });
-                  } else if (filterColumn === "catManufacturer") {
-                    filterAttr.push({
-                      name: filterColumn,
-                      id: "m",
-                      values: filterSelection
-                    });
-                  }
+                if (filter) {
+                  filter.values = filterSelection;
+                  update = true;
+                } else {
+                  filterAttr.push({
+                    id: attrId,
+                    name: filterColumn,
+                    values: filterSelection
+                  });
                 }
+              } else if (filterColumn === "catManufacturer") {
+                let filter = categoryFilter.find(f => f.id === "m");
 
-                if (filterAttr.length) {
-                  console.log('categoryFilter', categoryFilter, filterAttr);
-
-
-
-                  setCategoryFilter(categoryFilter.concat(filterAttr));
-
-                  let attr = qs.parse((history.location.search.substring(1)));
-
-                  if (attr && attr.hasOwnProperty("a")) {
-                    attr.a = attr.a.concat(filterAttr);
-                  } else {
-                    attr.a = filterAttr.slice(0);
-                  }
-
-                  // setRedirectUrl(`/${history.location.pathname.split("/")[1]}/` + "?" + qs.stringify(attr));
-
-                  // history.push({
-                  //   pathname: history.location.pathname,
-                  //   search: qs.stringify(attr)
-                  // });
+                if (filter) {
+                  filter.values = filterSelection;
+                  update = true;
+                } else {
+                  filterAttr.push({
+                    id: "m",
+                    name: filterColumn,
+                    values: filterSelection
+                  });
                 }
               }
+
+              setCategoryFilter(categoryFilter.concat(filterAttr).filter(f => f.values.length));
+
+              // let attr = qs.parse((history.location.search.substring(1)));
+              //
+              // if (attr && attr.hasOwnProperty("a")) {
+              //   attr.a = attr.a.concat(filterAttr);
+              // } else {
+              //   attr.a = filterAttr.slice(0);
+              // }
+
               setOpenFilterDropdown(false);
             }}
             className="btn __blue __lg __w-100p"
@@ -384,7 +382,7 @@ export default function CataloguePage(props) {
       </div>
 
       <div ref={tableHolder} className="catalogue-page__full">
-        {showCatPreloader ?  <span>Skeleton here</span> :  catalogHTML}
+        {showCatPreloader ? <span>Skeleton here</span> : catalogHTML}
       </div>
     </>
   );
