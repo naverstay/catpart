@@ -474,6 +474,7 @@
       &-link {
         text-decoration: underline;
         color: $gray_link;
+        margin: auto;
 
         &:hover {
           color: $main_blue_light;
@@ -752,6 +753,10 @@
           white-space: nowrap;
           background: inherit;
           border: 0;
+
+          span {
+            margin: auto;
+          }
         }
 
         &.-even {
@@ -761,9 +766,13 @@
         &.-odd {
           background: #fff;
         }
+      }
 
-        &:hover {
-          background: $main_gray_hover;
+      .rt-tbody {
+        .rt-tr {
+          &:hover {
+            background: $main_gray_hover;
+          }
         }
       }
 

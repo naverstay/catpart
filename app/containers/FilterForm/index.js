@@ -105,17 +105,34 @@ export function FilterForm({
 
   const updateFilterNames = (options, ids) => {
     const requestURL = "/catalog/attributes";
+    const filterNames = [];
 
-    apiGET(requestURL, { ids: ids }, data => {
-      console.log("updateFilterNames", options, ids, data);
-      setCategoryFilterNames(options.a.map(m => {
-        return {
-          id: m.id === "m" ? "Производитель" : m.id,
-          name: data[m.id],
-          values: m.v
-        };
-      }));
-    });
+    let manufacturer = categoryFilter.find(f => f.id === "m");
+
+    if (manufacturer) {
+      filterNames.push({
+        id: "m",
+        name: "Производитель",
+        values: manufacturer.values
+      });
+    }
+
+    if (ids.length && options.hasOwnProperty("a") && prevRequestAttr !== requestURL + JSON.stringify(options)) {
+      setPrevRequestAttr(requestURL + JSON.stringify(options));
+
+      apiGET(requestURL, { ids: ids }, data => {
+        console.log("updateFilterNames", options, ids, data);
+        setCategoryFilterNames(filterNames.concat(options.a.map(m => {
+          return {
+            id: m.id,
+            name: data[m.id],
+            values: m.v
+          };
+        })));
+      });
+    } else {
+      setCategoryFilterNames(filterNames);
+    }
   };
 
   const [openPaginationDropdown, setOpenPaginationDropdown] = useState(false);
@@ -126,6 +143,8 @@ export function FilterForm({
     }
   });
   // const [responseData, setResponseData] = useState(null);
+  const [prevPageURL, setPrevPageURL] = useState("");
+  const [prevRequestAttr, setPrevRequestAttr] = useState("");
   const [prevRequest, setPrevRequest] = useState("");
   const [count, setCount] = useState(0);
   const [searchInfo, setSearchInfo] = useState("");
@@ -144,7 +163,8 @@ export function FilterForm({
 
   const paramsPage = parseInt(props.match.params.page);
   const [catPage, setCatPage] = useState(isNaN(paramsPage) ? 1 : paramsPage);
-  const [updateTrigger, setUpdateTrigger] = useState(0);
+  const [pageLimitTrigger, setPageLimitTrigger] = useState(0);
+  const [categoryFilterTrigger, setCategoryFilterTrigger] = useState(0);
 
   const [noDataText, setNodataText] = useState("");
   const [breadcrumbs, setBreadcrumbs] = useState([]);
@@ -310,27 +330,13 @@ export function FilterForm({
   };
 
   const removeFilter = (param, index) => {
-    setCategoryFilterNames(categoryFilterNames.reduce((acc, f, fi) => {
-      if (index < 0) {
-        return acc;
-      } else if (fi === param) {
-        if (f.values.length > 1) {
-          f.values.splice(index, 1);
-          return acc;
-        } else {
-          return acc;
-        }
-      } else {
-        return acc;
-      }
-    }, []));
-
     setCategoryFilter(categoryFilter.reduce((acc, f, fi) => {
       if (index < 0) {
         return acc;
       } else if (fi === param) {
         if (f.values.length > 1) {
           f.values.splice(index, 1);
+          console.log("splice", f.values);
           return acc.concat(f);
         } else {
           return acc;
@@ -386,8 +392,6 @@ export function FilterForm({
 
       let manufacturer = attributes.a.find(f => f.id === "m");
 
-      console.log("manufacturer", manufacturer);
-
       if (manufacturer) {
         options.manufacturer = manufacturer.v;
       }
@@ -395,6 +399,10 @@ export function FilterForm({
       // if (limit) {
       //   options.limit = manufacturer.v;
       // }
+    }
+
+    if (attributes && attributes.hasOwnProperty("m")) {
+      options.manufacturer = attributes.m;
     }
 
     if (attributes && attributes.hasOwnProperty("l")) {
@@ -408,6 +416,8 @@ export function FilterForm({
         state: { isActive: true }
       });
     }
+
+    console.log("manufacturer", options);
 
     if (prevRequest !== requestURL + JSON.stringify(options)) {
       setPrevRequest(requestURL + JSON.stringify(options));
@@ -512,19 +522,25 @@ export function FilterForm({
     setCatPage(1);
     setPagination({ pages: 1 });
 
-    setUpdateTrigger(updateTrigger + 1);
+    setPageLimitTrigger(pageLimitTrigger + 1);
   }, [catPageLimit]);
 
   useEffect(() => {
     let url = "";
     let options = {};
+    let attrIds = [];
+    let page = 1;
 
     if (props.match.params.hasOwnProperty("catalogue") && props.match.params.catalogue !== "catalog") {
       url = `/${props.match.params.catalogue.replace(/\//g, "")}`;
     }
 
+    if (props.match.params.hasOwnProperty("page")) {
+      page = parseInt(props.match.params.page);
+    }
+
     if (categoryFilter.length) {
-      options.a = categoryFilter.filter(f => !(f.id === "m" || f.id === "l")).map(m => {
+      options.a = categoryFilter.filter(f => f.id !== "m").map(m => {
         return {
           id: m.id,
           v: m.values
@@ -534,21 +550,15 @@ export function FilterForm({
       let manufacturer = categoryFilter.find(f => f.id === "m");
 
       if (manufacturer) {
-        options.m = manufacturer.v;
+        options.m = manufacturer.values;
       }
     }
 
     if (options && options.hasOwnProperty("a")) {
-      let attrIds = options.a.filter(f => !(f.id === "m" || f.id === "l")).map(m => (parseInt(m.id)));
-
-      if (attrIds.length) {
-        updateFilterNames(options, attrIds);
-      } else {
-        setCategoryFilterNames([]);
-      }
-    } else {
-      setCategoryFilterNames([]);
+      attrIds = options.a.map(m => (parseInt(m.id)));
     }
+
+    updateFilterNames(options, attrIds);
 
     history.replace({
       pathname: url + "/" + (catPage > 1 ? `${catPage}/` : ""),
@@ -561,15 +571,16 @@ export function FilterForm({
     setCategoryPage(true);
 
     getCategoryList(url, options, catPage);
-  }, [catPage, categoryFilter]);
+  }, [catPage, categoryFilterTrigger]);
 
   useEffect(() => {
-    console.log("updateTrigger", updateTrigger);
+    console.log("pageLimitTrigger", props.match.url);
     if (someCategoryUrl) {
       setShowCatPreloader(true);
       setItemData(null);
       setCategoryPage(true);
       let url = "";
+      let attrIds = [];
       let options = qs.parse((props.location.search.substring(1)));
 
       if (props.match.params.hasOwnProperty("catalogue") && props.match.params.catalogue !== "catalog") {
@@ -577,16 +588,10 @@ export function FilterForm({
       }
 
       if (options && options.hasOwnProperty("a")) {
-        let attrIds = options.a.filter(f => !(f.id === "m" || f.id === "l")).map(m => (parseInt(m.id)));
-
-        if (attrIds.length) {
-          updateFilterNames(options, attrIds);
-        } else {
-          setCategoryFilterNames([]);
-        }
-      } else {
-        setCategoryFilterNames([]);
+        attrIds = options.a.map(m => (parseInt(m.id)));
       }
+
+      updateFilterNames(options, attrIds);
 
       getCategoryList(url, options, catPage);
     } else {
@@ -595,14 +600,22 @@ export function FilterForm({
       setErrorPage(false);
       setCategoryPage(false);
     }
-  }, [props.match.url, updateTrigger]);
+  }, [pageLimitTrigger, prevPageURL]);
+
+  useEffect(() => {
+    let newURL = props.match.url.split("/")[1];
+    console.log("prevPageURL", props.match.url);
+    if (prevPageURL !== newURL) {
+      setPrevPageURL(newURL);
+      setCatPage(1);
+    } else {
+      setCategoryFilterTrigger(categoryFilterTrigger + 1);
+    }
+  }, [props.match.url, categoryFilter]);
 
   const filterItemsHTML = useMemo(() => {
-    let ret = null;
-
-    if (categoryFilterNames.length) {
-      ret = categoryFilterNames.map((f, fi) => {
-        return <li key={fi}>
+    return categoryFilterNames.length ? categoryFilterNames.map((f, fi) => (
+      <li key={fi}>
           <span className={"catalogue-page__filter-item"}>
             <span>{f.name}</span>
              <span className={"filter-remove-btn btn __gray"} onClick={() => {
@@ -611,7 +624,7 @@ export function FilterForm({
               <span className={"icon icon-close"} />
             </span>
           </span>
-          {f.values.map((m, mi) => <span key={mi} className={"catalogue-page__filter-item"}>
+        {f.values.map((m, mi) => <span key={mi} className={"catalogue-page__filter-item"}>
             <span>{m}</span>
              <span className={"filter-remove-btn btn __gray"} onClick={() => {
                removeFilter(fi, mi);
@@ -619,12 +632,9 @@ export function FilterForm({
               <span className={"icon icon-close"} />
             </span>
           </span>)}
-        </li>;
-      });
-    }
-
-    return ret;
-  }, [props.match.url, categoryFilterNames]);
+      </li>)
+    ) : null;
+  }, [categoryFilterNames]);
 
   const paginationHTML = useMemo(() => {
     let pages = getButtonsMap(pagination.pages, catPage);
@@ -647,7 +657,7 @@ export function FilterForm({
         </Ripples>
       </li>;
     }) : null;
-  }, [props.match.url, pagination, catPage]);
+  }, [pagination, catPage]);
 
   return (
     <>
@@ -732,80 +742,91 @@ export function FilterForm({
                 {noDataText}
               </div> : null}
 
-              {categoryItems.length && pagination.pages > 1 ? <div className="catalogue-page__pagination">
-                <ul className={"catalogue-page__pagination-list"}>
-                  <li className={"catalogue-page__pagination-item"}>
-                    <div ref={openPaginationRef} className="dropdown-holder">
-                      <Ripples
-                        onClick={() => {
-                          setOpenPaginationDropdown(!openPaginationDropdown);
-                        }}
-                        className={"btn __gray" + (openPaginationDropdown ? " __opened" : "")}
-                        during={1000}
-                      >
+              {categoryItems.length ?
+                <div className="catalogue-page__pagination">
+                  {categoryItems.length > 10 || pagination.pages > 1 ?
+                    <ul className={"catalogue-page__pagination-list"}>
+                      <li className={"catalogue-page__pagination-item"}>
+                        <div ref={openPaginationRef} className="dropdown-holder">
+                          <Ripples
+                            onClick={() => {
+                              setOpenPaginationDropdown(!openPaginationDropdown);
+                            }}
+                            className={"btn __gray" + (openPaginationDropdown ? " __opened" : "")}
+                            during={1000}
+                          >
                       <span className="btn-inner">
                         <span>{catPageLimit}</span>
                         <span className={"icon icon-chevron-up"} />
                       </span>
-                      </Ripples>
-                      {openPaginationDropdown && (
-                        <div className="dropdown-container">
-                          <ul className="dropdown-list">
-                            {pageLimitList.map((t, ti) => (
-                              <li key={ti}><Ripples
-                                onClick={() => {
-                                  // setCatPage(-1);
-                                  setOpenPaginationDropdown(false);
-                                  setCatPageLimit(t);
-                                }}
-                                className="dropdown-link"
-                                during={1000}
-                              >{t}</Ripples></li>
-                            ))}
-                          </ul>
+                          </Ripples>
+                          {openPaginationDropdown && (
+                            <div className="dropdown-container">
+                              <ul className="dropdown-list">
+                                {pageLimitList.map((t, ti) => (
+                                  <li key={ti}><Ripples
+                                    onClick={() => {
+                                      // setCatPage(-1);
+                                      setOpenPaginationDropdown(false);
+                                      setCatPageLimit(t);
+                                    }}
+                                    className="dropdown-link"
+                                    during={1000}
+                                  >{t}</Ripples></li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
                         </div>
-                      )}
-                    </div>
-                  </li>
-                </ul>
-                {paginationHTML ? <ul className={"catalogue-page__pagination-list"}>
-                  {paginationHTML}
-                </ul> : null}
-                {pagination.pages > 3 ? <ul className={"catalogue-page__pagination-list"}>
-                  <li className={"catalogue-page__pagination-item"}>
-                    <Ripples
-                      onClick={() => {
-                        setCatPage(Math.max(1, catPage - 1));
-                      }}
-                      className={"btn __gray" + (catPage === 1 ? " __disabled" : "")}
-                      during={1000}
-                    >
-                      <span className="btn-inner">Пред.</span>
-                      {/*{catPage === 1 ? <span className="btn-inner">Пред.</span> : <Link*/}
-                      {/*  to={(`/${props.match.url.split("/")[1]}/${catPage > 2 ? (catPage - 1) + "/" : ""}` + history.location.search).replace(/\/\//, "/")}*/}
-                      {/*  className="btn-inner">Пред.</Link>}*/}
-                    </Ripples>
-                  </li>
-                  <li className={"catalogue-page__pagination-item"}>
-                    <Ripples
-                      onClick={() => {
-                        setCatPage((catPage + (catPage < pagination.pages ? 1 : 0)));
-                      }}
-                      className={"btn __gray" + (catPage === pagination.pages ? " __disabled" : "")}
-                      during={1000}
-                    >
-                      <span className="btn-inner">След.</span>
-                      {/*{catPage === pagination.pages ? <span className="btn-inner">След.</span> : <Link*/}
-                      {/*  to={(`/${props.match.url.split("/")[1]}/${(catPage + 1) + "/"}` + history.location.search).replace(/\/\//, "/")}*/}
-                      {/*  className="btn-inner">След.</Link>}*/}
-                    </Ripples>
-                  </li>
-                </ul> : null}
-              </div> : null}
+                      </li>
+                    </ul> : null
+                  }
 
-            </> : null}
+                  {paginationHTML ?
+                    <ul className={"catalogue-page__pagination-list"}>
+                      {paginationHTML}
+                    </ul> : null
+                  }
+
+                  {pagination.pages > 3 ?
+                    <ul className={"catalogue-page__pagination-list"}>
+                      <li className={"catalogue-page__pagination-item"}>
+                        <Ripples
+                          onClick={() => {
+                            setCatPage(Math.max(1, catPage - 1));
+                          }}
+                          className={"btn __gray" + (catPage === 1 ? " __disabled" : "")}
+                          during={1000}
+                        >
+                          <span className="btn-inner">Пред.</span>
+                          {/*{catPage === 1 ? <span className="btn-inner">Пред.</span> : <Link*/}
+                          {/*  to={(`/${props.match.url.split("/")[1]}/${catPage > 2 ? (catPage - 1) + "/" : ""}` + history.location.search).replace(/\/\//, "/")}*/}
+                          {/*  className="btn-inner">Пред.</Link>}*/}
+                        </Ripples>
+                      </li>
+                      <li className={"catalogue-page__pagination-item"}>
+                        <Ripples
+                          onClick={() => {
+                            setCatPage((catPage + (catPage < pagination.pages ? 1 : 0)));
+                          }}
+                          className={"btn __gray" + (catPage === pagination.pages ? " __disabled" : "")}
+                          during={1000}
+                        >
+                          <span className="btn-inner">След.</span>
+                          {/*{catPage === pagination.pages ? <span className="btn-inner">След.</span> : <Link*/}
+                          {/*  to={(`/${props.match.url.split("/")[1]}/${(catPage + 1) + "/"}` + history.location.search).replace(/\/\//, "/")}*/}
+                          {/*  className="btn-inner">След.</Link>}*/}
+                        </Ripples>
+                      </li>
+                    </ul> : null
+                  }
+                </div> : null
+              }
+            </> : null
+          }
         </>
-        : null}
+        : null
+      }
 
       {!cart && busy ? (
         <div className="skeleton-holder">
@@ -821,8 +842,8 @@ export function FilterForm({
           <div className="skeleton skeleton-wide">
             <SkeletonWide />
           </div>
-        </div>
-      ) : null}
+        </div>) : null
+      }
 
       <div className="form-filter">
         {!cart &&
@@ -856,7 +877,8 @@ export function FilterForm({
                 </div>
               )}
             </div>
-          ) : null)}
+          ) : null)
+        }
 
         {!cart && showResults && !categoryPage ? <h1 className="form-filter__stat">{searchInfo}</h1> :
           <div className="form-filter__stat">&nbsp;</div>}
@@ -966,8 +988,8 @@ export function FilterForm({
                       </label>
                     </Ripples>
                   ))}
-              </div>
-            ) : null}
+              </div>) : null
+            }
           </div>
         )}
       </div>

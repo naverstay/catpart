@@ -81,7 +81,6 @@ export default function CataloguePage(props) {
 
         if (sameCol) {
           setOpenFilterDropdown(false);
-          setFilterColumn("");
         } else {
           setOpenFilterDropdown(true);
           setFilterColumn(col);
@@ -111,6 +110,12 @@ export default function CataloguePage(props) {
   useEffect(() => {
     setOpenFilterDropdown(false);
   }, [categoryItems]);
+
+  useEffect(() => {
+    if (!openFilterDropdown) {
+      setFilterColumn("");
+    }
+  }, [openFilterDropdown]);
 
   useEffect(() => {
     setFilterText("");
@@ -243,6 +248,8 @@ export default function CataloguePage(props) {
       : null;
   }, [categoryItems, catColumnsList]);
 
+  console.log("categoryFilter", categoryFilter);
+
   return (
     redirectUrl ? <Redirect to={redirectUrl} /> : <>
       <Helmet>
@@ -360,7 +367,7 @@ export default function CataloguePage(props) {
                 }
               }
 
-              console.log('filterAttr', filterAttr);
+              console.log("filterAttr", filterAttr);
 
               setCategoryFilter(categoryFilter.concat(filterAttr).filter(f => f.values.length));
 
