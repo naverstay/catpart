@@ -29,10 +29,10 @@
     position: relative;
     text-decoration: none;
     display: flex;
-    padding: 0 20px;
+    padding: 3px 20px;
     align-items: center;
     color: $main_gray;
-    height: 30px;
+    min-height: 30px;
     cursor: pointer;
     transition: background .3s;
 

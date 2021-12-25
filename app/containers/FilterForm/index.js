@@ -17,6 +17,7 @@ import Ripples from "react-ripples";
 // import { useInjectSaga } from 'utils/injectSaga';
 import { makeSelectRepos, makeSelectLoading, makeSelectError } from "containers/App/selectors";
 
+import qs from "qs";
 import { useDetectClickOutside } from "react-detect-click-outside";
 import { changeCurrency } from "./actions";
 // import reducer from './reducer';
@@ -40,7 +41,7 @@ import CatalogueItem from "../CatalogueItem";
 import { Link } from "react-router-dom";
 import CataloguePage from "../CataloguePage";
 import { getButtonsMap } from "../../utils/getPaginationMap";
-import { flatDeep } from "../../utils/flatDeep";
+import Breadcrumbs from "../../components/Breadcrumbs";
 
 // const key = 'home';
 const TRIGGER_DROPDOWN_LIMIT = 11;
@@ -66,6 +67,7 @@ export function FilterForm({
   totalCart,
   notificationFunc,
   updateCart,
+  setSearchData,
   sendSearchRequest,
   setOpenMobMenu,
   searchData,
@@ -109,9 +111,14 @@ export function FilterForm({
   const [openShare, setOpenShare] = useState(false);
   const [openMoreTriggers, setOpenMoreTriggers] = useState(false);
   const [catColumnsList, setCatColumnsList] = useState([]);
-  const [catPage, setCatPage] = useState(1);
 
-  const [catPageLimit, setCatPageLimit] = useState(10);
+  const params = qs.parse((props.location.search.substring(1)));
+  const paramsLimit = params.hasOwnProperty("l") ? parseInt(params.l) : 10;
+  const [catPageLimit, setCatPageLimit] = useState([10, 50, 100].indexOf(paramsLimit) > -1 ? paramsLimit : 10);
+
+  const paramsPage = parseInt(props.match.params.page);
+  const [catPage, setCatPage] = useState(isNaN(paramsPage) ? 1 : paramsPage);
+
   const [noDataText, setNodataText] = useState("");
   const [breadcrumbs, setBreadcrumbs] = useState([]);
   const [pagination, setPagination] = useState({ pages: 1 });
@@ -188,7 +195,19 @@ export function FilterForm({
 
       window.log && console.log("searchQueries", searchQueries);
 
-      setSearchInfo(searchQueries.replace(/, $/, "") + ` найдено ${plural(totalData, "наименование", "наименования", "наименований")}.`);
+      let actualInfo = "";
+
+      if (searchData.res.length && searchData.res[0].hasOwnProperty("data") && searchData.res[0].data.length && searchData.res[0].data[0].hasOwnProperty("updated_at")) {
+        actualInfo = ` Данные актуальны на ${new Date(searchData.res[0].data[0].updated_at).toLocaleDateString("ru-Ru", {
+          year: "numeric",
+          month: "numeric",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit"
+        }).replace(",", "")} МСК`;
+      }
+
+      setSearchInfo(searchQueries.replace(/, $/, "") + ` найдено ${plural(totalData, "наименование", "наименования", "наименований")}.` + actualInfo);
     }
 
     window.log && console.log("totalData", totalData);
@@ -263,19 +282,28 @@ export function FilterForm({
     });
   };
 
-  const getCategoryList = (category) => {
-    setNodataText("");
-    const requestURL = "/catalog/" + category;
+  const getCategoryList = (category, attributes, page) => {
+    // setNodataText("");
+    setCatPage(page);
+
+    if (attributes && attributes.hasOwnProperty("a") && typeof attributes.a === "object" && !Array.isArray(attributes.a) && attributes !== null) {
+      attributes.a = Object.keys(attributes.a).map(k => attributes.a[k]);
+    }
+
+    console.log("attributes", attributes);
+
+    const requestURL = "/catalog" + category;
+    const attrIds = [];
 
     let options = {
       page: catPage,
-      limit: catPageLimit,
-      attributes: categoryFilter.filter(f => f.id !== "manufacturer").map(m => {
-        return {
-          id: m.id,
-          values: m.values
-        };
-      })
+      limit: catPageLimit
+      // attributes: attributes.filter(f => f.id !== "manufacturer").map(m => {
+      //   return {
+      //     id: m.id,
+      //     values: m.values
+      //   };
+      // })
       // attributes: (categoryFilter.reduce((acc, m) => {
       //   let ret = [];
       //
@@ -290,11 +318,36 @@ export function FilterForm({
       // }, []))
     };
 
-    let manufacturer = categoryFilter.find(f => f.id === "manufacturer");
+    if (attributes && attributes.hasOwnProperty("a")) {
+      options.attributes = attributes.a.filter(f => !(f.id === "m" || f.id === "l")).map(m => {
+        attrIds.push(parseInt(m.id));
+        return {
+          id: m.id,
+          values: m.v
+        };
+      });
 
-    if (manufacturer) {
-      options.manufacturer = manufacturer.values;
+      let manufacturer = attributes.a.find(f => f.id === "m");
+
+      console.log("manufacturer", manufacturer);
+
+      if (manufacturer) {
+        options.manufacturer = manufacturer.v;
+      }
+
+      // if (limit) {
+      //   options.limit = manufacturer.v;
+      // }
     }
+
+    if (attributes && attributes.hasOwnProperty("l")) {
+      const paramsLimit = params.hasOwnProperty("l") ? parseInt(params.l) : 10;
+      setCatPageLimit([10, 50, 100].indexOf(paramsLimit) > -1 ? paramsLimit : 10);
+      attributes.l = catPageLimit;
+      history.replace(history.location.pathname + qs.stringify(attributes));
+    }
+
+    console.log("options", options);
 
     if (prevRequest !== requestURL + JSON.stringify(options)) {
       setPrevRequest(requestURL + JSON.stringify(options));
@@ -316,14 +369,38 @@ export function FilterForm({
           if (data.hasOwnProperty("product")) {
             setCategoryPage(false);
             setItemData(data.product);
-            sendSearchRequest({
-              q: props.match.url.replace(/\//g, ""),
-              c: 1
-            });
+
+            if (data.hasOwnProperty("histories") && data.histories.res) {
+              setSearchData(data.histories);
+            }
+
+            // sendSearchRequest({
+            //   q: props.match.url.replace(/\//g, ""),
+            //   c: 1
+            // });
           } else if (data.hasOwnProperty("items")) {
             setCategoryPage(true);
             setItemData(null);
+
             // setItemSlugLinks(itemSlugLinks.concat(responseData.items.map(d => d.slug)).concat(responseData.hasOwnProperty("breadcrumbs") ? responseData.breadcrumbs : []));
+
+            const requestURL = "/catalog/attributes";
+
+            console.log("attrIds", attrIds);
+
+            if (attrIds.length) {
+              apiGET(requestURL, { ids: attrIds }, data => {
+                setCategoryFilter(attributes.a.map(m => {
+                  return {
+                    id: m.id === "m" ? "Производитель" : m.id,
+                    name: data[m.id],
+                    values: m.v
+                  };
+                }));
+              });
+            } else {
+              setCategoryFilter([]);
+            }
 
             if (data.items.length) {
               setCategoryItems(data.items.map((d, di) => {
@@ -387,17 +464,55 @@ export function FilterForm({
     }
   };
 
-  // useEffect(() => {
-  //   setCatPage(1);
-  // }, [catPageLimit, categoryFilter]);
+  useEffect(() => {
+    console.log("categoryFilter", categoryFilter, qs.stringify({ a: categoryFilter }));
+
+    let options = {};
+
+    if (categoryFilter.length) {
+      options.a = categoryFilter.filter(f => !(f.id === "m" || f.id === "l")).map(m => {
+        return {
+          id: m.id,
+          v: m.values
+        };
+      });
+
+      let manufacturer = categoryFilter.find(f => f.id === "m");
+
+      if (manufacturer) {
+        options.m = manufacturer.v;
+      }
+    }
+
+    console.log("manufacturer", options);
+
+    history.push({
+      pathname: history.pathname,
+      search: qs.stringify(options)
+    });
+
+  }, [categoryFilter]);
 
   useEffect(() => {
+    console.log("catPage", catPage, props.match);
     if (someCategoryUrl) {
-      setNodataText("");
+      // setNodataText("");
+      // setCategoryFilter([]);
       setShowCatPreloader(true);
       setItemData(null);
       setCategoryPage(true);
-      getCategoryList(props.match.url.replace(/\//g, ""));
+      let url = "";
+      let page = 1;
+
+      if (props.match.params.hasOwnProperty("catalogue") && props.match.params.catalogue !== "catalog") {
+        url = "/" + props.match.params.catalogue.replace(/\//g, "");
+      }
+
+      if (props.match.params.hasOwnProperty("page")) {
+        page = parseInt(props.match.params.page);
+      }
+
+      getCategoryList(url, qs.parse((props.location.search.substring(1))), isNaN(page) ? 1 : page);
     } else {
       setShowCatPreloader(false);
       setItemData(null);
@@ -408,7 +523,9 @@ export function FilterForm({
 
   const removeFilter = (param, index) => {
     setCategoryFilter(categoryFilter.reduce((acc, f, fi) => {
-      if (fi === param) {
+      if (index < 0) {
+        return acc;
+      } else if (fi === param) {
         if (f.values.length > 1) {
           f.values.splice(index, 1);
           return acc.concat(f);
@@ -427,7 +544,14 @@ export function FilterForm({
     if (categoryFilter.length) {
       ret = categoryFilter.map((f, fi) => {
         return <li key={fi}>
-          <span className={"catalogue-page__filter-item"}>{f.name}</span>
+          <span className={"catalogue-page__filter-item"}>
+            <span>{f.name}</span>
+             <span className={"filter-remove-btn btn __gray"} onClick={() => {
+               removeFilter(fi, -1);
+             }}>
+              <span className={"icon icon-close"} />
+            </span>
+          </span>
           {f.values.map((m, mi) => <span key={mi} className={"catalogue-page__filter-item"}>
             <span>{m}</span>
              <span className={"filter-remove-btn btn __gray"} onClick={() => {
@@ -446,20 +570,24 @@ export function FilterForm({
   const paginationHTML = useMemo(() => {
     let pages = getButtonsMap(pagination.pages, catPage);
 
-    return pagination.pages ? pages.map((p, pi) => {
+    return pagination.pages && pagination.pages > 1 ? pages.map((p, pi) => {
       return <li key={pi} className={"catalogue-page__pagination-item"}>
         <Ripples
-          onClick={p.isMore ? null : () => {
-            setCatPage(parseInt(p.text));
-          }}
+          // onClick={p.isMore ? null : () => {
+          //   setCatPage(parseInt(p.text));
+          // }}
           className={"btn " + (parseInt(p.text) === catPage ? "__blue" : "__gray")}
           during={1000}
         >
-          <span className="btn-inner">{p.text}</span>
+          {p.isMore || parseInt(p.text) === catPage ?
+            <span className="btn-inner">{p.text}</span>
+            : <Link
+              to={(`/${props.match.url.split("/")[1]}/${parseInt(p.text) === 1 ? "" : p.text + "/"}` + history.location.search).replace(/\/\//, "/")}
+              className="btn-inner">{p.text}</Link>}
         </Ripples>
       </li>;
     }) : null;
-  }, [pagination, catPage]);
+  }, [props.match.url, pagination, catPage]);
 
   return (
     <>
@@ -483,6 +611,8 @@ export function FilterForm({
 
       {/* todo search and any category/product page */}
       {!cart && someCategoryUrl ? <>
+          <Breadcrumbs bread={breadcrumbs} />
+
           {itemData ? <CatalogueItem
             profile={profile}
             history={history}
@@ -505,109 +635,115 @@ export function FilterForm({
             props={{ ...props }}
           /> : categoryPage ?
             <>
-              {showCatPreloader ? <span>Skeleton here</span> : <>
-                <CataloguePage
-                  filterItemsHTML={filterItemsHTML}
-                  categoryItems={categoryItems}
-                  catPage={catPage}
-                  setCatPage={setCatPage}
-                  breadcrumbs={breadcrumbs}
-                  catColumnsList={catColumnsList}
-                  noDataText={noDataText}
-                  nestedCategories={nestedCategories.slice(0)}
-                  categoryInfo={categoryInfo}
-                  profile={profile}
-                  history={history}
-                  // busy={formBusy}
-                  categoryFilter={categoryFilter}
-                  setCategoryFilter={setCategoryFilter}
-                  setBusyOrder={setBusyOrder}
-                  currency={currency}
-                  setCurrency={setCurrency}
-                  currencyList={currencyList}
-                  setCurrencyList={setCurrencyList}
-                  RUB={RUB}
-                  setShowTableHeadFixed={setShowTableHeadFixed}
-                  setTableHeadFixed={setTableHeadFixed}
-                  setOpenAuthPopup={setOpenAuthPopup}
-                  setOrderSent={setOrderSent}
-                  totalCart={totalCart}
-                  updateCart={updateCart}
-                  // notificationFunc={createNotification}
-                  // setOpenCatalogue={setOpenCatalogue}
-                  // setOpenMobMenu={setOpenMobMenu}
-                  {...props}
-                />
+              <CataloguePage
+                showCatPreloader={showCatPreloader}
+                filterItemsHTML={filterItemsHTML}
+                categoryItems={categoryItems}
+                catPage={catPage}
+                setCatPage={setCatPage}
+                breadcrumbs={breadcrumbs}
+                catColumnsList={catColumnsList}
+                noDataText={noDataText}
+                nestedCategories={nestedCategories.slice(0)}
+                categoryInfo={categoryInfo}
+                profile={profile}
+                history={history}
+                // busy={formBusy}
+                categoryFilter={categoryFilter}
+                setCategoryFilter={setCategoryFilter}
+                setBusyOrder={setBusyOrder}
+                currency={currency}
+                setCurrency={setCurrency}
+                currencyList={currencyList}
+                setCurrencyList={setCurrencyList}
+                RUB={RUB}
+                setShowTableHeadFixed={setShowTableHeadFixed}
+                setTableHeadFixed={setTableHeadFixed}
+                setOpenAuthPopup={setOpenAuthPopup}
+                setOrderSent={setOrderSent}
+                totalCart={totalCart}
+                updateCart={updateCart}
+                // notificationFunc={createNotification}
+                // setOpenCatalogue={setOpenCatalogue}
+                // setOpenMobMenu={setOpenMobMenu}
+                {...props}
+              />
 
-                {noDataText ? <div className="catalogue-page__nodata">
-                  {noDataText}
-                </div> : null}
+              {noDataText ? <div className="catalogue-page__nodata">
+                {noDataText}
+              </div> : null}
 
-                {categoryItems.length ? <div className="catalogue-page__pagination">
-                  <ul className={"catalogue-page__pagination-list"}>
-                    <li className={"catalogue-page__pagination-item"}>
-                      <div ref={openPaginationRef} className="dropdown-holder">
-                        <Ripples
-                          onClick={() => {
-                            setOpenPaginationDropdown(!openPaginationDropdown);
-                          }}
-                          className={"btn __gray" + (openPaginationDropdown ? " __opened" : "")}
-                          during={1000}
-                        >
+              {categoryItems.length && pagination.pages > 1 ? <div className="catalogue-page__pagination">
+                <ul className={"catalogue-page__pagination-list"}>
+                  <li className={"catalogue-page__pagination-item"}>
+                    <div ref={openPaginationRef} className="dropdown-holder">
+                      <Ripples
+                        onClick={() => {
+                          setOpenPaginationDropdown(!openPaginationDropdown);
+                        }}
+                        className={"btn __gray" + (openPaginationDropdown ? " __opened" : "")}
+                        during={1000}
+                      >
                       <span className="btn-inner">
                         <span>{catPageLimit}</span>
                         <span className={"icon icon-chevron-up"} />
                       </span>
-                        </Ripples>
-                        {openPaginationDropdown && (
-                          <div className="dropdown-container">
-                            <ul className="dropdown-list">
-                              {[1, 2, 3, 10, 20, 50, 100].map((t, ti) => (
-                                <li key={ti}><Ripples
-                                  onClick={() => {
-                                    setOpenPaginationDropdown(false);
-                                    setCatPage(1);
-                                    setCatPageLimit(t);
-                                  }}
-                                  className="dropdown-link"
-                                  during={1000}
-                                >{t}</Ripples></li>
-                              ))}
-                            </ul>
-                          </div>
-                        )}
-                      </div>
-                    </li>
-                  </ul>
-                  {paginationHTML ? <ul className={"catalogue-page__pagination-list"}>
-                    {paginationHTML}
-                  </ul> : null}
-                  <ul className={"catalogue-page__pagination-list"}>
-                    <li className={"catalogue-page__pagination-item"}>
-                      <Ripples
-                        onClick={() => {
-                          setCatPage(Math.max(1, catPage - 1));
-                        }}
-                        className={"btn __gray" + (catPage === 1 ? " __disabled" : "")}
-                        during={1000}
-                      >
-                        <span className="btn-inner">Пред.</span>
                       </Ripples>
-                    </li>
-                    <li className={"catalogue-page__pagination-item"}>
-                      <Ripples
-                        onClick={() => {
-                          setCatPage((catPage + (catPage < pagination.pages ? 1 : 0)));
-                        }}
-                        className={"btn __gray" + (catPage === pagination.pages ? " __disabled" : "")}
-                        during={1000}
-                      >
-                        <span className="btn-inner">След.</span>
-                      </Ripples>
-                    </li>
-                  </ul>
-                </div> : null}
-              </>}
+                      {openPaginationDropdown && (
+                        <div className="dropdown-container">
+                          <ul className="dropdown-list">
+                            {[
+                              1, 2, 3,
+                              10, 50, 100].map((t, ti) => (
+                              <li key={ti}><Ripples
+                                onClick={() => {
+                                  setOpenPaginationDropdown(false);
+                                  setCatPage(1);
+                                  setCatPageLimit(t);
+                                }}
+                                className="dropdown-link"
+                                during={1000}
+                              >{t}</Ripples></li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+                  </li>
+                </ul>
+                {paginationHTML ? <ul className={"catalogue-page__pagination-list"}>
+                  {paginationHTML}
+                </ul> : null}
+                {pagination.pages > 3 ? <ul className={"catalogue-page__pagination-list"}>
+                  <li className={"catalogue-page__pagination-item"}>
+                    <Ripples
+                      onClick={() => {
+                        setCatPage(Math.max(1, catPage - 1));
+                      }}
+                      className={"btn __gray" + (catPage === 1 ? " __disabled" : "")}
+                      during={1000}
+                    >
+                      {catPage === 1 ? <span className="btn-inner">Пред.</span> : <Link
+                        to={(`/${props.match.url.split("/")[1]}/${catPage > 2 ? (catPage - 1) + "/" : ""}` + history.location.search).replace(/\/\//, "/")}
+                        className="btn-inner">Пред.</Link>}
+                    </Ripples>
+                  </li>
+                  <li className={"catalogue-page__pagination-item"}>
+                    <Ripples
+                      onClick={() => {
+                        setCatPage((catPage + (catPage < pagination.pages ? 1 : 0)));
+                      }}
+                      className={"btn __gray" + (catPage === pagination.pages ? " __disabled" : "")}
+                      during={1000}
+                    >
+                      {catPage === pagination.pages ? <span className="btn-inner">След.</span> : <Link
+                        to={(`/${props.match.url.split("/")[1]}/${(catPage + 1) + "/"}` + history.location.search).replace(/\/\//, "/")}
+                        className="btn-inner">След.</Link>}
+                    </Ripples>
+                  </li>
+                </ul> : null}
+              </div> : null}
+
             </> : null}
         </>
         : null}
@@ -698,7 +834,7 @@ export function FilterForm({
                   <div className="form-filter__control">
                     <Ripples
                       onClick={() => {
-                        onSubmitSearchForm(props.match.url.replace(/\//g, ""), 1);
+                        onSubmitSearchForm(itemData.title, 1);
                       }}
                       className="btn __blue"
                       during={1000}

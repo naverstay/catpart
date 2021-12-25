@@ -7,7 +7,7 @@ function Breadcrumbs({ bread }) {
       <ul itemScope="" itemType="http://schema.org/BreadcrumbList" className="breadcrumbs__list">
         {bread.map((b, bi) => <li itemProp="itemListElement" itemScope="" itemType="http://schema.org/ListItem"
                                   key={bi}><Link itemProp="item" className={"breadcrumbs__link"}
-                                                 to={"/" + b.slug}>
+                                                 to={"/" + b.slug + "/"}>
           <span itemProp="name">{b.name}</span>
           <meta itemProp="position" content={bi + 1} />
         </Link>

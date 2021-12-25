@@ -7,6 +7,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import Swiper from "react-id-swiper";
+import qs from "qs";
 import { Navigation, Manipulation } from "swiper";
 import { Helmet } from "react-helmet";
 import Breadcrumbs from "../../components/Breadcrumbs";
@@ -19,18 +20,18 @@ import checkEmailExist from "../../utils/checkEmailExist";
 import { uniqArray } from "../../utils/uniqArray";
 
 export default function CatalogueItem(props) {
-  const { breadcrumbs, itemData } = props;
+  const { breadcrumbs, itemData, history } = props;
 
   const snippetCheckData = itemData && itemData.hasOwnProperty("snippet") && itemData.snippet.specs && itemData.snippet.specs.length ? itemData.snippet.specs.map(m => m.attribute.id) : [];
   const [snippetCheckValue, setSnippetCheckValue] = useState([]);
   const [similarSlides, setSimilarSlides] = useState([]);
   const [analogSliderTitles, setAnalogSliderTitles] = useState([]);
+  const [analogLink, setAnalogLink] = useState("");
 
   const handleCheckAll = (target) => {
-    console.log("handleCheckAll", target.target.value, snippetCheckData, target.target.value ? snippetCheckData : []);
-
     return setSnippetCheckValue(target.target.value ? snippetCheckData : []);
   };
+
   const handleChange = (value, target) => {
     let newVal = snippetCheckValue.slice(0);
 
@@ -38,11 +39,8 @@ export default function CatalogueItem(props) {
       newVal.push(value);
     } else {
       let index = snippetCheckValue.findIndex(f => f === value);
-      console.log("index", index);
       newVal.splice(index, 1);
     }
-
-    console.log("handleChange", value, newVal);
 
     return setSnippetCheckValue(newVal);
   };
@@ -51,23 +49,33 @@ export default function CatalogueItem(props) {
 
   const navigationPrevRef = useRef();
   const navigationNextRef = useRef();
-  const slideData = {
-    "manufacturer": "Microchip", "part_no": "SY54020RMG", "case_package": "-", "pins": "16", "circuits": "1"
-  };
-
-  // let analogSliderTitles = ["Производитель", "Номер детали"];
-
-  let slides = Array.from({ length: 10 }, (_, i) => slideData);
 
   useEffect(() => {
-    console.log();
+    const params = itemData.snippet.specs.filter(s => {
+      return snippetCheckValue.indexOf(s.attribute.id) > -1 && s.display_value.length > 0;
+    }).map(m => {
+      return {
+        id: m.attribute.id,
+        v: [m.display_value]
+      };
+    });
+
+    console.log("params", params, qs.parse(qs.stringify({ a: params })));
+
+    if (params.length) {
+      setAnalogLink("/catalog/?" + qs.stringify({ a: params }));
+    }
+  }, [snippetCheckValue]);
+
+  useEffect(() => {
+    console.log("get similar");
 
     if (itemData && itemData.hasOwnProperty("slug")) {
       const requestURL = `/catalog/${itemData.slug}/similar`;
 
       apiGET(requestURL, {}, data => {
 
-        let titles = ["Производитель", "Номер детали"];
+        let titles = ["manufacturer", "part_no"];
         let slides = [];
 
         for (let i = 0; i < data.length; i++) {
@@ -118,18 +126,20 @@ export default function CatalogueItem(props) {
         swiper.navigation.init();
         swiper.navigation.update();
       }, reachEnd: (swiper) => {
-        setTimeout(() => {
-          swiper.appendSlide([...Array(6)].map((m, mi) => `<div class="swiper-slide">` + slideBuilder(slideData, swiper.slides.length + mi + 1) + "</div>"));
-        }, 1000);
+        console.log("reachEnd");
+        // setTimeout(() => {
+        //   swiper.appendSlide([...Array(6)].map((m, mi) => `<div class="swiper-slide">` + slideBuilder(slideData, swiper.slides.length + mi + 1) + "</div>"));
+        // }, 1000);
       }
     }
   };
 
   const slideBuilder = (s, index) => {
     let ret = `<div class="catalogue-page__analogue-item">`;
+    analogSliderTitles.forEach((v, vi) => {
+      // const text = v === "part_no" ? <Link to={s.slug}>{s[v]}</Link> : s[v];
 
-    analogSliderTitles.map((v, vi) => {
-      ret += `<div class="catalogue-page__analogue-param ${(vi % 2 === 0 ? "__odd" : "__even")}">${s[v] || ""}</div>`;
+      ret += `<div class="catalogue-page__analogue-param ${(vi % 2 === 0 ? "__odd" : "__even")}"><span class="catalogue-page__analogue-value">${s[v] || ""}</span></div>`;
     });
 
     return ret + "</div>";
@@ -161,8 +171,6 @@ export default function CatalogueItem(props) {
       <meta name="keywords" content={title} />
       <link rel="canonical" href="https://catpart.ru/" />
     </Helmet>
-
-    <Breadcrumbs bread={breadcrumbs} />
 
     <div className="row">
       <div itemScope itemType="http://schema.org/Product" className="column sm-col-12 xl-col-9">
@@ -222,8 +230,6 @@ export default function CatalogueItem(props) {
                 </div>
 
                 {itemData.snippet.specs.map((s, si) => {
-                  let id = `${si + 1}`;
-
                   return <div key={si}
                               className={"catalogue-page__analogue-param " + ((si % 2 === 0 ? "__odd" : "__even"))}>
                     <span>{s.hasOwnProperty("attribute") && (s.attribute.name || s.attribute.id || "")}</span>
@@ -232,8 +238,9 @@ export default function CatalogueItem(props) {
                   <FormCheck
                     onChange={handleChange.bind(this, s.attribute.id)}
                     checked={snippetCheckValue.indexOf(s.attribute.id) > -1}
-                    name={id}
-                    value={s.attribute.id}
+                    id={s.attribute.id}
+                    name={s.attribute.id}
+                    value={s.display_value}
                     error={null}
                     label={snippetCheckValue.indexOf(s.attribute.id) > -1 ? "Убрать из фильтра" : "Добавить в фильтр"}
                     inputRef={null}
@@ -244,29 +251,36 @@ export default function CatalogueItem(props) {
             </article>
 
             <div className="text-center">
-              <div className="btn __blue">Подобрать аналоги</div>
+              {analogLink ? <Link to={analogLink} className="btn __blue">Подобрать аналоги</Link> :
+                <span className="btn __blue">Подобрать аналоги</span>}
             </div>
           </>
           : null}
 
-        <article className="article __catalogue">
-          <h2>Аналоги</h2>
-        </article>
+        {similarSlides.length ?
+          <>
+            <article className="article __catalogue">
+              <h2>Аналоги</h2>
+            </article>
 
-        <div className="catalogue-page__analogue">
-          <div ref={navigationPrevRef} className="btn __blue analogue-slider__button analogue-slider__button--prev" />
-          <div ref={navigationNextRef} className="btn __blue analogue-slider__button analogue-slider__button--next" />
-          <div className="catalogue-page__analogue-title">
-            <div className="catalogue-page__analogue-item">
-              {analogSliderTitles.map((t, ti) => {
-                return <div key={ti} className="catalogue-page__analogue-param">{t}</div>;
-              })}
+            <div className="catalogue-page__analogue">
+              <div ref={navigationPrevRef}
+                   className="btn __blue analogue-slider__button analogue-slider__button--prev" />
+              <div ref={navigationNextRef}
+                   className="btn __blue analogue-slider__button analogue-slider__button--next" />
+              <div className="catalogue-page__analogue-title">
+                <div className="catalogue-page__analogue-item">
+                  {analogSliderTitles.map((t, ti) => {
+                    const text = t === "part_no" ? "Номер детали" : t === "manufacturer" ? "Производитель" : t;
+                    return <div key={ti} className="catalogue-page__analogue-param">{text}</div>;
+                  })}
+                </div>
+              </div>
+              <div className="catalogue-page__analogue-slider">
+                {similarSliderHTML}
+              </div>
             </div>
-          </div>
-          <div className="catalogue-page__analogue-slider">
-            {similarSliderHTML}
-          </div>
-        </div>
+          </> : null}
       </React.Fragment> : null}
   </>);
 }

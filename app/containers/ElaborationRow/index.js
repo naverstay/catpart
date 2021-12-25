@@ -68,7 +68,7 @@ const ElaborationRow = props => {
             <FormInput
               onBlur={handleChange.bind(this, 'elaboration-' + f)}
               placeholder={elaborationLabels[fi]}
-              defaultValue={row.hasOwnProperty(f) ? String(row[f]) : ''}
+              defaultValue={row.hasOwnProperty(f) ? decodeURIComponent(String(row[f])) : ''}
               name={'elaboration-' + f}
               //
               error={f === 'name' ? errors['elaboration-name'] : null}

@@ -5,10 +5,11 @@
  */
 
 import React, { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, Redirect } from "react-router-dom";
 import { Helmet } from "react-helmet";
 // Import React Table
 import ReactTable from "react-table";
+import qs from "qs";
 
 // Import React Table HOC Fixed columns
 import withFixedColumns from "react-table-hoc-fixed-columns";
@@ -29,19 +30,23 @@ export default function CataloguePage(props) {
     categoryItems,
     breadcrumbs,
     catPage,
+    history,
     catColumnsList,
     nestedCategories,
     categoryInfo,
     categoryFilter,
     setCategoryFilter,
+    showCatPreloader,
     filterItemsHTML
   } = props;
 
   const [openFilterDropdown, setOpenFilterDropdown] = useState(false);
+  const [redirectUrl, setRedirectUrl] = useState("");
   const [filterColumn, setFilterColumn] = useState("");
   const [filterSelection, setFilterSelection] = useState([]);
   const [columnOptions, setColumnOptions] = useState([]);
   const [filterText, setFilterText] = useState("");
+  const [filterHoverCol, setFilterHoverCol] = useState(-1);
 
   const openFilterRef = useDetectClickOutside({
     onTriggered: (e) => {
@@ -64,7 +69,7 @@ export default function CataloguePage(props) {
   let title = categoryInfo && categoryInfo.hasOwnProperty("name") ? categoryInfo.name : "";
 
   nestedCategories.forEach((s, si) => {
-    nestedCategoriesItems[si % 4].push(<Link to={"/" + s.slug} key={si}
+    nestedCategoriesItems[si % 4].push(<Link to={"/" + s.slug + "/"} key={si}
                                              className={"catalogue__list-link"}>{s.name}</Link>);
   });
 
@@ -89,7 +94,7 @@ export default function CataloguePage(props) {
 
   const getColumnWidth = (accessor, headerText) => {
     const maxWidth = 600;
-    const padding = 22;
+    const padding = 23;
     const cellLength = Math.max(
       ...(headerText || "").split(" ").map(h => {
         rtCellSizer.innerText = h || "";
@@ -100,12 +105,16 @@ export default function CataloguePage(props) {
         return Math.ceil(padding + rtCellSizer.offsetWidth);
       })
     );
-    return Math.min(maxWidth, cellLength);
+    return cellLength;
   };
 
   useEffect(() => {
     setOpenFilterDropdown(false);
   }, [categoryItems]);
+
+  useEffect(() => {
+    console.log("filterHoverCol", filterHoverCol);
+  }, [filterHoverCol]);
 
   useEffect(() => {
     setFilterText("");
@@ -118,14 +127,45 @@ export default function CataloguePage(props) {
     })).filter(f => f && f.toLowerCase().indexOf(filterText) === 0));
   }, [filterColumn, filterText]);
 
+  const cellProps = ({ columnIndex }) => ({
+    "data-col-idx": columnIndex,
+    onMouseEnter: () => {
+      const table = tableRef.current.getDOMNode();
+      table.classList.add(`active-col-${columnIndex}`);
+    },
+    onMouseLeave: () => {
+      const table = tableRef.current.getDOMNode();
+      table.classList.remove(`active-col-${columnIndex}`);
+    }
+  });
+
   const catalogHTML = useMemo(() => {
     return categoryItems && categoryItems.length ?
       <>
         <ReactTableFixedColumns
-          key={categoryItems.length}
+          key={categoryItems.length + filterHoverCol}
           data={categoryItems}
+          showPagination={false}
+          showPageJump={false}
           sortable={false}
-          // useGridLayout={true}
+          getTdProps={(state, rowInfo, column, instance) => {
+            return {
+              onMouseEnter: (e) => {
+                let nodes = Array.prototype.slice.call(e.target.parentNode.children);
+                const index = nodes.indexOf(e.target);
+                let header = e.target.closest(".rt-table").querySelector(".rt-thead.-header");
+
+                Array.prototype.slice.call(header.querySelectorAll(".rt-th")).forEach((h, hi) => {
+                  h.classList[index === hi ? "add" : "remove"]("__hover");
+                });
+              },
+              onMouseLeave: (e) => {
+                let nodes = Array.prototype.slice.call(e.target.parentNode.children);
+                let header = e.target.closest(".rt-table").querySelector(".rt-thead.-header");
+                Array.prototype.slice.call(header.querySelectorAll(".rt-th"))[nodes.indexOf(e.target)].classList.remove("__hover");
+              }
+            };
+          }}
           columns={[
             {
               Header: "",
@@ -162,7 +202,8 @@ export default function CataloguePage(props) {
                   // Header: <div className={"text-center"}>Производитель</div>,
                   accessor: "catManufacturer",
                   Header: tableProps => {
-                    return <div className={"catalogue-page__table-cell text-center"}>
+                    return <div
+                      className={"catalogue-page__table-cell text-center" + (2 === filterHoverCol ? " __hovered" : "")}>
                       <span>Производитель</span>
                       {rtSortExtension("catManufacturer")}
                     </div>;
@@ -180,7 +221,8 @@ export default function CataloguePage(props) {
               Header: "",
               columns: [].concat(catColumnsList.map((c, ci) => {
                 c.Header = tableProps => {
-                  return <div className={"catalogue-page__table-cell"}>
+                  return <div
+                    className={"catalogue-page__table-cell" + (ci + 3 === filterHoverCol ? " __hovered" : "")}>
                     <span>{c.accessor}</span>
                     {rtSortExtension(c.accessor)}
                   </div>;
@@ -188,6 +230,10 @@ export default function CataloguePage(props) {
 
                 c.minWidth = 10;
                 c.width = getColumnWidth(c.accessor, c.accessor);
+
+                c.Cell = tableProps => {
+                  return <span className={"text-center"}>{tableProps.value}</span>;
+                };
 
                 return c;
               }))
@@ -202,15 +248,13 @@ export default function CataloguePage(props) {
   }, [categoryItems, catColumnsList]);
 
   return (
-    <>
+    redirectUrl ? <Redirect to={redirectUrl} /> : <>
       <Helmet>
         <title>{title}</title>
         <meta name="description" content={title} />
         <meta name="keywords" content={title} />
-        <link rel="canonical" href="https://catpart.ru/" />
+        <link rel="canonical" href={`https://catpart.ru/${history.location.pathname.split("/")[1]}/`} />
       </Helmet>
-
-      <Breadcrumbs bread={breadcrumbs} />
 
       {categoryInfo !== null ? <div className="row">
         <div className="column sm-col-12 xl-col-9">
@@ -271,20 +315,19 @@ export default function CataloguePage(props) {
                     }
 
                     setFilterSelection(filterSelection);
-                    console.log("Ripples", o, filterSelection, filterSelection.indexOf(o));
                   }}
                   className={"dropdown-link"}
                   during={1000}
                 ><label htmlFor={"filter-option_" + oi}>
                   <span>{o}</span>
-                </label></Ripples></li>;
+                </label></Ripples>
+              </li>;
             })}
           </ul>
 
           <Ripples
             onClick={() => {
               if (filterSelection.length) {
-                console.log("catColumnsList", catColumnsList);
                 let filterAttr = [];
 
                 if (filterSelection.length) {
@@ -292,21 +335,36 @@ export default function CataloguePage(props) {
 
                   if (attr) {
                     filterAttr.push({
-                      name: filterColumn,
-                      id: filterColumn === "catManufacturer" ? "manufacturer" : attr.attributeId,
-                      values: filterSelection
+                      // name: filterColumn,
+                      id: filterColumn === "catManufacturer" ? "m" : attr.attributeId,
+                      v: filterSelection
                     });
                   } else if (filterColumn === "catManufacturer") {
                     filterAttr.push({
-                      name: filterColumn,
-                      id: "manufacturer",
-                      values: filterSelection
+                      // name: filterColumn,
+                      id: "m",
+                      v: filterSelection
                     });
                   }
                 }
 
                 if (filterAttr.length) {
-                  setCategoryFilter(categoryFilter.concat(filterAttr));
+                  // setCategoryFilter(categoryFilter.concat(filterAttr));
+
+                  let attr = qs.parse((history.location.search.substring(1)));
+
+                  if (attr && attr.hasOwnProperty("a")) {
+                    attr.a = attr.a.concat(filterAttr);
+                  } else {
+                    attr.a = filterAttr.slice(0);
+                  }
+
+                  setRedirectUrl(`/${history.location.pathname.split("/")[1]}/` + "?" + qs.stringify(attr));
+
+                  // history.push({
+                  //   pathname: history.location.pathname,
+                  //   search: qs.stringify(attr)
+                  // });
                 }
               }
               setOpenFilterDropdown(false);
@@ -322,7 +380,7 @@ export default function CataloguePage(props) {
       </div>
 
       <div ref={tableHolder} className="catalogue-page__full">
-        {catalogHTML}
+        {showCatPreloader ?  <span>Skeleton here</span> :  catalogHTML}
       </div>
     </>
   );

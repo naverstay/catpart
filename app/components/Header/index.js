@@ -242,7 +242,7 @@ function Header({
         </Link>
         <Ripples
           during={1000}
-          className="btn __blue btn-catalogue"
+          className={"btn __blue btn-catalogue" + (openCatalogue ? " __active" : "")}
           onClick={() => {
             setOpenCatalogue(!openCatalogue);
           }}
@@ -328,7 +328,7 @@ function Header({
                 window.log && console.log("open", openAuthPopup);
               }}
               during={1000}
-              className="btn __blue"
+              className={"btn __blue" + (openAuthPopup ? " __active" : "")}
             >
               <span className="btn-inner">
                 <span className="__dotted">Личный кабинет</span>
