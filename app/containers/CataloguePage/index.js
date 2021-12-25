@@ -335,21 +335,25 @@ export default function CataloguePage(props) {
 
                   if (attr) {
                     filterAttr.push({
-                      // name: filterColumn,
+                      name: filterColumn,
                       id: filterColumn === "catManufacturer" ? "m" : attr.attributeId,
-                      v: filterSelection
+                      values: filterSelection
                     });
                   } else if (filterColumn === "catManufacturer") {
                     filterAttr.push({
-                      // name: filterColumn,
+                      name: filterColumn,
                       id: "m",
-                      v: filterSelection
+                      values: filterSelection
                     });
                   }
                 }
 
                 if (filterAttr.length) {
-                  // setCategoryFilter(categoryFilter.concat(filterAttr));
+                  console.log('categoryFilter', categoryFilter, filterAttr);
+
+
+
+                  setCategoryFilter(categoryFilter.concat(filterAttr));
 
                   let attr = qs.parse((history.location.search.substring(1)));
 
@@ -359,7 +363,7 @@ export default function CataloguePage(props) {
                     attr.a = filterAttr.slice(0);
                   }
 
-                  setRedirectUrl(`/${history.location.pathname.split("/")[1]}/` + "?" + qs.stringify(attr));
+                  // setRedirectUrl(`/${history.location.pathname.split("/")[1]}/` + "?" + qs.stringify(attr));
 
                   // history.push({
                   //   pathname: history.location.pathname,

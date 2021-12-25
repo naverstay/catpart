@@ -175,7 +175,7 @@ export default function CatalogueItem(props) {
     <div className="row">
       <div itemScope itemType="http://schema.org/Product" className="column sm-col-12 xl-col-9">
         {itemData ? <article className="article __catalogue">
-          <h1 itemProp="name" className="article-title">{itemData.snippet.name}</h1>
+          <h1 itemProp="name" className="article-title">{itemData.title}</h1>
 
           <div className={"catalogue-page__item"}>
             <div className="catalogue-page__item-image">

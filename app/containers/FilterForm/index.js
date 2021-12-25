@@ -86,9 +86,14 @@ export function FilterForm({
   // useInjectReducer({ key, reducer });
   // useInjectSaga({ key, saga });
 
+  const pageLimitList = [
+    1, 2, 3,
+    10, 50, 100];
   const query = new URLSearchParams(props.location.search);
   const [nestedCategories, setNestedCategories] = useState([]);
   const [categoryInfo, setCategoryInfo] = useState(null);
+
+
   const [categoryFilter, setCategoryFilter] = useState([]);
 
   const [openPaginationDropdown, setOpenPaginationDropdown] = useState(false);
@@ -114,10 +119,11 @@ export function FilterForm({
 
   const params = qs.parse((props.location.search.substring(1)));
   const paramsLimit = params.hasOwnProperty("l") ? parseInt(params.l) : 10;
-  const [catPageLimit, setCatPageLimit] = useState([10, 50, 100].indexOf(paramsLimit) > -1 ? paramsLimit : 10);
+  const [catPageLimit, setCatPageLimit] = useState(pageLimitList.indexOf(paramsLimit) > -1 ? paramsLimit : 10);
 
   const paramsPage = parseInt(props.match.params.page);
   const [catPage, setCatPage] = useState(isNaN(paramsPage) ? 1 : paramsPage);
+  const [updateTrigger, setUpdateTrigger] = useState(0);
 
   const [noDataText, setNodataText] = useState("");
   const [breadcrumbs, setBreadcrumbs] = useState([]);
@@ -290,7 +296,7 @@ export function FilterForm({
       attributes.a = Object.keys(attributes.a).map(k => attributes.a[k]);
     }
 
-    console.log("attributes", attributes);
+    console.log("attributes", page, attributes);
 
     const requestURL = "/catalog" + category;
     const attrIds = [];
@@ -342,7 +348,7 @@ export function FilterForm({
 
     if (attributes && attributes.hasOwnProperty("l")) {
       const paramsLimit = params.hasOwnProperty("l") ? parseInt(params.l) : 10;
-      setCatPageLimit([10, 50, 100].indexOf(paramsLimit) > -1 ? paramsLimit : 10);
+      setCatPageLimit(pageLimitList.indexOf(paramsLimit) > -1 ? paramsLimit : 10);
       attributes.l = catPageLimit;
       history.replace(history.location.pathname + qs.stringify(attributes));
     }
@@ -385,8 +391,6 @@ export function FilterForm({
             // setItemSlugLinks(itemSlugLinks.concat(responseData.items.map(d => d.slug)).concat(responseData.hasOwnProperty("breadcrumbs") ? responseData.breadcrumbs : []));
 
             const requestURL = "/catalog/attributes";
-
-            console.log("attrIds", attrIds);
 
             if (attrIds.length) {
               apiGET(requestURL, { ids: attrIds }, data => {
@@ -465,9 +469,23 @@ export function FilterForm({
   };
 
   useEffect(() => {
-    console.log("categoryFilter", categoryFilter, qs.stringify({ a: categoryFilter }));
+    console.log("catPageLimit 1");
+    setCatPage(1);
+    setUpdateTrigger(updateTrigger + 1);
+  }, [catPageLimit]);
 
+  useEffect(() => {
+    console.log("someCategoryUrl", catPage, categoryFilter);
+    console.log("catPageLimit 2");
+
+    let url = "";
     let options = {};
+
+    if (props.match.params.hasOwnProperty("catalogue") && props.match.params.catalogue !== "catalog") {
+      url = `/${props.match.params.catalogue.replace(/\//g, "")}/`;
+    }
+
+    console.log("categoryFilter", categoryFilter, qs.stringify({ a: categoryFilter }));
 
     if (categoryFilter.length) {
       options.a = categoryFilter.filter(f => !(f.id === "m" || f.id === "l")).map(m => {
@@ -486,15 +504,20 @@ export function FilterForm({
 
     console.log("manufacturer", options);
 
-    history.push({
-      pathname: history.pathname,
+    history.replace({
+      pathname: url + (catPage > 1 ? `${catPage}/` : ""),
       search: qs.stringify(options)
     });
 
-  }, [categoryFilter]);
+    // setUpdateTrigger(updateTrigger + 1);
+
+    // getCategoryList(url, options, catPage);
+  }, [catPage, categoryFilter]);
 
   useEffect(() => {
-    console.log("catPage", catPage, props.match);
+    console.log("someCategoryUrl", catPage, props.match);
+    console.log("catPageLimit 3", updateTrigger);
+
     if (someCategoryUrl) {
       // setNodataText("");
       // setCategoryFilter([]);
@@ -512,14 +535,14 @@ export function FilterForm({
         page = parseInt(props.match.params.page);
       }
 
-      getCategoryList(url, qs.parse((props.location.search.substring(1))), isNaN(page) ? 1 : page);
+      getCategoryList(url, qs.parse((props.location.search.substring(1))), catPage);
     } else {
       setShowCatPreloader(false);
       setItemData(null);
       setErrorPage(false);
       setCategoryPage(false);
     }
-  }, [catPage, catPageLimit, props.match.url, categoryFilter]);
+  }, [props.match.url, updateTrigger]);
 
   const removeFilter = (param, index) => {
     setCategoryFilter(categoryFilter.reduce((acc, f, fi) => {
@@ -573,17 +596,18 @@ export function FilterForm({
     return pagination.pages && pagination.pages > 1 ? pages.map((p, pi) => {
       return <li key={pi} className={"catalogue-page__pagination-item"}>
         <Ripples
-          // onClick={p.isMore ? null : () => {
-          //   setCatPage(parseInt(p.text));
-          // }}
+          onClick={p.isMore ? null : () => {
+            setCatPage(parseInt(p.text));
+          }}
           className={"btn " + (parseInt(p.text) === catPage ? "__blue" : "__gray")}
           during={1000}
         >
-          {p.isMore || parseInt(p.text) === catPage ?
-            <span className="btn-inner">{p.text}</span>
-            : <Link
-              to={(`/${props.match.url.split("/")[1]}/${parseInt(p.text) === 1 ? "" : p.text + "/"}` + history.location.search).replace(/\/\//, "/")}
-              className="btn-inner">{p.text}</Link>}
+          <span className="btn-inner">{p.text}</span>
+          {/*{p.isMore || parseInt(p.text) === catPage ?*/}
+          {/*  <span className="btn-inner">{p.text}</span>*/}
+          {/*  : <Link*/}
+          {/*    to={(`/${props.match.url.split("/")[1]}/${parseInt(p.text) === 1 ? "" : p.text + "/"}` + history.location.search).replace(/\/\//, "/")}*/}
+          {/*    className="btn-inner">{p.text}</Link>}*/}
         </Ripples>
       </li>;
     }) : null;
@@ -607,7 +631,6 @@ export function FilterForm({
           <link rel="canonical" href="https://catpart.ru/" />
         </Helmet>
       ) : null}
-
 
       {/* todo search and any category/product page */}
       {!cart && someCategoryUrl ? <>
@@ -692,13 +715,11 @@ export function FilterForm({
                       {openPaginationDropdown && (
                         <div className="dropdown-container">
                           <ul className="dropdown-list">
-                            {[
-                              1, 2, 3,
-                              10, 50, 100].map((t, ti) => (
+                            {pageLimitList.map((t, ti) => (
                               <li key={ti}><Ripples
                                 onClick={() => {
+                                  // setCatPage(-1);
                                   setOpenPaginationDropdown(false);
-                                  setCatPage(1);
                                   setCatPageLimit(t);
                                 }}
                                 className="dropdown-link"
@@ -723,9 +744,10 @@ export function FilterForm({
                       className={"btn __gray" + (catPage === 1 ? " __disabled" : "")}
                       during={1000}
                     >
-                      {catPage === 1 ? <span className="btn-inner">Пред.</span> : <Link
-                        to={(`/${props.match.url.split("/")[1]}/${catPage > 2 ? (catPage - 1) + "/" : ""}` + history.location.search).replace(/\/\//, "/")}
-                        className="btn-inner">Пред.</Link>}
+                      <span className="btn-inner">Пред.</span>
+                      {/*{catPage === 1 ? <span className="btn-inner">Пред.</span> : <Link*/}
+                      {/*  to={(`/${props.match.url.split("/")[1]}/${catPage > 2 ? (catPage - 1) + "/" : ""}` + history.location.search).replace(/\/\//, "/")}*/}
+                      {/*  className="btn-inner">Пред.</Link>}*/}
                     </Ripples>
                   </li>
                   <li className={"catalogue-page__pagination-item"}>
@@ -736,9 +758,10 @@ export function FilterForm({
                       className={"btn __gray" + (catPage === pagination.pages ? " __disabled" : "")}
                       during={1000}
                     >
-                      {catPage === pagination.pages ? <span className="btn-inner">След.</span> : <Link
-                        to={(`/${props.match.url.split("/")[1]}/${(catPage + 1) + "/"}` + history.location.search).replace(/\/\//, "/")}
-                        className="btn-inner">След.</Link>}
+                      <span className="btn-inner">След.</span>
+                      {/*{catPage === pagination.pages ? <span className="btn-inner">След.</span> : <Link*/}
+                      {/*  to={(`/${props.match.url.split("/")[1]}/${(catPage + 1) + "/"}` + history.location.search).replace(/\/\//, "/")}*/}
+                      {/*  className="btn-inner">След.</Link>}*/}
                     </Ripples>
                   </li>
                 </ul> : null}
