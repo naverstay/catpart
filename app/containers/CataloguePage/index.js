@@ -23,14 +23,11 @@ import FormInput from "../../components/FormInput";
 import { uniqArray } from "../../utils/uniqArray";
 
 export default function CataloguePage(props) {
-  let nestedCategoriesItems = [[], [], [], []];
   const rtCellSizer = document.getElementById("rtCellSizer");
   const tableHolder = React.createRef();
-  const filterInputRef = React.createRef();
+
   const {
     categoryItems,
-    breadcrumbs,
-    catPage,
     history,
     catColumnsList,
     nestedCategories,
@@ -42,7 +39,7 @@ export default function CataloguePage(props) {
   } = props;
 
   const [openFilterDropdown, setOpenFilterDropdown] = useState(false);
-  const [redirectUrl, setRedirectUrl] = useState("");
+
   const [filterColumn, setFilterColumn] = useState("");
   const [filterSelection, setFilterSelection] = useState([]);
   const [columnOptions, setColumnOptions] = useState([]);
@@ -68,24 +65,15 @@ export default function CataloguePage(props) {
 
   let title = categoryInfo && categoryInfo.hasOwnProperty("name") ? categoryInfo.name : "";
 
-  nestedCategories.forEach((s, si) => {
-    nestedCategoriesItems[si % 4].push(<Link to={"/" + s.slug + "/"} key={si}
-                                             className={"catalogue__list-link"}>{s.name}</Link>);
-  });
-
   const rtSortExtension = (col) => {
     return <div className={"catalogue-page__table-sorter"}>
       <div className="sort-btn btn __gray" onClick={() => {
-        let sameCol = col === filterColumn;
-        console.log("rtSortExtension", sameCol, col, filterColumn);
-
-        if (sameCol) {
+        if (col === filterColumn) {
           setOpenFilterDropdown(false);
         } else {
           setOpenFilterDropdown(true);
           setFilterColumn(col);
         }
-
       }}><span /></div>
       <div className="catalogue-page__table-tip">Фильтр</div>
     </div>;
@@ -137,8 +125,18 @@ export default function CataloguePage(props) {
     })).filter(f => f && f.toLowerCase().indexOf(filterText) === 0));
   }, [filterColumn, filterText]);
 
+  const nestedCategoriesItems = useMemo(() => {
+    let ret = [[], [], [], []];
+
+    nestedCategories.forEach((s, si) => {
+      ret[si % 4].push(<Link to={"/" + s.slug + "/"} key={si} className={"catalogue__list-link"}>{s.name}</Link>);
+    });
+
+    return ret;
+  }, [nestedCategories]);
+
   const catalogHTML = useMemo(() => {
-    return categoryItems && categoryItems.length ?
+    return catColumnsList.length && categoryItems.length ?
       <>
         <ReactTableFixedColumns
           key={categoryItems.length}
@@ -176,8 +174,9 @@ export default function CataloguePage(props) {
                     return <span className={"catalogue-page__table-image"}>
                       {tableProps.row.catImage ?
                         <LazyLoadImage
+                          effect="opacity"
                           src={tableProps.row.catImage}
-                          placeholder={<span className={"catalogue-page__table-loader"} />}
+                          // placeholder={<span className={"catalogue-page__table-loader"} />}
                           alt={tableProps.row.catPartNum} />
                         : null}
                     </span>;
@@ -246,12 +245,12 @@ export default function CataloguePage(props) {
         />
       </>
       : null;
-  }, [categoryItems, catColumnsList]);
+  }, [catColumnsList]);
 
   console.log("categoryFilter", categoryFilter);
 
   return (
-    redirectUrl ? <Redirect to={redirectUrl} /> : <>
+    <>
       <Helmet>
         <title>{title}</title>
         <meta name="description" content={title} />
@@ -284,111 +283,108 @@ export default function CataloguePage(props) {
       <ul className={"catalogue-page__filter-data"}>{filterItemsHTML}</ul>
 
       <div ref={openFilterRef} className="catalogue-page__filter">
-        {openFilterDropdown ? <div className="catalogue-page__filter-popup">
-          <div
-            className={"catalogue-page__filter-title"}>{filterColumn === "catManufacturer" ? "Производитель" : filterColumn}</div>
+        {openFilterDropdown ?
+          <div className="catalogue-page__filter-popup">
+            <div
+              className={"catalogue-page__filter-title"}>{filterColumn === "catManufacturer" ? "Производитель" : filterColumn}</div>
 
-          <FormInput
-            key={filterColumn}
-            onChange={(e) => {
-              setFilterText(e.target.value.toLowerCase());
-            }}
-            placeholder={"Искать"}
-            itemprop="query-input"
-            name="filter-search"
-            //
-            className={"__lg"}
-            error={null}
-            id="filter-search"
-            // inputRef={formArtNumber}
-          />
-
-          <ul className="catalogue-page__filter-options">
-            {columnOptions.map((o, oi) => {
-              let checked = false;
-              let filter = categoryFilter.find(f => f.name === filterColumn);
-
-              if (filter && filter.values.indexOf(o) > -1) {
-                checked = true;
-              }
-
-              return <li key={oi}>
-                <input id={"filter-option_" + oi} defaultChecked={checked} className="hide" value={o} type="checkbox" />
-                <Ripples
-                  onClick={() => {
-                    const filterIndex = filterSelection.findIndex(f => f === o);
-
-                    if (filterIndex > -1) {
-                      filterSelection.splice(filterIndex, 1);
-                    } else {
-                      filterSelection.push(o);
-                    }
-
-                    setFilterSelection(filterSelection);
-                  }}
-                  className={"dropdown-link"}
-                  during={1000}
-                ><label htmlFor={"filter-option_" + oi}>
-                  <span>{o}</span>
-                </label></Ripples>
-              </li>;
-            })}
-          </ul>
-
-          <Ripples
-            onClick={() => {
-              let filterAttr = [];
-              let param = catColumnsList.find(f => f.accessor === filterColumn);
-
-              if (param) {
-                let attrId = filterColumn === "catManufacturer" ? "m" : param.attributeId;
-                let filter = categoryFilter.find(f => f.id === attrId);
-
-                if (filter) {
-                  filter.values = filterSelection;
-                } else {
-                  filterAttr.push({
-                    id: attrId,
-                    name: filterColumn,
-                    values: filterSelection
-                  });
-                }
-              } else if (filterColumn === "catManufacturer") {
-                let filter = categoryFilter.find(f => f.id === "m");
-
-                if (filter) {
-                  filter.values = filterSelection;
-                } else {
-                  filterAttr.push({
-                    id: "m",
-                    name: filterColumn,
-                    values: filterSelection
-                  });
-                }
-              }
-
-              console.log("filterAttr", filterAttr);
-
-              setCategoryFilter(categoryFilter.concat(filterAttr).filter(f => f.values.length));
-
-              // let attr = qs.parse((history.location.search.substring(1)));
+            <FormInput
+              key={filterColumn}
+              onChange={(e) => {
+                setFilterText(e.target.value.toLowerCase());
+              }}
+              placeholder={"Искать"}
+              itemprop="query-input"
+              name="filter-search"
               //
-              // if (attr && attr.hasOwnProperty("a")) {
-              //   attr.a = attr.a.concat(filterAttr);
-              // } else {
-              //   attr.a = filterAttr.slice(0);
-              // }
+              className={"__lg"}
+              error={null}
+              id="filter-search"
+              // inputRef={formArtNumber}
+            />
 
-              setOpenFilterDropdown(false);
-            }}
-            className="btn __blue __lg __w-100p"
-            during={1000}
-          >
+            <ul className="catalogue-page__filter-options">
+              {columnOptions.map((o, oi) => {
+                let checked = false;
+                let filter = categoryFilter.find(f => f.name === filterColumn);
+
+                if (filter && filter.values.indexOf(o) > -1) {
+                  checked = true;
+                }
+
+                console.log("defaultChecked", o, checked, categoryFilter);
+
+                return <li key={oi}>
+                  <input id={"filter-option_" + oi} defaultChecked={checked} className="hide" value={o}
+                         type="checkbox" />
+                  <Ripples
+                    onClick={() => {
+                      const filterIndex = filterSelection.findIndex(f => f === o);
+
+                      if (filterIndex > -1) {
+                        filterSelection.splice(filterIndex, 1);
+                      } else {
+                        filterSelection.push(o);
+                      }
+
+                      setFilterSelection(filterSelection);
+                    }}
+                    className={"dropdown-link"}
+                    during={1000}
+                  ><label htmlFor={"filter-option_" + oi}>
+                    <span>{o}</span>
+                  </label></Ripples>
+                </li>;
+              })}
+            </ul>
+
+            <Ripples
+              onClick={() => {
+                let filterAttr = [];
+                let param = catColumnsList.find(f => f.accessor === filterColumn);
+
+                if (param) {
+                  let attrId = filterColumn === "catManufacturer" ? "m" : param.attributeId;
+                  let filter = categoryFilter.find(f => f.id === attrId);
+
+                  if (filter) {
+                    filter.values = filterSelection;
+                  } else {
+                    filterAttr.push({
+                      id: attrId,
+                      name: filterColumn,
+                      values: filterSelection
+                    });
+                  }
+                } else if (filterColumn === "catManufacturer") {
+                  let filter = categoryFilter.find(f => f.id === "m");
+
+                  if (filter) {
+                    filter.values = filterSelection;
+                  } else {
+                    filterAttr.push({
+                      id: "m",
+                      name: filterColumn,
+                      values: filterSelection
+                    });
+                  }
+                }
+
+                console.log("filterAttr", filterAttr);
+
+                setCategoryFilter(categoryFilter.concat(filterAttr).filter(f => f.values.length));
+
+                setOpenFilterDropdown(false);
+              }}
+              className="btn __blue __lg __w-100p"
+              during={1000}
+            >
             <span className="btn-inner">
               <span>Применить</span>
             </span>
-          </Ripples>
-        </div> : null}
+            </Ripples>
+          </div> : null
+        }
       </div>
 
       <div ref={tableHolder} className="catalogue-page__full">

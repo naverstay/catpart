@@ -96,10 +96,19 @@ export function FilterForm({
 
   let queryAttr = params && params.hasOwnProperty("a") ? (params.a.map(m => {
     return {
-      id: m.id === "m" ? "Производитель" : m.id,
+      id: m.id,
       values: m.v
     };
   })) : [];
+
+  if (params && params.hasOwnProperty("m")) {
+    queryAttr.push({
+      id: "m",
+      name: "Производитель",
+      values: params.m
+    });
+  }
+
   const [categoryFilter, setCategoryFilter] = useState(queryAttr);
   const [categoryFilterNames, setCategoryFilterNames] = useState([]);
 
@@ -330,6 +339,7 @@ export function FilterForm({
   };
 
   const removeFilter = (param, index) => {
+    console.log("removeFilter", param, index, categoryFilter);
     setCategoryFilter(categoryFilter.reduce((acc, f, fi) => {
       if (index < 0) {
         return acc;
@@ -417,9 +427,9 @@ export function FilterForm({
       });
     }
 
-    console.log("manufacturer", options);
-
     if (prevRequest !== requestURL + JSON.stringify(options)) {
+      console.log("prevRequest", options, prevRequest);
+
       setPrevRequest(requestURL + JSON.stringify(options));
 
       // setCategoryPage(false);
@@ -512,65 +522,65 @@ export function FilterForm({
         setShowCatPreloader(false);
       });
     } else {
-      console.log("prevRequest", prevRequest);
-      setShowCatPreloader(false);
+      console.log("prevRequest skip", prevRequest);
+      // setShowCatPreloader(false);
     }
   };
 
   useEffect(() => {
     console.log("catPageLimit 1");
+    setCategoryItems([]);
     setCatPage(1);
     setPagination({ pages: 1 });
-
     setPageLimitTrigger(pageLimitTrigger + 1);
   }, [catPageLimit]);
 
   useEffect(() => {
-    let url = "";
-    let options = {};
-    let attrIds = [];
-    let page = 1;
+    if (categoryPage) {
+      let url = "";
+      let options = {};
+      let attrIds = [];
+      let page = 1;
 
-    if (props.match.params.hasOwnProperty("catalogue") && props.match.params.catalogue !== "catalog") {
-      url = `/${props.match.params.catalogue.replace(/\//g, "")}`;
-    }
+      setShowCatPreloader(true);
 
-    if (props.match.params.hasOwnProperty("page")) {
-      page = parseInt(props.match.params.page);
-    }
+      if (props.match.params.hasOwnProperty("catalogue") && props.match.params.catalogue !== "catalog") {
+        url = `/${props.match.params.catalogue.replace(/\//g, "")}`;
+      }
 
-    if (categoryFilter.length) {
-      options.a = categoryFilter.filter(f => f.id !== "m").map(m => {
-        return {
-          id: m.id,
-          v: m.values
-        };
+      if (props.match.params.hasOwnProperty("page")) {
+        page = parseInt(props.match.params.page);
+      }
+
+      if (categoryFilter.length) {
+        options.a = categoryFilter.filter(f => f.id !== "m").map(m => {
+          return {
+            id: m.id,
+            v: m.values
+          };
+        });
+
+        let manufacturer = categoryFilter.find(f => f.id === "m");
+
+        if (manufacturer) {
+          options.m = manufacturer.values;
+        }
+      }
+
+      if (options && options.hasOwnProperty("a")) {
+        attrIds = options.a.map(m => (parseInt(m.id)));
+      }
+
+      updateFilterNames(options, attrIds);
+
+      history.replace({
+        pathname: (url || "/catalog") + "/" + (catPage > 1 ? `${catPage}/` : ""),
+        search: qs.stringify(options),
+        state: { isActive: true }
       });
 
-      let manufacturer = categoryFilter.find(f => f.id === "m");
-
-      if (manufacturer) {
-        options.m = manufacturer.values;
-      }
+      getCategoryList(url, options, catPage);
     }
-
-    if (options && options.hasOwnProperty("a")) {
-      attrIds = options.a.map(m => (parseInt(m.id)));
-    }
-
-    updateFilterNames(options, attrIds);
-
-    history.replace({
-      pathname: url + "/" + (catPage > 1 ? `${catPage}/` : ""),
-      search: qs.stringify(options),
-      state: { isActive: true }
-    });
-
-    setShowCatPreloader(true);
-    setItemData(null);
-    setCategoryPage(true);
-
-    getCategoryList(url, options, catPage);
   }, [catPage, categoryFilterTrigger]);
 
   useEffect(() => {
@@ -585,6 +595,23 @@ export function FilterForm({
 
       if (props.match.params.hasOwnProperty("catalogue") && props.match.params.catalogue !== "catalog") {
         url = "/" + props.match.params.catalogue.replace(/\//g, "");
+      } else {
+        let queryAttr = options && options.hasOwnProperty("a") ? (options.a.map(m => {
+          return {
+            id: m.id,
+            values: m.v
+          };
+        })) : [];
+
+        if (options && options.hasOwnProperty("m")) {
+          queryAttr.push({
+            id: "m",
+            name: "Производитель",
+            values: options.m
+          });
+        }
+
+        setCategoryFilter(queryAttr);
       }
 
       if (options && options.hasOwnProperty("a")) {
@@ -604,13 +631,12 @@ export function FilterForm({
 
   useEffect(() => {
     let newURL = props.match.url.split("/")[1];
-    console.log("prevPageURL", props.match.url);
+    console.log("prevPageURL", prevPageURL, newURL, categoryFilter);
     if (prevPageURL !== newURL) {
-      setPrevPageURL(newURL);
       setCatPage(1);
-    } else {
-      setCategoryFilterTrigger(categoryFilterTrigger + 1);
+      setPrevPageURL(newURL);
     }
+    setCategoryFilterTrigger(categoryFilterTrigger + 1);
   }, [props.match.url, categoryFilter]);
 
   const filterItemsHTML = useMemo(() => {
@@ -708,34 +734,12 @@ export function FilterForm({
                 showCatPreloader={showCatPreloader}
                 filterItemsHTML={filterItemsHTML}
                 categoryItems={categoryItems}
-                catPage={catPage}
-                setCatPage={setCatPage}
-                breadcrumbs={breadcrumbs}
                 catColumnsList={catColumnsList}
-                noDataText={noDataText}
                 nestedCategories={nestedCategories.slice(0)}
                 categoryInfo={categoryInfo}
-                profile={profile}
                 history={history}
-                // busy={formBusy}
                 categoryFilter={categoryFilter}
                 setCategoryFilter={setCategoryFilter}
-                setBusyOrder={setBusyOrder}
-                currency={currency}
-                setCurrency={setCurrency}
-                currencyList={currencyList}
-                setCurrencyList={setCurrencyList}
-                RUB={RUB}
-                setShowTableHeadFixed={setShowTableHeadFixed}
-                setTableHeadFixed={setTableHeadFixed}
-                setOpenAuthPopup={setOpenAuthPopup}
-                setOrderSent={setOrderSent}
-                totalCart={totalCart}
-                updateCart={updateCart}
-                // notificationFunc={createNotification}
-                // setOpenCatalogue={setOpenCatalogue}
-                // setOpenMobMenu={setOpenMobMenu}
-                {...props}
               />
 
               {noDataText ? <div className="catalogue-page__nodata">

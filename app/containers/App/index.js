@@ -654,7 +654,7 @@ export default function App({ history }) {
                 <Route exact strict path="/:url*" render={props => {
                   console.log("app redirect", props.location);
                   return <Redirect
-                    to={`${props.location.pathname}/${props.location.search}`.replace(/\/\//, "/")} />;
+                    to={`${props.location.pathname}/${props.location.search}`.replace(/\/\//g, "/")} />;
                 }} />
 
                 {/* <Route path="/about" render={routeProps => <FeaturePage updateCart={updateCart} notificationFunc={createNotification} setOrderSent={setOrderSent} totalCart={totalCart} currency={currency}  setOpenCatalogue={setOpenCatalogue}  setOpenMobMenu={setOpenMobMenu} {...routeProps} />} /> */}
@@ -756,7 +756,7 @@ export default function App({ history }) {
                     let goto = "";
 
                     if (props.match.params.page && parseInt(props.match.params.page) < 2) {
-                      goto = `/${props.location.pathname.split("/")[1]}/${props.location.search}`.replace(/\/\//, "/");
+                      goto = `/${props.location.pathname.split("/")[1]}/${props.location.search}`.replace(/\/\//g, "/");
                     }
 
                     return errorPage ? <NotFoundPage setOpenMobMenu={setOpenMobMenu} {...props} /> : goto ?
