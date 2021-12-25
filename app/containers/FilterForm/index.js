@@ -42,6 +42,7 @@ import { Link } from "react-router-dom";
 import CataloguePage from "../CataloguePage";
 import { getButtonsMap } from "../../utils/getPaginationMap";
 import Breadcrumbs from "../../components/Breadcrumbs";
+import NotFoundPage from "../NotFoundPage/Loadable";
 
 // const key = 'home';
 const TRIGGER_DROPDOWN_LIMIT = 11;
@@ -74,7 +75,7 @@ export function FilterForm({
   loading,
   error,
   onChangeCurrency,
-  setErrorPage,
+  // setErrorPage,
   categoryItems,
   setCategoryItems,
   // nestedCategories,
@@ -93,6 +94,7 @@ export function FilterForm({
   const query = new URLSearchParams(props.location.search);
   const [nestedCategories, setNestedCategories] = useState([]);
   const [categoryInfo, setCategoryInfo] = useState(null);
+  const [errorPage, setErrorPage] = useState(false);
 
   let queryAttr = params && params.hasOwnProperty("a") ? (params.a.map(m => {
     return {
@@ -536,7 +538,7 @@ export function FilterForm({
   }, [catPageLimit]);
 
   useEffect(() => {
-    if (categoryPage) {
+    if (categoryPage && someCategoryUrl) {
       let url = "";
       let options = {};
       let attrIds = [];
@@ -686,7 +688,7 @@ export function FilterForm({
   }, [pagination, catPage]);
 
   return (
-    <>
+    errorPage ? <NotFoundPage setOpenMobMenu={setOpenMobMenu} {...props} /> : <>
       <div id="rtCellSizer" />
       {cart ? (
         <Helmet>

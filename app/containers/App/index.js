@@ -36,6 +36,7 @@ import apiPOST from "../../utils/upload";
 import { smoothScrollTo } from "../../utils/smoothScrollTo";
 import { flatDeep } from "../../utils/flatDeep";
 import { uniqArray } from "../../utils/uniqArray";
+import qs from "qs";
 // import ContactsPage from '../ContactsPage';
 
 export default function App({ history }) {
@@ -430,7 +431,13 @@ export default function App({ history }) {
     window.log && console.log("onSubmitSearchForm", art, quantity);
 
     if (art.length) {
-      history.push(`/search/?art=${encodeURIComponent(art)}&q=${encodeURIComponent(quantity || 1)}`);
+      history.replace({
+        pathname: "/search/",
+        search: `art=${encodeURIComponent(art)}&q=${encodeURIComponent(quantity || 1)}`,
+        state: { isActive: true }
+      });
+
+      // history.push();
       sendSearchRequest({
         q: art,
         c: quantity || 1
@@ -759,42 +766,41 @@ export default function App({ history }) {
                       goto = `/${props.location.pathname.split("/")[1]}/${props.location.search}`.replace(/\/\//g, "/");
                     }
 
-                    return errorPage ? <NotFoundPage setOpenMobMenu={setOpenMobMenu} {...props} /> : goto ?
-                      <Redirect to={goto} /> : <FilterForm
-                        cart={props.match.path === "/order"}
-                        someCategoryUrl={!(props.match.path === "/search" || props.match.path === "/order")}
-                        sendSearchRequest={sendSearchRequest}
-                        setSearchData={setSearchData}
-                        setErrorPage={setErrorPage}
-                        prevRequest={prevRequest}
-                        setPrevRequest={setPrevRequest}
-                        setCategoryItems={setCategoryItems}
-                        nestedCategories={nestedCategories}
-                        setNestedCategories={setNestedCategories}
-                        profile={profile}
-                        history={history}
-                        busy={formBusy}
-                        setBusyOrder={setBusyOrder}
-                        categoryItems={categoryItems}
-                        currency={currency}
-                        setCurrency={setCurrency}
-                        currencyList={currencyList}
-                        setCurrencyList={setCurrencyList}
-                        RUB={RUB}
-                        setTableHeadFixed={setTableHeadFixed}
-                        setOpenAuthPopup={setOpenAuthPopup}
-                        setShowTableHeadFixed={setShowTableHeadFixed}
-                        setOrderSent={setOrderSent}
-                        totalCart={totalCart}
-                        updateCart={updateCart}
-                        notificationFunc={createNotification}
-                        setOpenCatalogue={setOpenCatalogue}
-                        setOpenMobMenu={setOpenMobMenu}
-                        searchData={searchData}
-                        showResults={!formBusy}
-                        onSubmitSearchForm={onSubmitSearchForm}
-                        props={{ ...props }}
-                      />;
+                    return goto ? <Redirect to={goto} /> : <FilterForm
+                      cart={props.match.path === "/order"}
+                      someCategoryUrl={!(props.match.path === "/search" || props.match.path === "/order")}
+                      sendSearchRequest={sendSearchRequest}
+                      setSearchData={setSearchData}
+                      setErrorPage={setErrorPage}
+                      prevRequest={prevRequest}
+                      setPrevRequest={setPrevRequest}
+                      setCategoryItems={setCategoryItems}
+                      nestedCategories={nestedCategories}
+                      setNestedCategories={setNestedCategories}
+                      profile={profile}
+                      history={history}
+                      busy={formBusy}
+                      setBusyOrder={setBusyOrder}
+                      categoryItems={categoryItems}
+                      currency={currency}
+                      setCurrency={setCurrency}
+                      currencyList={currencyList}
+                      setCurrencyList={setCurrencyList}
+                      RUB={RUB}
+                      setTableHeadFixed={setTableHeadFixed}
+                      setOpenAuthPopup={setOpenAuthPopup}
+                      setShowTableHeadFixed={setShowTableHeadFixed}
+                      setOrderSent={setOrderSent}
+                      totalCart={totalCart}
+                      updateCart={updateCart}
+                      notificationFunc={createNotification}
+                      setOpenCatalogue={setOpenCatalogue}
+                      setOpenMobMenu={setOpenMobMenu}
+                      searchData={searchData}
+                      showResults={!formBusy}
+                      onSubmitSearchForm={onSubmitSearchForm}
+                      props={{ ...props }}
+                    />;
                   }}
                 />
 
