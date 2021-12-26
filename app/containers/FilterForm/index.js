@@ -800,6 +800,7 @@ export function FilterForm({
                                       setPagination({ pages: 1 });
                                       setCatPageLimit(t);
                                       setCatPage(1);
+                                      setPageLimitTrigger(pageLimitTrigger + 1);
                                     }}
                                     className="dropdown-link"
                                     during={1000}
