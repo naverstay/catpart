@@ -336,13 +336,21 @@ export default function CataloguePage(props) {
                         if (filter) {
                           filter.values = [o];
                         } else {
-                          let item = catColumnsList.find(f => f.accessor === filterColumn);
+                          if (filterColumn === "catManufacturer") {
+                            filter = {
+                              id: "m",
+                              name: "Производитель",
+                              values: [o]
+                            };
+                          } else {
+                            let item = catColumnsList.find(f => f.accessor === filterColumn);
 
-                          filter = {
-                            id: item.attributeId,
-                            name: item.accessor,
-                            values: [o]
-                          };
+                            filter = {
+                              id: item.attributeId,
+                              name: item.accessor,
+                              values: [o]
+                            };
+                          }
                         }
                       }
 
@@ -380,6 +388,8 @@ export default function CataloguePage(props) {
                     filterAttr.push(filterSelection);
                   }
                 }
+
+                console.log('filterAttr', filterAttr);
 
                 setCategoryFilter(categoryFilterNames.concat(filterAttr).filter(f => f.values.length));
 

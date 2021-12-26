@@ -89,7 +89,7 @@ export function FilterForm({
   const params = qs.parse((props.location.search.substring(1)));
 
   const pageLimitList = [
-    1, 2, 3,
+    // 1, 2, 3,
     10, 50, 100];
   const query = new URLSearchParams(props.location.search);
   const [nestedCategories, setNestedCategories] = useState([]);
@@ -128,19 +128,20 @@ export function FilterForm({
       });
     }
 
-    if (ids.length && options.hasOwnProperty("a") && prevRequestAttr !== requestURL + JSON.stringify(options)) {
-      setPrevRequestAttr(requestURL + JSON.stringify(options));
+    if (ids.length && options.hasOwnProperty("a")) {
+      if (prevRequestAttr !== requestURL + JSON.stringify(options)) {
+        setPrevRequestAttr(requestURL + JSON.stringify(options));
 
-      apiGET(requestURL, { ids: ids }, data => {
-        console.log("updateFilterNames", options, ids, data);
-        setCategoryFilterNames(filterNames.concat(options.a.map(m => {
-          return {
-            id: m.id,
-            name: data[m.id],
-            values: m.v
-          };
-        })));
-      });
+        apiGET(requestURL, { ids: ids }, data => {
+          setCategoryFilterNames(filterNames.concat(options.a.map(m => {
+            return {
+              id: m.id,
+              name: data[m.id],
+              values: m.v
+            };
+          })));
+        });
+      }
     } else {
       setCategoryFilterNames(filterNames);
     }
@@ -170,7 +171,7 @@ export function FilterForm({
   const [catColumnsList, setCatColumnsList] = useState([]);
 
   const paramsLimit = params.hasOwnProperty("l") ? parseInt(params.l) : 10;
-  const [catPageLimit, setCatPageLimit] = useState( !isNaN(paramsLimit) && pageLimitList.indexOf(paramsLimit) > -1 ? paramsLimit : 10);
+  const [catPageLimit, setCatPageLimit] = useState(!isNaN(paramsLimit) && pageLimitList.indexOf(paramsLimit) > -1 ? paramsLimit : 10);
   const [pageLimitTrigger, setPageLimitTrigger] = useState(0);
 
   const paramsPage = parseInt(props.match.params.page);
@@ -341,7 +342,6 @@ export function FilterForm({
   };
 
   const removeFilter = (param, index) => {
-    console.log("removeFilter", param, index, categoryFilter);
     setCategoryFilter(categoryFilter.reduce((acc, f, fi) => {
       if (index < 0) {
         return acc;
@@ -419,14 +419,14 @@ export function FilterForm({
 
     // if (attributes && attributes.hasOwnProperty("l")) {
     //   const paramsLimit = params.hasOwnProperty("l") ? parseInt(params.l) : 10;
-      // setCatPageLimit(pageLimitList.indexOf(paramsLimit) > -1 ? paramsLimit : 10);
-      // attributes.l = catPageLimit;
-      // history.replace(history.location.pathname + qs.stringify(attributes));
-      // history.replace({
-      //   pathname: history.location.pathname,
-      //   search: qs.stringify(attributes),
-      //   state: { isActive: true }
-      // });
+    // setCatPageLimit(pageLimitList.indexOf(paramsLimit) > -1 ? paramsLimit : 10);
+    // attributes.l = catPageLimit;
+    // history.replace(history.location.pathname + qs.stringify(attributes));
+    // history.replace({
+    //   pathname: history.location.pathname,
+    //   search: qs.stringify(attributes),
+    //   state: { isActive: true }
+    // });
     // }
 
     if (prevRequest !== requestURL + JSON.stringify(options)) {
@@ -531,14 +531,6 @@ export function FilterForm({
     }
   };
 
-  // useEffect(() => {
-  //   console.log("catPageLimit 1", catPage);
-  //   setCategoryItems([]);
-  //   // setCatPage(1);
-  //   setPagination({ pages: 1 });
-  //   setPageLimitTrigger(pageLimitTrigger + 1);
-  // }, [catPageLimit]);
-
   useEffect(() => {
     setPageLimitTrigger(pageLimitTrigger + 1);
   }, [catPage]);
@@ -585,11 +577,11 @@ export function FilterForm({
 
       getCategoryList(url, options, catPage);
 
-      // if (catPageLimit !== 10) {
-      //   options.l = catPageLimit;
-      // }
+      if (catPageLimit !== 10) {
+        options.l = catPageLimit;
+      }
 
-      history.replace({
+      history.push({
         pathname: (url || "/catalog") + "/" + (catPage > 1 ? `${catPage}/` : ""),
         search: qs.stringify(options),
         state: { isActive: true }
@@ -657,11 +649,11 @@ export function FilterForm({
     let newURL = props.match.url.split("/")[1];
     console.log("prevPageURL", prevPageURL, newURL, categoryFilter);
     if (prevPageURL !== newURL) {
-      // setCatPage(1);
       setPrevPageURL(newURL);
     }
+    setCatPage(1);
     setCategoryFilterTrigger(categoryFilterTrigger + 1);
-  }, [props.match.url, categoryFilter]);
+  }, [categoryFilter]);
 
   const filterItemsHTML = useMemo(() => {
     return categoryFilterNames.length ? categoryFilterNames.map((f, fi) => (
