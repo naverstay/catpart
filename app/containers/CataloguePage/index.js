@@ -15,12 +15,12 @@ import qs from "qs";
 import withFixedColumns from "react-table-hoc-fixed-columns";
 
 const ReactTableFixedColumns = withFixedColumns(ReactTable);
-import Breadcrumbs from "../../components/Breadcrumbs";
 import Ripples from "react-ripples";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import { useDetectClickOutside } from "react-detect-click-outside";
 import FormInput from "../../components/FormInput";
-import { uniqArray } from "../../utils/uniqArray";
+import apiGET from "../../utils/search";
+import LoadingIndicator from "components/LoadingIndicator";
 
 export default function CataloguePage(props) {
   const rtCellSizer = document.getElementById("rtCellSizer");
@@ -40,16 +40,29 @@ export default function CataloguePage(props) {
   } = props;
 
   const [openFilterDropdown, setOpenFilterDropdown] = useState(false);
+  const [openMobFilterDropdown, setOpenMobFilterDropdown] = useState(false);
 
   const [filterColumn, setFilterColumn] = useState("");
   const [filterSelection, setFilterSelection] = useState(null);
   const [columnOptions, setColumnOptions] = useState([]);
+  const [filterOptions, setFilterOptions] = useState([]);
   const [filterText, setFilterText] = useState("");
 
   const openFilterRef = useDetectClickOutside({
     onTriggered: (e) => {
-      if (!e.target.closest(".catalogue-page__table-sorter")) {
+      if (!(e.target.closest(".catalogue-page__table-sorter") || e.target.closest(".catalogue-page__filter-popup") || e.target.closest(".catalogue-page__filter-dropdown"))) {
         setOpenFilterDropdown(false);
+        setFilterOptions([]);
+      }
+    }
+  });
+
+  const openMobFilterRef = useDetectClickOutside({
+    onTriggered: (e) => {
+      if (!(e.target.closest(".catalogue-page__table-sorter") || e.target.closest(".catalogue-page__filter-popup") || e.target.closest(".catalogue-page__filter-dropdown"))) {
+        setOpenMobFilterDropdown(false);
+        setFilterOptions([]);
+        setFilterColumn("");
       }
     }
   });
@@ -72,8 +85,9 @@ export default function CataloguePage(props) {
         if (col === filterColumn) {
           setOpenFilterDropdown(false);
         } else {
-          setOpenFilterDropdown(true);
+          setOpenMobFilterDropdown(false);
           setFilterColumn(col);
+          setOpenFilterDropdown(true);
         }
       }}><span /></div>
       <div className="catalogue-page__table-tip">Фильтр</div>
@@ -101,13 +115,24 @@ export default function CataloguePage(props) {
   }, [categoryItems]);
 
   useEffect(() => {
-    if (!openFilterDropdown) {
+    if (openFilterDropdown) {
+      let item = catColumnsList.find(f => f.accessor === filterColumn);
+
+      if (item && item.hasOwnProperty("attributeId")) {
+        const requestURL = `/catalog/attributes/${item.attributeId}/values`;
+        apiGET(requestURL, {}, data => {
+          setFilterOptions(data);
+        });
+      }
+    } else {
       setFilterColumn("");
     }
-  }, [openFilterDropdown]);
+
+  }, [openFilterDropdown, filterColumn]);
 
   useEffect(() => {
     setFilterText("");
+    setFilterOptions([]);
 
     let filter = categoryFilter.find(f => f.name === filterColumn);
 
@@ -115,10 +140,8 @@ export default function CataloguePage(props) {
   }, [categoryItems, filterColumn]);
 
   useEffect(() => {
-    setColumnOptions(uniqArray(categoryItems.map(c => {
-      return c[filterColumn] || "";
-    })).filter(f => f && f.toLowerCase().indexOf(filterText) === 0));
-  }, [filterColumn, filterText]);
+    setColumnOptions(filterOptions.filter(f => f && f.toLowerCase().indexOf(filterText) === 0));
+  }, [filterOptions, filterText]);
 
   const nestedCategoriesItems = useMemo(() => {
     let ret = [[], [], [], []];
@@ -288,7 +311,36 @@ export default function CataloguePage(props) {
         </div>
       </div> : null}
 
-      <ul className={"catalogue-page__filter-data"}>{filterItemsHTML}</ul>
+      <ul className={"catalogue-page__filter-data"}>
+        {filterItemsHTML}
+        <li ref={openMobFilterRef} className={"mob-only_ dropdown-holder"}>
+          <Ripples
+            onClick={() => {
+              setOpenMobFilterDropdown(!openMobFilterDropdown);
+            }}
+            className={"btn __gray filter-add-btn"}
+            during={1000}
+          >
+            <span className="btn-inner">Добавить фильтр</span>
+          </Ripples>
+          {openMobFilterDropdown ?
+            <div className={"dropdown-container"}>
+              <ul className={"catalogue-page__filter-dropdown"}>
+                {catColumnsList.map((m, mi) => <li key={mi}>
+                  <Ripples
+                    onClick={() => {
+                      setOpenMobFilterDropdown(false);
+                      setFilterColumn(m.accessor);
+                      setOpenFilterDropdown(true);
+                    }}
+                    className="dropdown-link"
+                    during={1000}
+                  >{m.accessor}</Ripples>
+                </li>)}
+              </ul>
+            </div> : null}
+        </li>
+      </ul>
 
       <div ref={openFilterRef} className="catalogue-page__filter">
         {openFilterDropdown ?
@@ -312,66 +364,66 @@ export default function CataloguePage(props) {
             />
 
             <ul className="catalogue-page__filter-options">
-              {columnOptions.map((o, oi) => {
-                let checked = false;
-                let filter = categoryFilterNames.find(f => f.name === filterColumn);
+              {filterOptions.length ?
+                columnOptions.length ? columnOptions.map((o, oi) => {
+                  let checked = false;
+                  let filter = categoryFilterNames.find(f => f.name === filterColumn);
 
-                if (filter && filter.values.indexOf(o) > -1) {
-                  checked = true;
-                }
+                  if (filter && filter.values.indexOf(o) > -1) {
+                    checked = true;
+                  }
 
-                console.log("defaultChecked", o, checked, filterColumn, categoryFilter);
+                  return <li key={oi}>
+                    <input id={"filter-option_" + oi} defaultChecked={checked} className="hide" value={o}
+                           type="checkbox" />
+                    <Ripples
+                      onClick={() => {
+                        let filter;
 
-                return <li key={oi}>
-                  <input id={"filter-option_" + oi} defaultChecked={checked} className="hide" value={o}
-                         type="checkbox" />
-                  <Ripples
-                    onClick={() => {
-                      let filter;
+                        if (filterSelection && filterSelection.hasOwnProperty("values")) {
+                          const filterIndex = filterSelection.values.findIndex(f => f === o);
 
-                      if (filterSelection && filterSelection.hasOwnProperty("values")) {
-                        const filterIndex = filterSelection.values.findIndex(f => f === o);
-
-                        if (filterIndex > -1) {
-                          filterSelection.values.splice(filterIndex, 1);
-                        } else {
-                          filterSelection.values.push(o);
-                        }
-
-                        filter = filterSelection;
-                      } else {
-                        filter = categoryFilterNames.find(f => f.name === filterColumn);
-
-                        if (filter) {
-                          filter.values = [o];
-                        } else {
-                          if (filterColumn === "catManufacturer") {
-                            filter = {
-                              id: "m",
-                              name: "Производитель",
-                              values: [o]
-                            };
+                          if (filterIndex > -1) {
+                            filterSelection.values.splice(filterIndex, 1);
                           } else {
-                            let item = catColumnsList.find(f => f.accessor === filterColumn);
+                            filterSelection.values.push(o);
+                          }
 
-                            filter = {
-                              id: item.attributeId,
-                              name: item.accessor,
-                              values: [o]
-                            };
+                          filter = filterSelection;
+                        } else {
+                          filter = categoryFilterNames.find(f => f.name === filterColumn);
+
+                          if (filter) {
+                            filter.values = [o];
+                          } else {
+                            if (filterColumn === "catManufacturer") {
+                              filter = {
+                                id: "m",
+                                name: "Производитель",
+                                values: [o]
+                              };
+                            } else {
+                              let item = catColumnsList.find(f => f.accessor === filterColumn);
+
+                              filter = {
+                                id: item.attributeId,
+                                name: item.accessor,
+                                values: [o]
+                              };
+                            }
                           }
                         }
-                      }
 
-                      setFilterSelection(filter);
-                    }}
-                    className={"dropdown-link"}
-                    during={1000}
-                  ><label htmlFor={"filter-option_" + oi}>
-                    <span>{o}</span>
-                  </label></Ripples>
-                </li>;
-              })}
+                        setFilterSelection(filter);
+                      }}
+                      className={"dropdown-link"}
+                      during={1000}
+                    ><label htmlFor={"filter-option_" + oi}>
+                      <span>{o}</span>
+                    </label></Ripples>
+                  </li>;
+                }) : <li className={'catalogue-page__filter-nodata'}>Нет совпадений</li>
+                : <LoadingIndicator />}
             </ul>
 
             <Ripples

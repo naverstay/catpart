@@ -640,33 +640,47 @@ export function FilterForm({
 
   useEffect(() => {
     let newURL = props.match.url.split("/")[1];
-    console.log("prevPageURL", prevPageURL, newURL, categoryFilter);
+    console.log("prevPageURL", prevPageURL, newURL, props.match);
     if (prevPageURL !== newURL) {
       setPrevPageURL(newURL);
+      setCatPage(1);
     }
-    setCatPage(1);
     setCategoryFilterTrigger(categoryFilterTrigger + 1);
-  }, [categoryFilter]);
+  }, [categoryFilter, props.match.url]);
 
   const filterItemsHTML = useMemo(() => {
     return categoryFilterNames.length ? categoryFilterNames.map((f, fi) => (
       <li key={fi}>
-          <span className={"catalogue-page__filter-item"}>
+          <div className={"catalogue-page__filter-item"}>
             <span>{f.name}</span>
-             <span className={"filter-remove-btn btn __gray"} onClick={() => {
-               removeFilter(fi, -1);
-             }}>
-              <span className={"icon icon-close"} />
-            </span>
-          </span>
-        {f.values.map((m, mi) => <span key={mi} className={"catalogue-page__filter-item"}>
-            <span>{m}</span>
-             <span className={"filter-remove-btn btn __gray"} onClick={() => {
-               removeFilter(fi, mi);
-             }}>
-              <span className={"icon icon-close"} />
-            </span>
-          </span>)}
+            <Ripples
+              onClick={() => {
+                removeFilter(fi, -1);
+              }}
+              className={"filter-remove-btn btn __gray"}
+              during={1000}
+            >
+              <span className="btn-inner">
+                <span className={"icon icon-close"} />
+              </span>
+            </Ripples>
+          </div>
+
+        {f.values.map((m, mi) => <div key={mi} className={"catalogue-page__filter-item"}>
+             <span>{m}</span>
+             <Ripples
+               onClick={() => {
+                 removeFilter(fi, mi);
+               }}
+               className={"filter-remove-btn btn __gray"}
+               during={1000}
+             >
+              <span className="btn-inner">
+                <span className={"icon icon-close"} />
+              </span>
+            </Ripples>
+          </div>)
+        }
       </li>)
     ) : null;
   }, [categoryFilterNames]);

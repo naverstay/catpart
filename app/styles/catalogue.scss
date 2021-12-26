@@ -364,14 +364,23 @@
         margin-bottom: 16px;
       }
 
+      &-dropdown {
+        max-height: 300px;
+        overflow-y: auto;
+      }
+
+      &-nodata {
+        padding: 20px;
+      }
+
       &-data {
         position: relative;
-        z-index: 1;
+        z-index: 4;
         list-style: none;
         font-size: 12px;
         padding-top: 10px;
 
-        li {
+        > li {
           margin-bottom: 10px;
         }
       }
@@ -410,7 +419,7 @@
           }
         }
 
-        &:first-child {
+        &:first-child:not(:last-child) {
           padding: 0 20px;
         }
       }
@@ -453,6 +462,10 @@
         border-radius: 5px;
         background-color: rgb(255, 255, 255);
         box-shadow: 0 0 20px 0 rgba(71, 93, 244, 0.1);
+      }
+
+      @include respond-to-max($tablet) {
+        padding-top: 30px;
       }
     }
 
