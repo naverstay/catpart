@@ -62,7 +62,6 @@ export default function CataloguePage(props) {
       if (!(e.target.closest(".catalogue-page__table-sorter") || e.target.closest(".catalogue-page__filter-popup") || e.target.closest(".catalogue-page__filter-dropdown"))) {
         setOpenMobFilterDropdown(false);
         setFilterOptions([]);
-        setFilterColumn("");
       }
     }
   });
@@ -116,10 +115,20 @@ export default function CataloguePage(props) {
 
   useEffect(() => {
     if (openFilterDropdown) {
-      let item = catColumnsList.find(f => f.accessor === filterColumn);
+      console.log("openFilterDropdown", filterColumn);
 
-      if (item && item.hasOwnProperty("attributeId")) {
-        const requestURL = `/catalog/attributes/${item.attributeId}/values`;
+      let requestURL = "";
+      if (filterColumn === "catManufacturer") {
+        requestURL = "/catalog/manufacturers";
+      } else {
+        let item = catColumnsList.find(f => f.accessor === filterColumn);
+
+        if (item && item.hasOwnProperty("attributeId")) {
+          requestURL = `/catalog/attributes/${item.attributeId}/values`;
+        }
+      }
+
+      if (requestURL) {
         apiGET(requestURL, {}, data => {
           setFilterOptions(data);
         });
@@ -313,7 +322,7 @@ export default function CataloguePage(props) {
 
       <ul className={"catalogue-page__filter-data"}>
         {filterItemsHTML}
-        <li ref={openMobFilterRef} className={"mob-only_ dropdown-holder"}>
+        <li ref={openMobFilterRef} className={"mob-only dropdown-holder"}>
           <Ripples
             onClick={() => {
               setOpenMobFilterDropdown(!openMobFilterDropdown);
@@ -326,6 +335,18 @@ export default function CataloguePage(props) {
           {openMobFilterDropdown ?
             <div className={"dropdown-container"}>
               <ul className={"catalogue-page__filter-dropdown"}>
+                <li>
+                  <Ripples
+                    onClick={() => {
+                      setOpenMobFilterDropdown(false);
+                      setFilterColumn("catManufacturer");
+                      setOpenFilterDropdown(true);
+                    }}
+                    className="dropdown-link"
+                    during={1000}
+                  >Производитель</Ripples>
+                </li>
+
                 {catColumnsList.map((m, mi) => <li key={mi}>
                   <Ripples
                     onClick={() => {
@@ -365,7 +386,8 @@ export default function CataloguePage(props) {
 
             <ul className="catalogue-page__filter-options">
               {filterOptions.length ?
-                columnOptions.length ? columnOptions.map((o, oi) => {
+                // columnOptions.length ?
+                columnOptions.map((o, oi) => {
                   let checked = false;
                   let filter = categoryFilterNames.find(f => f.name === filterColumn);
 
@@ -422,7 +444,8 @@ export default function CataloguePage(props) {
                       <span>{o}</span>
                     </label></Ripples>
                   </li>;
-                }) : <li className={'catalogue-page__filter-nodata'}>Нет совпадений</li>
+                })
+                // <li className={"catalogue-page__filter-nodata"}>Нет совпадений</li>
                 : <LoadingIndicator />}
             </ul>
 

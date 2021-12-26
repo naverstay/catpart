@@ -640,46 +640,48 @@ export function FilterForm({
 
   useEffect(() => {
     let newURL = props.match.url.split("/")[1];
-    console.log("prevPageURL", prevPageURL, newURL, props.match);
     if (prevPageURL !== newURL) {
       setPrevPageURL(newURL);
-      setCatPage(1);
     }
+  }, [props.match.url]);
+
+  useEffect(() => {
+    setCatPage(1);
     setCategoryFilterTrigger(categoryFilterTrigger + 1);
-  }, [categoryFilter, props.match.url]);
+  }, [categoryFilter]);
 
   const filterItemsHTML = useMemo(() => {
     return categoryFilterNames.length ? categoryFilterNames.map((f, fi) => (
       <li key={fi}>
-          <div className={"catalogue-page__filter-item"}>
-            <span>{f.name}</span>
-            <Ripples
-              onClick={() => {
-                removeFilter(fi, -1);
-              }}
-              className={"filter-remove-btn btn __gray"}
-              during={1000}
-            >
+        <div className={"catalogue-page__filter-item"}>
+          <span>{f.name}</span>
+          <Ripples
+            onClick={() => {
+              removeFilter(fi, -1);
+            }}
+            className={"filter-remove-btn btn __gray"}
+            during={1000}
+          >
               <span className="btn-inner">
                 <span className={"icon icon-close"} />
               </span>
-            </Ripples>
-          </div>
+          </Ripples>
+        </div>
 
         {f.values.map((m, mi) => <div key={mi} className={"catalogue-page__filter-item"}>
-             <span>{m}</span>
-             <Ripples
-               onClick={() => {
-                 removeFilter(fi, mi);
-               }}
-               className={"filter-remove-btn btn __gray"}
-               during={1000}
-             >
+          <span>{m}</span>
+          <Ripples
+            onClick={() => {
+              removeFilter(fi, mi);
+            }}
+            className={"filter-remove-btn btn __gray"}
+            during={1000}
+          >
               <span className="btn-inner">
                 <span className={"icon icon-close"} />
               </span>
-            </Ripples>
-          </div>)
+          </Ripples>
+        </div>)
         }
       </li>)
     ) : null;

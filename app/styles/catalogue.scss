@@ -365,12 +365,15 @@
       }
 
       &-dropdown {
+        padding: 10px 0;
         max-height: 300px;
         overflow-y: auto;
       }
 
       &-nodata {
+        opacity: 0;
         padding: 20px;
+        transition: opacity .5s;
       }
 
       &-data {
@@ -465,7 +468,7 @@
       }
 
       @include respond-to-max($tablet) {
-        padding-top: 30px;
+        margin-top: 30px;
       }
     }
 
