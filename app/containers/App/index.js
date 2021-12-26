@@ -194,7 +194,7 @@ export default function App({ history }) {
   // }, [categorySlugLinks]);
 
   useEffect(() => {
-    console.log("itemSlugLinks", itemSlugLinks);
+    window.log && console.log("itemSlugLinks", itemSlugLinks);
   }, [itemSlugLinks]);
 
   const updateStore = (store, options, cb) => {
@@ -767,8 +767,6 @@ export default function App({ history }) {
                     if (props.match.params.page && parseInt(props.match.params.page) < 2) {
                       goto = `/${props.location.pathname.split("/")[1]}/${props.location.search}`.replace(/\/\//g, "/");
                     }
-
-                    console.log("props", goto, props.match);
 
                     return goto ? <Redirect to={goto} /> : <FilterForm
                       cart={props.match.path === "/order"}

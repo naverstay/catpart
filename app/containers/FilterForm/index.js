@@ -367,8 +367,6 @@ export function FilterForm({
       attributes.a = Object.keys(attributes.a).map(k => attributes.a[k]);
     }
 
-    console.log("attributes", page, attributes);
-
     const requestURL = "/catalog" + category;
 
     let options = {
@@ -430,8 +428,6 @@ export function FilterForm({
     // }
 
     if (prevRequest !== requestURL + JSON.stringify(options)) {
-      console.log("prevRequest", options, prevRequest);
-
       setPrevRequest(requestURL + JSON.stringify(options));
 
       // setCategoryPage(false);
@@ -536,8 +532,6 @@ export function FilterForm({
   }, [catPage]);
 
   useEffect(() => {
-    console.log("catPageLimit 2", catPage);
-
     if (categoryPage && someCategoryUrl) {
       let url = "";
       let options = {};
@@ -590,7 +584,6 @@ export function FilterForm({
   }, [pageLimitTrigger, categoryFilterTrigger]);
 
   useEffect(() => {
-    console.log("pageLimitTrigger", props.match.url);
     if (someCategoryUrl) {
       setShowCatPreloader(true);
       setItemData(null);

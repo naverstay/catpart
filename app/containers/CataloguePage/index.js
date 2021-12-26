@@ -111,12 +111,6 @@ export default function CataloguePage(props) {
 
     let filter = categoryFilter.find(f => f.name === filterColumn);
 
-    console.log("filter", filter, categoryFilter);
-
-    // if (filter && filter.values.indexOf(o) > -1) {
-    //   checked = true;
-    // }
-
     setFilterSelection(filter);
   }, [categoryItems, filterColumn]);
 
@@ -242,8 +236,6 @@ export default function CataloguePage(props) {
                 c.width = getColumnWidth(c.accessor, c.accessor);
 
                 c.Cell = (cell) => {
-                  // console.log("tableProps", tableProps.column.attributeId, catColumnsList);
-
                   let name = catColumnsList.find(f => f.attributeId === cell.column.attributeId).accessor;
 
                   return <span
