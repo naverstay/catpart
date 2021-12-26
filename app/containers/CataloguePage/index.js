@@ -34,6 +34,7 @@ export default function CataloguePage(props) {
     categoryInfo,
     categoryFilter,
     setCategoryFilter,
+    categoryFilterNames,
     showCatPreloader,
     filterItemsHTML
   } = props;
@@ -41,7 +42,7 @@ export default function CataloguePage(props) {
   const [openFilterDropdown, setOpenFilterDropdown] = useState(false);
 
   const [filterColumn, setFilterColumn] = useState("");
-  const [filterSelection, setFilterSelection] = useState([]);
+  const [filterSelection, setFilterSelection] = useState(null);
   const [columnOptions, setColumnOptions] = useState([]);
   const [filterText, setFilterText] = useState("");
 
@@ -116,7 +117,7 @@ export default function CataloguePage(props) {
     //   checked = true;
     // }
 
-    setFilterSelection([]);
+    setFilterSelection(filter);
   }, [categoryItems, filterColumn]);
 
   useEffect(() => {
@@ -304,28 +305,48 @@ export default function CataloguePage(props) {
             <ul className="catalogue-page__filter-options">
               {columnOptions.map((o, oi) => {
                 let checked = false;
-                let filter = categoryFilter.find(f => f.name === filterColumn);
+                let filter = categoryFilterNames.find(f => f.name === filterColumn);
 
                 if (filter && filter.values.indexOf(o) > -1) {
                   checked = true;
                 }
 
-                console.log("defaultChecked", o, checked, categoryFilter);
+                console.log("defaultChecked", o, checked, filterColumn, categoryFilter);
 
                 return <li key={oi}>
                   <input id={"filter-option_" + oi} defaultChecked={checked} className="hide" value={o}
                          type="checkbox" />
                   <Ripples
                     onClick={() => {
-                      const filterIndex = filterSelection.findIndex(f => f === o);
+                      let filter;
 
-                      if (filterIndex > -1) {
-                        filterSelection.splice(filterIndex, 1);
+                      if (filterSelection && filterSelection.hasOwnProperty("values")) {
+                        const filterIndex = filterSelection.values.findIndex(f => f === o);
+
+                        if (filterIndex > -1) {
+                          filterSelection.values.splice(filterIndex, 1);
+                        } else {
+                          filterSelection.values.push(o);
+                        }
+
+                        filter = filterSelection;
                       } else {
-                        filterSelection.push(o);
+                        filter = categoryFilterNames.find(f => f.name === filterColumn);
+
+                        if (filter) {
+                          filter.values = [o];
+                        } else {
+                          let item = catColumnsList.find(f => f.accessor === filterColumn);
+
+                          filter = {
+                            id: item.attributeId,
+                            name: item.accessor,
+                            values: [o]
+                          };
+                        }
                       }
 
-                      setFilterSelection(filterSelection);
+                      setFilterSelection(filter);
                     }}
                     className={"dropdown-link"}
                     during={1000}
@@ -343,34 +364,24 @@ export default function CataloguePage(props) {
 
                 if (param) {
                   let attrId = filterColumn === "catManufacturer" ? "m" : param.attributeId;
-                  let filter = categoryFilter.find(f => f.id === attrId);
+                  let filter = categoryFilterNames.find(f => f.id === attrId);
 
                   if (filter) {
-                    filter.values = filterSelection;
+                    filter.values = filterSelection.values;
                   } else {
-                    filterAttr.push({
-                      id: attrId,
-                      name: filterColumn,
-                      values: filterSelection
-                    });
+                    filterAttr.push(filterSelection);
                   }
                 } else if (filterColumn === "catManufacturer") {
-                  let filter = categoryFilter.find(f => f.id === "m");
+                  let filter = categoryFilterNames.find(f => f.id === "m");
 
                   if (filter) {
-                    filter.values = filterSelection;
+                    filter.values = filterSelection.values;
                   } else {
-                    filterAttr.push({
-                      id: "m",
-                      name: filterColumn,
-                      values: filterSelection
-                    });
+                    filterAttr.push(filterSelection);
                   }
                 }
 
-                console.log("filterAttr", filterAttr);
-
-                setCategoryFilter(categoryFilter.concat(filterAttr).filter(f => f.values.length));
+                setCategoryFilter(categoryFilterNames.concat(filterAttr).filter(f => f.values.length));
 
                 setOpenFilterDropdown(false);
               }}

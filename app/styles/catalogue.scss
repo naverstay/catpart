@@ -406,6 +406,7 @@
         &:not(:hover) {
           .filter-remove-btn {
             opacity: 0;
+            pointer-events: none;
           }
         }
 

@@ -466,9 +466,11 @@ export default function App({ history }) {
     const requestURL = "/catalog/categories";
 
     apiGET(requestURL, {}, data => {
-      let uniqueArray = uniqArray(flatDeep(data));
-      setCategorySlugLinks(uniqueArray);
-      setMenuJson(data);
+      if (data && data.length) {
+        let uniqueArray = uniqArray(flatDeep(data));
+        setCategorySlugLinks(uniqueArray);
+        setMenuJson(data);
+      }
     });
 
     const profileLS = localStorage.getItem("catpart-profile");
@@ -766,7 +768,7 @@ export default function App({ history }) {
                       goto = `/${props.location.pathname.split("/")[1]}/${props.location.search}`.replace(/\/\//g, "/");
                     }
 
-                    console.log('props', goto, props.match);
+                    console.log("props", goto, props.match);
 
                     return goto ? <Redirect to={goto} /> : <FilterForm
                       cart={props.match.path === "/order"}

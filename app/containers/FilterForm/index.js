@@ -170,7 +170,7 @@ export function FilterForm({
   const [catColumnsList, setCatColumnsList] = useState([]);
 
   const paramsLimit = params.hasOwnProperty("l") ? parseInt(params.l) : 10;
-  const [catPageLimit, setCatPageLimit] = useState(pageLimitList.indexOf(paramsLimit) > -1 ? paramsLimit : 10);
+  const [catPageLimit, setCatPageLimit] = useState( !isNaN(paramsLimit) && pageLimitList.indexOf(paramsLimit) > -1 ? paramsLimit : 10);
   const [pageLimitTrigger, setPageLimitTrigger] = useState(0);
 
   const paramsPage = parseInt(props.match.params.page);
@@ -417,17 +417,17 @@ export function FilterForm({
       options.manufacturer = attributes.m;
     }
 
-    if (attributes && attributes.hasOwnProperty("l")) {
-      const paramsLimit = params.hasOwnProperty("l") ? parseInt(params.l) : 10;
-      setCatPageLimit(pageLimitList.indexOf(paramsLimit) > -1 ? paramsLimit : 10);
-      attributes.l = catPageLimit;
+    // if (attributes && attributes.hasOwnProperty("l")) {
+    //   const paramsLimit = params.hasOwnProperty("l") ? parseInt(params.l) : 10;
+      // setCatPageLimit(pageLimitList.indexOf(paramsLimit) > -1 ? paramsLimit : 10);
+      // attributes.l = catPageLimit;
       // history.replace(history.location.pathname + qs.stringify(attributes));
       // history.replace({
       //   pathname: history.location.pathname,
       //   search: qs.stringify(attributes),
       //   state: { isActive: true }
       // });
-    }
+    // }
 
     if (prevRequest !== requestURL + JSON.stringify(options)) {
       console.log("prevRequest", options, prevRequest);
@@ -531,13 +531,17 @@ export function FilterForm({
     }
   };
 
+  // useEffect(() => {
+  //   console.log("catPageLimit 1", catPage);
+  //   setCategoryItems([]);
+  //   // setCatPage(1);
+  //   setPagination({ pages: 1 });
+  //   setPageLimitTrigger(pageLimitTrigger + 1);
+  // }, [catPageLimit]);
+
   useEffect(() => {
-    console.log("catPageLimit 1", catPage);
-    setCategoryItems([]);
-    // setCatPage(1);
-    setPagination({ pages: 1 });
     setPageLimitTrigger(pageLimitTrigger + 1);
-  }, [catPageLimit]);
+  }, [catPage]);
 
   useEffect(() => {
     console.log("catPageLimit 2", catPage);
@@ -591,7 +595,7 @@ export function FilterForm({
         state: { isActive: true }
       });
     }
-  }, [catPage, categoryFilterTrigger]);
+  }, [pageLimitTrigger, categoryFilterTrigger]);
 
   useEffect(() => {
     console.log("pageLimitTrigger", props.match.url);
@@ -647,7 +651,7 @@ export function FilterForm({
       setErrorPage(false);
       setCategoryPage(false);
     }
-  }, [prevPageURL, pageLimitTrigger]);
+  }, [prevPageURL]);
 
   useEffect(() => {
     let newURL = props.match.url.split("/")[1];
@@ -758,6 +762,7 @@ export function FilterForm({
                 nestedCategories={nestedCategories.slice(0)}
                 categoryInfo={categoryInfo}
                 history={history}
+                categoryFilterNames={categoryFilterNames}
                 categoryFilter={categoryFilter}
                 setCategoryFilter={setCategoryFilter}
               />
@@ -790,9 +795,11 @@ export function FilterForm({
                                 {pageLimitList.map((t, ti) => (
                                   <li key={ti}><Ripples
                                     onClick={() => {
-                                      // setCatPage(-1);
                                       setOpenPaginationDropdown(false);
+                                      setCategoryItems([]);
+                                      setPagination({ pages: 1 });
                                       setCatPageLimit(t);
+                                      setCatPage(1);
                                     }}
                                     className="dropdown-link"
                                     during={1000}
