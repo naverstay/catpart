@@ -151,6 +151,12 @@ ul {
   display: none !important;
 }
 
+.mob-hidden {
+  @include respond-to-max($tablet) {
+    display: none !important;
+  }
+}
+
 .md-block {
   @include respond-to-min($tablet) {
     display: block !important;

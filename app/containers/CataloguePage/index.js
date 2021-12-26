@@ -190,10 +190,15 @@ export default function CataloguePage(props) {
                   accessor: "catPartNum",
                   Cell: tableProps => {
                     return tableProps.row._original.catPartLink ?
-                      <Link className={"catalogue-page__table-link"}
-                            to={"/" + tableProps.row._original.catPartLink}>
-                        {tableProps.row.catPartNum}
-                      </Link> : <span>{tableProps.row.catPartNum}</span>;
+                      <div className={"catalogue-page__table-name"}>
+                        <Link className={"catalogue-page__table-link"}
+                              to={"/" + tableProps.row._original.catPartLink}>
+                          {tableProps.row.catPartNum}
+                        </Link>
+                        <div className={"catalogue-page__table-expander icon icon-chevron-up"} onClick={(e) => {
+                          e.target.closest(".rt-tr").classList.toggle("__opened");
+                        }} />
+                      </div> : <span>{tableProps.row.catPartNum}</span>;
                   },
                   // width: 170,
                   minWidth: 10,
@@ -210,7 +215,11 @@ export default function CataloguePage(props) {
                     </div>;
                   },
                   Cell: tableProps => {
-                    return <span className={"white-space__normal"}>{tableProps.row.catManufacturer}</span>;
+                    return <span className={"text-center catalogue-page__table-param"}>
+                    <span className={"catalogue-page__table-key"}>Производитель</span>
+                    <span
+                      className={"catalogue-page__table-value white-space__normal"}>{tableProps.row.catManufacturer}</span>
+                  </span>;
                   },
                   minWidth: 10,
                   width: getColumnWidth("catManufacturer", "Производитель")
@@ -232,8 +241,16 @@ export default function CataloguePage(props) {
                 c.minWidth = 10;
                 c.width = getColumnWidth(c.accessor, c.accessor);
 
-                c.Cell = tableProps => {
-                  return <span className={"text-center"}>{tableProps.value}</span>;
+                c.Cell = (cell) => {
+                  // console.log("tableProps", tableProps.column.attributeId, catColumnsList);
+
+                  let name = catColumnsList.find(f => f.attributeId === cell.column.attributeId).accessor;
+
+                  return <span
+                    className={"text-center catalogue-page__table-param" + (cell.value ? "" : " mob-hidden")}>
+                    <span className={"catalogue-page__table-key"}>{name}</span>
+                    <span className={"catalogue-page__table-value"}>{cell.value}</span>
+                  </span>;
                 };
 
                 return c;
@@ -389,7 +406,7 @@ export default function CataloguePage(props) {
                   }
                 }
 
-                console.log('filterAttr', filterAttr);
+                console.log("filterAttr", filterAttr);
 
                 setCategoryFilter(categoryFilterNames.concat(filterAttr).filter(f => f.values.length));
 

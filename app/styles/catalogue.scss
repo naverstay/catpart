@@ -472,10 +472,64 @@
 
     &__table {
 
+      &-name {
+        @include respond-to-max($tablet) {
+          white-space: normal;
+          display: flex;
+          justify-content: space-between;
+        }
+      }
+
+      &-param {
+        margin: auto;
+
+        @include respond-to-max($tablet) {
+          display: flex;
+          justify-content: space-between;
+          white-space: normal;
+          padding: 6px 10px;
+        }
+      }
+
+      &-key {
+        display: none;
+        padding-right: 5px;
+
+        @include respond-to-max($tablet) {
+          display: block;
+          text-align: left;
+        }
+      }
+
+      &-value {
+        @include respond-to-max($tablet) {
+          text-align: right;
+        }
+      }
+
+      &-expander {
+        width: 20px;
+        height: 20px;
+        position: relative;
+        cursor: pointer;
+        display: none;
+        margin: -5px 0 0 5px;
+
+        &::before {
+          transition: transform .3s;
+          transform: rotate(180deg);
+        }
+
+        @include respond-to-max($tablet) {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
+      }
+
       &-link {
         text-decoration: underline;
         color: $gray_link;
-        margin: auto;
 
         &:hover {
           color: $main_blue_light;
@@ -654,33 +708,15 @@
       position: relative;
       padding-left: 15px;
 
+      @include respond-to-max($tablet) {
+        .rt-table {
+          overflow: visible;
+        }
+      }
+
       @include respond-to-min($wide + 30px) {
         padding-left: 30px;
       }
-
-      //&::before {
-      //  content: '';
-      //  position: absolute;
-      //  top: 80px;
-      //  bottom: 0;
-      //  width: 15px;
-      //  background: #fff;
-      //  z-index: 12;
-      //}
-      //
-      //.rt-table {
-      //  padding-left: 15px;
-      //}
-      //
-      //@include respond-to-min($wide + 30px) {
-      //  &::before {
-      //    width: 30px;
-      //  }
-      //
-      //  .rt-table {
-      //    padding-left: 30px;
-      //  }
-      //}
 
       .rt-thead {
         position: static;
@@ -737,14 +773,14 @@
             }
           }
         }
-      }
 
-      .rt-tbody .rt-tr-group {
-        border: 0;
+        @include respond-to-max($tablet) {
+          display: none !important;
+        }
       }
 
       .rt-tr {
-        border-radius: 5px;
+        border-radius: 4px;
         transition: background-color .3s;
 
         .rt-td {
@@ -754,10 +790,6 @@
           white-space: nowrap;
           background: inherit;
           border: 0;
-
-          span {
-            margin: auto;
-          }
         }
 
         &.-even {
@@ -767,12 +799,68 @@
         &.-odd {
           background: #fff;
         }
+
+        @include respond-to-max($tablet) {
+          display: block;
+          padding: 10px 0;
+          position: relative;
+
+          .rt-td {
+            display: none;
+            max-width: none !important;
+
+            &:not(.rthfc-td-fixed) {
+              width: 100% !important;
+              padding: 0 10px;
+            }
+
+            &.rthfc-td-fixed {
+              display: block;
+
+              &:first-child {
+                position: absolute;
+                left: 0;
+                top: 10px;
+              }
+
+              &:not(:first-child) {
+                padding-right: 0;
+                left: 75px !important;
+                width: calc(100% - 75px) !important;
+                max-width: none !important;
+              }
+            }
+          }
+        }
       }
 
       .rt-tbody {
+        .rt-tr-group {
+          border: 0;
+        }
+
         .rt-tr {
           &:hover {
             background: $main_gray_hover;
+          }
+        }
+
+        @include respond-to-max($tablet) {
+          min-width: 0 !important;
+          width: 100%;
+
+          .rt-tr {
+            &.__opened {
+              .rt-td {
+                display: block;
+              }
+
+              .catalogue-page__table-expander {
+                &::before {
+                  transform: rotate(0deg);
+                }
+              }
+            }
           }
         }
       }
