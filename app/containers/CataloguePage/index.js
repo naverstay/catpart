@@ -136,7 +136,7 @@ export default function CataloguePage(props) {
   }, [nestedCategories]);
 
   const catalogHTML = useMemo(() => {
-    return catColumnsList.length && categoryItems.length ?
+    return categoryItems.length ?
       <>
         <ReactTableFixedColumns
           key={categoryItems.length}
@@ -245,9 +245,7 @@ export default function CataloguePage(props) {
         />
       </>
       : null;
-  }, [catColumnsList]);
-
-  console.log("categoryFilter", categoryFilter);
+  }, [categoryItems]);
 
   return (
     <>

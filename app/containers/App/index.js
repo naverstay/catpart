@@ -659,7 +659,7 @@ export default function App({ history }) {
                   )}
                 />
                 <Route exact strict path="/:url*" render={props => {
-                  console.log("app redirect", props.location);
+                  console.log("app redirect", props.location, `${props.location.pathname}/${props.location.search}`);
                   return <Redirect
                     to={`${props.location.pathname}/${props.location.search}`.replace(/\/\//g, "/")} />;
                 }} />
@@ -758,13 +758,15 @@ export default function App({ history }) {
                 {/*/>*/}
 
                 <Route
-                  path={["/order", "/search", "/:catalogue/:page/", "/:catalogue/"]}
+                  path={["/order", "/search", "/:catalogue/:page/", "/:catalogue"]}
                   render={props => {
                     let goto = "";
 
                     if (props.match.params.page && parseInt(props.match.params.page) < 2) {
                       goto = `/${props.location.pathname.split("/")[1]}/${props.location.search}`.replace(/\/\//g, "/");
                     }
+
+                    console.log('props', goto, props.match);
 
                     return goto ? <Redirect to={goto} /> : <FilterForm
                       cart={props.match.path === "/order"}
