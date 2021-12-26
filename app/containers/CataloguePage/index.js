@@ -271,7 +271,7 @@ export default function CataloguePage(props) {
                   let name = catColumnsList.find(f => f.attributeId === cell.column.attributeId).accessor;
 
                   return <span
-                    className={"text-center catalogue-page__table-param" + (cell.value ? "" : " mob-hidden")}>
+                    className={"text-center catalogue-page__table-param" + (cell.value ? "" : " mob-hidden__")}>
                     <span className={"catalogue-page__table-key"}>{name}</span>
                     <span className={"catalogue-page__table-value"}>{cell.value}</span>
                   </span>;

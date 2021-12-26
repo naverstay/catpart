@@ -425,6 +425,8 @@
   vertical-align: top;
   padding-left: 25px;
   cursor: pointer;
+  min-height: 20px;
+  min-width: 20px;
 
   &__icon {
     position: absolute;
