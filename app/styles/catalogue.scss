@@ -358,6 +358,10 @@
       position: relative;
       z-index: 15;
 
+      @include respond-to-max($tablet) {
+        transform: none !important;
+      }
+
       &-title {
         font-size: 16px;
         color: $main_gray;
@@ -557,6 +561,23 @@
         }
       }
 
+      &-cell {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+
+        &::before {
+          content: '';
+          position: absolute;
+          top: -10px;
+          bottom: -10px;
+          left: -10px;
+          right: -10px;
+        }
+      }
+
       &-tip {
         pointer-events: none;
         position: absolute;
@@ -587,10 +608,8 @@
         left: 50%;
         min-width: 30px;
         width: 100%;
-        margin-bottom: -10px;
         bottom: 100%;
-        padding-top: 10px;
-        padding-bottom: 20px;
+        padding: 15px 0;
         transition: opacity .3s, transform .3s;
         opacity: 0;
         transform: translate(-50%, 50px);
@@ -600,6 +619,7 @@
         .sort-btn {
 
           span {
+            pointer-events: none;
             position: absolute;
             height: 2px;
             width: 10px;
@@ -743,7 +763,6 @@
 
       .rt-thead {
         position: static;
-        box-shadow: none;
 
         &.-header {
           .rt-tr {
@@ -770,7 +789,7 @@
               &:hover {
                 .catalogue-page__table-sorter {
                   opacity: 1;
-                  transform: translate(-50%, 0);
+                  transform: translate(-50%, 0) !important;
                 }
               }
             }
@@ -778,7 +797,33 @@
             .rt-resizable-header-content {
               white-space: normal;
               overflow: visible;
-              margin: auto;
+              width: 100%;
+              height: 100%;
+            }
+          }
+
+          &:not(.__fixed) {
+            box-shadow: none;
+          }
+
+          &.__fixed {
+            .catalogue-page__table-tip {
+              top: 100%;
+              bottom: auto;
+
+              &::before {
+                top: auto;
+                bottom: 100%;
+                border-top: 0;
+                margin-bottom: -1px;
+                border-bottom: 8px solid #313131;
+              }
+            }
+
+            .catalogue-page__table-sorter {
+              bottom: auto;
+              top: 100%;
+              transform: translate(-50%, -50px);
             }
           }
         }
@@ -798,7 +843,8 @@
         }
 
         @include respond-to-max($tablet) {
-          display: none !important;
+          height: 0 !important;
+          overflow: hidden !important;
         }
       }
 

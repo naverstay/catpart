@@ -79,15 +79,19 @@ export default function CataloguePage(props) {
 
   let title = categoryInfo && categoryInfo.hasOwnProperty("name") ? categoryInfo.name : "";
 
-  const rtSortExtension = (col) => {
+  const rtSortExtension = (col, id) => {
     return <div className={"catalogue-page__table-sorter"}>
       <div className="sort-btn btn __gray" onClick={() => {
-        if (col === filterColumn) {
-          setOpenFilterDropdown(false);
+        if (id.indexOf("no_id") === 0) {
+          console.log("no id", col);
         } else {
-          setOpenMobFilterDropdown(false);
-          setFilterColumn(col);
-          setOpenFilterDropdown(true);
+          if (col === filterColumn) {
+            setOpenFilterDropdown(false);
+          } else {
+            setOpenMobFilterDropdown(false);
+            setFilterColumn(col);
+            setOpenFilterDropdown(true);
+          }
         }
       }}><span /></div>
       <div className="catalogue-page__table-tip">Фильтр</div>
@@ -110,6 +114,28 @@ export default function CataloguePage(props) {
     return cellLength;
   };
 
+  const handleScroll = event => {
+    const table = document.querySelector(".ReactTable");
+    const header = document.querySelector(".ReactTable .-header");
+    const headerGroups = document.querySelector(".ReactTable .-headerGroups");
+
+    if (table && header && headerGroups) {
+      const offset = -1 * Math.min(0, headerGroups.getBoundingClientRect().height + table.getBoundingClientRect().top);
+
+      header.style.transform = `translateY(${offset}px)`;
+      openFilterRef.current.style.transform = `translateY(${offset ? offset + headerGroups.getBoundingClientRect().height + header.getBoundingClientRect().height + 80 : 0}px)`;
+      header.classList[offset ? "add" : "remove"]("__fixed");
+    }
+  };
+
+  useEffect(() => {
+    document.body.addEventListener("scroll", handleScroll);
+
+    return () => {
+      document.body.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
   useEffect(() => {
     setOpenFilterDropdown(false);
   }, [categoryItems]);
@@ -123,9 +149,12 @@ export default function CataloguePage(props) {
         requestURL = "/catalog/manufacturers";
       } else {
         let item = catColumnsList.find(f => f.accessor === filterColumn);
-
         if (item && item.hasOwnProperty("attributeId")) {
-          requestURL = `/catalog/attributes/${item.attributeId}/values`;
+          if (item.attributeId.indexOf("no_id") < 0) {
+            requestURL = `/catalog/attributes/${item.attributeId}/values`;
+          } else {
+            console.log("no id", item);
+          }
         }
       }
 
@@ -196,7 +225,7 @@ export default function CataloguePage(props) {
               fixed: "left",
               columns: [
                 {
-                  Header: <div className={"text-center"}>Фото</div>,
+                  Header: <div className={"catalogue-page__table-cell text-center"}>Фото</div>,
                   accessor: "catImage",
                   Cell: tableProps => {
                     return <span className={"catalogue-page__table-image"}>
@@ -213,7 +242,7 @@ export default function CataloguePage(props) {
                   width: 70
                 },
                 {
-                  Header: <div className={"text-center"}>Номер детали</div>,
+                  Header: <div className={"catalogue-page__table-cell text-center"}>Номер детали</div>,
                   accessor: "catPartNum",
                   Cell: tableProps => {
                     return tableProps.row._original.catPartLink ?
@@ -236,11 +265,13 @@ export default function CataloguePage(props) {
                   accessor: "catManufacturer",
                   Header: tableProps => {
                     return <div className={"catalogue-page__table-cell text-center"}
-                                onClick={() => {
-                                  setCategorySort("manufacturer");
+                                onClick={(e) => {
+                                  if (!e.target.classList.contains("sort-btn")) {
+                                    setCategorySort("manufacturer");
+                                  }
                                 }}>
                       <span>Производитель</span>
-                      {rtSortExtension("catManufacturer")}
+                      {rtSortExtension("catManufacturer", "m")}
                     </div>;
                   },
                   Cell: tableProps => {
@@ -261,15 +292,17 @@ export default function CataloguePage(props) {
               columns: [].concat(catColumnsList.map((c, ci) => {
                 c.Header = tableProps => {
                   return <div className={"catalogue-page__table-cell"}
-                              onClick={() => {
-                                if (c.attributeId) {
-                                  setCategorySort("attributes." + c.attributeId);
-                                } else {
-                                  console.log("attributes", c);
+                              onClick={(e) => {
+                                if (!e.target.classList.contains("sort-btn")) {
+                                  if (c.attributeId.indexOf("no_id") === 0) {
+                                    console.log("attributes", c);
+                                  } else {
+                                    setCategorySort("attributes." + c.attributeId);
+                                  }
                                 }
                               }}>
                     <span>{c.accessor}</span>
-                    {rtSortExtension(c.accessor)}
+                    {rtSortExtension(c.accessor, c.attributeId)}
                   </div>;
                 };
 
@@ -360,8 +393,12 @@ export default function CataloguePage(props) {
                   <Ripples
                     onClick={() => {
                       setOpenMobFilterDropdown(false);
-                      setFilterColumn(m.accessor);
-                      setOpenFilterDropdown(true);
+                      if (m.attributeId.indexOf("no_id") === 0) {
+                        console.log("no id", m);
+                      } else {
+                        setFilterColumn(m.accessor);
+                        setOpenFilterDropdown(true);
+                      }
                     }}
                     className="dropdown-link"
                     during={1000}

@@ -475,7 +475,7 @@ export function FilterForm({
                 if (d.snippet.specs && d.snippet.specs.length) {
                   d.snippet.specs.forEach((s, si) => {
                     catColumnNames.push({
-                      attributeId: s.attribute.id,
+                      attributeId: s.attribute.id || 'no_id_' + di,
                       accessor: s.attribute.name
                     });
                     params[s.attribute.name] = s.display_value;
