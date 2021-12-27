@@ -90,11 +90,21 @@ export function FilterForm({
 
   const pageLimitList = [
     // 1, 2, 3,
-    10, 50, 100];
+    10, 25, 50];
   const query = new URLSearchParams(props.location.search);
   const [nestedCategories, setNestedCategories] = useState([]);
   const [categoryInfo, setCategoryInfo] = useState(null);
   const [errorPage, setErrorPage] = useState(false);
+
+  let querySort = params && params.hasOwnProperty("s") ? (Object.keys(params.s).map(k => {
+    return {
+      field: k,
+      asc: params.s[k] === "a"
+    };
+  })) : [{
+    field: "",
+    asc: true
+  }];
 
   let queryAttr = params && params.hasOwnProperty("a") ? (params.a.map(m => {
     return {
@@ -113,6 +123,8 @@ export function FilterForm({
 
   const [categoryFilter, setCategoryFilter] = useState(queryAttr);
   const [categoryFilterNames, setCategoryFilterNames] = useState([]);
+  const [categorySortField, setCategorySortField] = useState(querySort.length ? querySort[0].field : "");
+  const [categorySortAsc, setCategorySortAsc] = useState(querySort.length ? querySort[0].asc : true);
 
   const updateFilterNames = (options, ids) => {
     const requestURL = "/catalog/attributes";
@@ -171,6 +183,7 @@ export function FilterForm({
   const [catColumnsList, setCatColumnsList] = useState([]);
 
   const paramsLimit = params.hasOwnProperty("l") ? parseInt(params.l) : 10;
+
   const [catPageLimit, setCatPageLimit] = useState(!isNaN(paramsLimit) && pageLimitList.indexOf(paramsLimit) > -1 ? paramsLimit : 10);
   const [pageLimitTrigger, setPageLimitTrigger] = useState(0);
 
@@ -316,11 +329,6 @@ export function FilterForm({
     totalData
   ]);
 
-  const reposListProps = {
-    loading,
-    error
-  };
-
   const onChangeSwitch = evt => {
     const user = localStorage.getItem("catpart-user");
     let userFields = { currency: evt.target.dataset.currency };
@@ -341,14 +349,23 @@ export function FilterForm({
     });
   };
 
+  const setCategorySortFunc = (field) => {
+    if (categorySortField === field) {
+      setCategorySortAsc(!categorySortAsc);
+    } else {
+      setCategorySortAsc(true);
+      setCategorySortField(field);
+    }
+    setPageLimitTrigger(pageLimitTrigger + 1);
+  };
+
   const removeFilter = (param, index) => {
     setCategoryFilter(categoryFilter.reduce((acc, f, fi) => {
-      if (index < 0) {
-        return acc;
-      } else if (fi === param) {
-        if (f.values.length > 1) {
+      if (fi === param) {
+        if (index < 0) {
+          return acc;
+        } else if (f.values.length > 1) {
           f.values.splice(index, 1);
-          console.log("splice", f.values);
           return acc.concat(f);
         } else {
           return acc;
@@ -372,24 +389,6 @@ export function FilterForm({
     let options = {
       page: catPage,
       limit: catPageLimit
-      // attributes: attributes.filter(f => f.id !== "manufacturer").map(m => {
-      //   return {
-      //     id: m.id,
-      //     values: m.values
-      //   };
-      // })
-      // attributes: (categoryFilter.reduce((acc, m) => {
-      //   let ret = [];
-      //
-      //   for (let i = 0; i < m.value.length; i++) {
-      //     ret.push({
-      //       id: m.id,
-      //       value: m.value[i]
-      //     });
-      //   }
-      //
-      //   return acc.concat(ret);
-      // }, []))
     };
 
     if (attributes && attributes.hasOwnProperty("a")) {
@@ -413,6 +412,12 @@ export function FilterForm({
 
     if (attributes && attributes.hasOwnProperty("m")) {
       options.manufacturer = attributes.m;
+    }
+
+    if (categorySortField) {
+      options.sort = {
+        [categorySortField]: categorySortAsc ? "asc" : "desc"
+      };
     }
 
     // if (attributes && attributes.hasOwnProperty("l")) {
@@ -490,7 +495,13 @@ export function FilterForm({
               setNodataText(`Нет данных ${props.match.url} страница ${catPage} лимит ${catPageLimit}`);
             }
 
-            setCatColumnsList(catColumnNames);
+            setCatColumnsList(catColumnNames.reduce((acc, c) => {
+              if (acc.findIndex(a => a.attributeId === c.attributeId) === -1) {
+                return acc.concat(c);
+              } else {
+                return acc;
+              }
+            }, []));
             setCategoryItems(items);
           } else {
             setNodataText(`Что-то пошло не так и не туда ${props.match.url} страница ${catPage} лимит ${catPageLimit}`);
@@ -517,11 +528,21 @@ export function FilterForm({
           } else {
             setNestedCategories([]);
           }
+
+          setTimeout(() => {
+            let rtCellSizer = document.getElementById("rtCellSizer");
+
+            if (rtCellSizer) {
+              let goto = rtCellSizer.getBoundingClientRect().top + document.body.scrollTop + 30;
+              smoothScrollTo(document.body, document.body.scrollTop, goto, 600);
+            }
+          }, 200);
         }
 
         setShowCatPreloader(false);
       });
     } else {
+
       console.log("prevRequest skip", prevRequest);
       // setShowCatPreloader(false);
     }
@@ -573,6 +594,12 @@ export function FilterForm({
 
       if (catPageLimit !== 10) {
         options.l = catPageLimit;
+      }
+
+      if (categorySortField) {
+        options.s = {
+          [categorySortField]: categorySortAsc ? "a" : "d"
+        };
       }
 
       history.push({
@@ -641,25 +668,31 @@ export function FilterForm({
   useEffect(() => {
     let newURL = props.match.url.split("/")[1];
     if (prevPageURL !== newURL) {
+      if (prevPageURL) {
+        setCatPageLimit(10);
+      }
       setPrevPageURL(newURL);
     }
   }, [props.match.url]);
 
-  useEffect(() => {
-    setCatPage(1);
+  useEffect((prev) => {
+    if (categoryFilter.length) {
+      setCatPage(1);
+    }
+
     setCategoryFilterTrigger(categoryFilterTrigger + 1);
   }, [categoryFilter]);
 
   const filterItemsHTML = useMemo(() => {
     return categoryFilterNames.length ? categoryFilterNames.map((f, fi) => (
-      <li key={fi}>
-        <div className={"catalogue-page__filter-item"}>
+      <React.Fragment key={fi}>
+        <div className={"catalogue-page__filter-item __first"}>
           <span>{f.name}</span>
           <Ripples
             onClick={() => {
               removeFilter(fi, -1);
             }}
-            className={"filter-remove-btn btn __gray"}
+            className={"btn__filter-remove btn __gray"}
             during={1000}
           >
               <span className="btn-inner">
@@ -674,7 +707,7 @@ export function FilterForm({
             onClick={() => {
               removeFilter(fi, mi);
             }}
-            className={"filter-remove-btn btn __gray"}
+            className={"btn__filter-remove btn __gray"}
             during={1000}
           >
               <span className="btn-inner">
@@ -683,7 +716,7 @@ export function FilterForm({
           </Ripples>
         </div>)
         }
-      </li>)
+      </React.Fragment>)
     ) : null;
   }, [categoryFilterNames]);
 
@@ -763,6 +796,7 @@ export function FilterForm({
                 nestedCategories={nestedCategories.slice(0)}
                 categoryInfo={categoryInfo}
                 history={history}
+                setCategorySort={setCategorySortFunc}
                 categoryFilterNames={categoryFilterNames}
                 categoryFilter={categoryFilter}
                 setCategoryFilter={setCategoryFilter}

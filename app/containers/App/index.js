@@ -542,12 +542,14 @@ export default function App({ history }) {
   };
 
   useEffect(() => {
-    document.body.classList[openCatalogue ? "add" : "remove"]("__no-overflow");
-  }, [openCatalogue]);
+    if (openAuthPopup || openRequisites) {
+      setOpenCatalogue(false);
+    }
+  }, [openAuthPopup, openRequisites]);
 
   useEffect(() => {
-    console.log("nestedCategories APP", nestedCategories);
-  }, [nestedCategories]);
+    document.body.classList[openCatalogue ? "add" : "remove"]("__no-overflow");
+  }, [openCatalogue]);
 
   useEffect(() => {
     document.body.classList[formBusy || busyOrder ? "add" : "remove"]("__busy");

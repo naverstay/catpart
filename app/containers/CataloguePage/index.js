@@ -29,6 +29,7 @@ export default function CataloguePage(props) {
   const {
     categoryItems,
     history,
+    setCategorySort,
     catColumnsList,
     nestedCategories,
     categoryInfo,
@@ -218,7 +219,7 @@ export default function CataloguePage(props) {
                     return tableProps.row._original.catPartLink ?
                       <div className={"catalogue-page__table-name"}>
                         <Link className={"catalogue-page__table-link"}
-                              to={"/" + tableProps.row._original.catPartLink}>
+                              to={"/" + tableProps.row._original.catPartLink + "/"}>
                           {tableProps.row.catPartNum}
                         </Link>
                         <div className={"catalogue-page__table-expander icon icon-chevron-up"} onClick={(e) => {
@@ -234,8 +235,10 @@ export default function CataloguePage(props) {
                   // Header: <div className={"text-center"}>Производитель</div>,
                   accessor: "catManufacturer",
                   Header: tableProps => {
-                    return <div
-                      className={"catalogue-page__table-cell text-center"}>
+                    return <div className={"catalogue-page__table-cell text-center"}
+                                onClick={() => {
+                                  setCategorySort("manufacturer");
+                                }}>
                       <span>Производитель</span>
                       {rtSortExtension("catManufacturer")}
                     </div>;
@@ -257,8 +260,14 @@ export default function CataloguePage(props) {
               Header: "",
               columns: [].concat(catColumnsList.map((c, ci) => {
                 c.Header = tableProps => {
-                  return <div
-                    className={"catalogue-page__table-cell"}>
+                  return <div className={"catalogue-page__table-cell"}
+                              onClick={() => {
+                                if (c.attributeId) {
+                                  setCategorySort("attributes." + c.attributeId);
+                                } else {
+                                  console.log("attributes", c);
+                                }
+                              }}>
                     <span>{c.accessor}</span>
                     {rtSortExtension(c.accessor)}
                   </div>;
@@ -322,12 +331,12 @@ export default function CataloguePage(props) {
 
       <ul className={"catalogue-page__filter-data"}>
         {filterItemsHTML}
-        <li ref={openMobFilterRef} className={"mob-only dropdown-holder"}>
+        <div ref={openMobFilterRef} className={"catalogue-page__filter-item mob-only dropdown-holder"}>
           <Ripples
             onClick={() => {
               setOpenMobFilterDropdown(!openMobFilterDropdown);
             }}
-            className={"btn __gray filter-add-btn"}
+            className={"btn __gray btn__filter-add"}
             during={1000}
           >
             <span className="btn-inner">Добавить фильтр</span>
@@ -360,7 +369,7 @@ export default function CataloguePage(props) {
                 </li>)}
               </ul>
             </div> : null}
-        </li>
+        </div>
       </ul>
 
       <div ref={openFilterRef} className="catalogue-page__filter">
@@ -386,7 +395,6 @@ export default function CataloguePage(props) {
 
             <ul className="catalogue-page__filter-options">
               {filterOptions.length ?
-                // columnOptions.length ?
                 columnOptions.map((o, oi) => {
                   let checked = false;
                   let filter = categoryFilterNames.find(f => f.name === filterColumn);
@@ -445,7 +453,6 @@ export default function CataloguePage(props) {
                     </label></Ripples>
                   </li>;
                 })
-                // <li className={"catalogue-page__filter-nodata"}>Нет совпадений</li>
                 : <LoadingIndicator />}
             </ul>
 
@@ -473,8 +480,6 @@ export default function CataloguePage(props) {
                   }
                 }
 
-                console.log("filterAttr", filterAttr);
-
                 setCategoryFilter(categoryFilterNames.concat(filterAttr).filter(f => f.values.length));
 
                 setOpenFilterDropdown(false);
@@ -491,7 +496,7 @@ export default function CataloguePage(props) {
       </div>
 
       <div ref={tableHolder} className="catalogue-page__full">
-        {showCatPreloader ? <span>Skeleton here</span> : catalogHTML}
+        {showCatPreloader ? <span>Загрузка</span> : catalogHTML}
       </div>
     </>
   );

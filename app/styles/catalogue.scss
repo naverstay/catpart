@@ -3,6 +3,7 @@
 @import "node_modules/react-table-hoc-fixed-columns/lib/styles";
 
 .catalogue {
+  @extend %menu_hide;
   position: absolute;
   right: 0;
   left: 0;
@@ -10,8 +11,6 @@
   top: 102px;
   z-index: 10;
   background: #fff;
-  transition: transform .3s, opacity .3s;
-  transform: translateX(100%);
   opacity: 0;
   pointer-events: none;
 
@@ -21,9 +20,8 @@
     position: absolute;
     top: 0;
     bottom: 0;
-    width: 0;
-    transition: width .3s;
     background: inherit;
+    width: 50vw;
   }
 
   &:before {
@@ -35,15 +33,9 @@
   }
 
   &.__open {
+    @extend %menu_show;
     opacity: 1;
     pointer-events: all;
-    transform: translateX(0);
-
-
-    &::after,
-    &::before {
-      width: 50vw;
-    }
   }
 
   &__inner {
@@ -76,13 +68,6 @@
     &:hover,
     &.__show {
       display: inline-flex;
-    }
-
-    &.__level-0 {
-      //display: inline-flex;
-      //flex-flow: column nowrap;
-      //overflow-y: hidden;
-      //overflow-x: auto;
     }
 
     &-link {
@@ -398,10 +383,6 @@
         list-style: none;
         font-size: 12px;
         padding-top: 10px;
-
-        > li {
-          margin-bottom: 10px;
-        }
       }
 
       &-item {
@@ -412,6 +393,7 @@
         justify-content: center;
         text-decoration: none;
         height: 30px;
+        margin-bottom: 10px;
         padding: 0 10px;
         min-width: 30px;
         border-radius: 4px;
@@ -432,13 +414,13 @@
         }
 
         &:not(:hover) {
-          .filter-remove-btn {
+          .btn__filter-remove {
             opacity: 0;
             pointer-events: none;
           }
         }
 
-        &:first-child:not(:last-child) {
+        &.__first {
           padding: 0 20px;
         }
       }
@@ -472,7 +454,7 @@
 
       &-popup {
         position: absolute;
-        top: -30px;
+        top: 0;
         left: 50%;
         transform: translateX(-50%);
         width: 270px;
@@ -485,6 +467,10 @@
 
       @include respond-to-max($tablet) {
         margin-top: 30px;
+
+        &-popup {
+          top: -30px;
+        }
       }
     }
 
@@ -744,6 +730,8 @@
       padding-left: 15px;
 
       @include respond-to-max($tablet) {
+        padding-right: 15px;
+
         .rt-table {
           overflow: visible;
         }
@@ -846,20 +834,27 @@
 
             &:not(.rthfc-td-fixed) {
               width: 100% !important;
-              padding: 0 10px;
+              padding: 0 5px;
 
               &:nth-child(2n + 1) {
                 background: $main_gray_light;
+              }
+
+              &:nth-child(2n + 2) {
+                background: #fff;
               }
             }
 
             &.rthfc-td-fixed {
               display: block;
+              background: none;
+
+              + .rt-td {
+                margin-top: 10px;
+              }
 
               &:first-child {
-                position: absolute;
-                left: 0;
-                top: 10px;
+                float: left;
               }
 
               &:not(:first-child) {
@@ -867,6 +862,10 @@
                 left: 75px !important;
                 width: calc(100% - 75px) !important;
                 max-width: none !important;
+
+                .catalogue-page__table-param {
+                  padding-left: 0;
+                }
               }
             }
           }

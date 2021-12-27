@@ -196,6 +196,7 @@
   }
 
   &-popup {
+    @extend %menu_hide;
     font-size: 12px;
     position: absolute;
     z-index: 10;
@@ -208,6 +209,10 @@
     width: 270px;
     max-width: 88vw;
     padding: 15px 20px;
+
+    &.__show {
+      @extend %menu_show;
+    }
 
     @include respond-to-max($tablet) {
 

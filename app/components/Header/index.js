@@ -335,65 +335,64 @@ function Header({
               </span>
             </Ripples>
 
-            {openAuthPopup || openResetPassword ? (
-              <div className="header-popup">
-                <h3 className="header-popup__title">{openResetPassword ? "Восстановление пароля" : "Авторизация"}</h3>
-                <p>{openResetPassword ? "Укажите вашу электронную почту или логин для восстановления пароля" : "Введите логин и пароль для входа в систему"}</p>
+            <div className={"header-popup" + (openAuthPopup || openResetPassword ? " __show" : "")}>
+              <h3 className="header-popup__title">{openResetPassword ? "Восстановление пароля" : "Авторизация"}</h3>
+              <p>{openResetPassword ? "Укажите вашу электронную почту или логин для восстановления пароля" : "Введите логин и пароль для входа в систему"}</p>
 
-                {openAuthPopup ? (
-                  <form ref={authRef} className="form-content" onSubmit={authSubmit}>
-                    <FormInput
-                      onChange={handleChange.bind(this, "auth-login")}
-                      placeholder="Логин"
-                      name="auth-login"
-                      //
-                      error={errors["auth-login"]}
-                      className="__lg"
-                      inputRef={loginInput}
-                    />
-                    <FormInput
-                      onChange={handleChange.bind(this, "auth-password")}
-                      placeholder="Пароль"
-                      name="auth-password"
-                      //
-                      error={errors["auth-password"]}
-                      // defaultValue={'12345678'}
-                      className="__lg"
-                      inputRef={passwordInput}
-                    />
+              {openAuthPopup ? (
+                <form ref={authRef} className="form-content" onSubmit={authSubmit}>
+                  <FormInput
+                    onChange={handleChange.bind(this, "auth-login")}
+                    placeholder="Логин"
+                    name="auth-login"
+                    //
+                    error={errors["auth-login"]}
+                    className="__lg"
+                    inputRef={loginInput}
+                  />
+                  <FormInput
+                    onChange={handleChange.bind(this, "auth-password")}
+                    placeholder="Пароль"
+                    name="auth-password"
+                    //
+                    error={errors["auth-password"]}
+                    // defaultValue={'12345678'}
+                    className="__lg"
+                    inputRef={passwordInput}
+                  />
 
-                    <div className="form-control">
-                      <Ripples className={`__w-100p btn __blue __lg${!validForm ? " __disabled" : ""}`} during={1000}>
-                        <button name="auth-submit" className="btn-inner">
-                          <span>Войти</span>
-                        </button>
-                      </Ripples>
-                    </div>
-                  </form>
-                ) : (
-                  <form ref={resetRef} className="form-content" onSubmit={resetSubmit}>
-                    <FormInput
-                      onChange={handleResetChange.bind(this, "auth-email")}
-                      placeholder="Электронная почта"
-                      name="auth-email"
-                      //
-                      error={resetErrors["auth-email"]}
-                      className="__lg"
-                      inputRef={emailInput}
-                    />
+                  <div className="form-control">
+                    <Ripples className={`__w-100p btn __blue __lg${!validForm ? " __disabled" : ""}`} during={1000}>
+                      <button name="auth-submit" className="btn-inner">
+                        <span>Войти</span>
+                      </button>
+                    </Ripples>
+                  </div>
+                </form>
+              ) : (
+                <form ref={resetRef} className="form-content" onSubmit={resetSubmit}>
+                  <FormInput
+                    onChange={handleResetChange.bind(this, "auth-email")}
+                    placeholder="Электронная почта"
+                    name="auth-email"
+                    //
+                    error={resetErrors["auth-email"]}
+                    className="__lg"
+                    inputRef={emailInput}
+                  />
 
-                    <div className="form-control">
-                      <Ripples className={`__w-100p btn __blue __lg${!validResetForm ? " __disabled" : ""}`}
-                               during={1000}>
-                        <button name="auth-submit" className="btn-inner">
-                          <span>Восстановить</span>
-                        </button>
-                      </Ripples>
-                    </div>
-                  </form>
-                )}
+                  <div className="form-control">
+                    <Ripples className={`__w-100p btn __blue __lg${!validResetForm ? " __disabled" : ""}`}
+                             during={1000}>
+                      <button name="auth-submit" className="btn-inner">
+                        <span>Восстановить</span>
+                      </button>
+                    </Ripples>
+                  </div>
+                </form>
+              )}
 
-                <p>
+              <p>
                   <span
                     onClick={() => {
                       setOpenResetPassword(!openResetPassword);
@@ -403,9 +402,9 @@ function Header({
                   >
                     {openResetPassword ? "Авторизоваться" : "Забыли пароль?"}
                   </span>
-                </p>
-              </div>
-            ) : null}
+              </p>
+            </div>
+
           </div>
         )}
 
