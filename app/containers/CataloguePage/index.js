@@ -225,7 +225,7 @@ export default function CataloguePage(props) {
               fixed: "left",
               columns: [
                 {
-                  Header: <div className={"catalogue-page__table-cell text-center"}>Фото</div>,
+                  Header: <div className={"catalogue-page__table-cell text-center"}><span>Фото</span></div>,
                   accessor: "catImage",
                   Cell: tableProps => {
                     return <span className={"catalogue-page__table-image"}>
@@ -242,7 +242,11 @@ export default function CataloguePage(props) {
                   width: 70
                 },
                 {
-                  Header: <div className={"catalogue-page__table-cell text-center"}>Номер детали</div>,
+                  Header: <div  onClick={(e) => {
+                    if (!e.target.classList.contains("sort-btn")) {
+                      setCategorySort("title");
+                    }
+                  }} className={"catalogue-page__table-cell text-center"}><span>Номер детали</span></div>,
                   accessor: "catPartNum",
                   Cell: tableProps => {
                     return tableProps.row._original.catPartLink ?

@@ -501,11 +501,16 @@
 
         &.__cart {
           flex: 1 0 112px;
+          text-align: center;
         }
       }
     }
 
-    &__value {    }
+    &__update {
+      @include respond-to-min($dt) {
+        text-align: center;
+      }
+    }
 
     &__label {
       padding-right: 4px;
@@ -520,5 +525,3 @@
     }
   }
 }
-
-

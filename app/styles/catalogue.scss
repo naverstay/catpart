@@ -575,6 +575,7 @@
           bottom: -10px;
           left: -10px;
           right: -10px;
+          cursor: pointer;
         }
       }
 
@@ -790,6 +791,12 @@
                 .catalogue-page__table-sorter {
                   opacity: 1;
                   transform: translate(-50%, 0) !important;
+                }
+              }
+
+              &:first-child {
+                .catalogue-page__table-cell::before {
+                  display: none;
                 }
               }
             }

@@ -29,7 +29,6 @@
     color: #c6c6c6;
     transition: color .3s, background .3s, transform .6s;
     transform: translateY(200px);
-    box-shadow: 0 0 3px rgba(198, 198, 198, .75);
 
     &::before {
       position: absolute;

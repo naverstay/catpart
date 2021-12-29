@@ -270,6 +270,7 @@ export function FilterForm({
       let actualInfo = "";
 
       if (searchData.res.length && searchData.res[0].hasOwnProperty("data") && searchData.res[0].data.length && searchData.res[0].data[0].hasOwnProperty("updated_at")) {
+
         actualInfo = ` Данные актуальны на ${new Date(searchData.res[0].data[0].updated_at).toLocaleDateString("ru-Ru", {
           year: "numeric",
           month: "numeric",
@@ -475,7 +476,7 @@ export function FilterForm({
                 if (d.snippet.specs && d.snippet.specs.length) {
                   d.snippet.specs.forEach((s, si) => {
                     catColumnNames.push({
-                      attributeId: s.attribute.id || 'no_id_' + di,
+                      attributeId: s.attribute.id || "no_id_" + di,
                       accessor: s.attribute.name
                     });
                     params[s.attribute.name] = s.display_value;
@@ -770,21 +771,6 @@ export function FilterForm({
             profile={profile}
             history={history}
             itemData={itemData}
-            breadcrumbs={breadcrumbs}
-            // busy={formBusy}
-            setBusyOrder={setBusyOrder}
-            currency={currency}
-            setCurrency={setCurrency}
-            currencyList={currencyList}
-            setCurrencyList={setCurrencyList}
-            RUB={RUB}
-            setShowTableHeadFixed={setShowTableHeadFixed}
-            setTableHeadFixed={setTableHeadFixed}
-            setOpenAuthPopup={setOpenAuthPopup}
-            setOrderSent={setOrderSent}
-            totalCart={totalCart}
-            updateCart={updateCart}
-            setOpenMobMenu={setOpenMobMenu}
             props={{ ...props }}
           /> : categoryPage ?
             <>
@@ -1088,6 +1074,7 @@ export function FilterForm({
               currency={currency}
               bom={searchData.bom}
               list={searchData.res}
+              relativeTime={itemData !== null}
             />
           ) : (totalData < 0 || someCategoryUrl) ? null : (
             <>

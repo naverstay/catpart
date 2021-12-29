@@ -10,17 +10,13 @@ import Swiper from "react-id-swiper";
 import qs from "qs";
 import { Navigation, Manipulation } from "swiper";
 import { Helmet } from "react-helmet";
-import Breadcrumbs from "../../components/Breadcrumbs";
 import apiGET from "../../utils/search";
 import NoImage from "../../images/no-image.png";
 import FormCheck from "../../components/FormCheck";
-import innValidation from "../../utils/innValidation";
-import { validateEmail } from "../../utils/validateEmail";
-import checkEmailExist from "../../utils/checkEmailExist";
 import { uniqArray } from "../../utils/uniqArray";
 
 export default function CatalogueItem(props) {
-  const { breadcrumbs, itemData, history } = props;
+  const {  itemData, history } = props;
 
   const snippetCheckData = itemData && itemData.hasOwnProperty("snippet") && itemData.snippet.specs && itemData.snippet.specs.length ? itemData.snippet.specs.map(m => m.attribute.id) : [];
   const [snippetCheckValue, setSnippetCheckValue] = useState([]);
@@ -74,34 +70,37 @@ export default function CatalogueItem(props) {
       const requestURL = `/catalog/${itemData.slug}/similar`;
 
       apiGET(requestURL, {}, data => {
+        if (data && data.error) {
+          console.log("similar error", data);
+        } else {
+          let titles = ["manufacturer", "part_no"];
+          let slides = [];
 
-        let titles = ["manufacturer", "part_no"];
-        let slides = [];
+          for (let i = 0; i < data.length; i++) {
+            const datum = data[i];
+            let slide = { part_no: datum.title, slug: datum.slug };
 
-        for (let i = 0; i < data.length; i++) {
-          const datum = data[i];
-          let slide = { part_no: datum.title, slug: datum.slug };
+            if (datum.hasOwnProperty("snippet")) {
+              slide.manufacturer = datum.snippet.manufacturer.name;
 
-          if (datum.hasOwnProperty("snippet")) {
-            slide.manufacturer = datum.snippet.manufacturer.name;
+              if (datum.snippet.hasOwnProperty("specs")) {
+                for (let j = 0; j < datum.snippet.specs.length; j++) {
+                  const spec = datum.snippet.specs[j];
 
-            if (datum.snippet.hasOwnProperty("specs")) {
-              for (let j = 0; j < datum.snippet.specs.length; j++) {
-                const spec = datum.snippet.specs[j];
-
-                titles.push(spec.attribute.name);
-                slide[spec.attribute.name] = spec.display_value;
+                  titles.push(spec.attribute.name);
+                  slide[spec.attribute.name] = spec.display_value;
+                }
               }
             }
+
+            slides.push(slide);
           }
 
-          slides.push(slide);
+          setAnalogSliderTitles(uniqArray(titles));
+          setSimilarSlides(slides);
+
+          console.log("similar", data, slides, uniqArray(titles));
         }
-
-        setAnalogSliderTitles(uniqArray(titles));
-        setSimilarSlides(slides);
-
-        console.log("similar", data, slides, uniqArray(titles));
       });
     }
   }, [itemData]);
