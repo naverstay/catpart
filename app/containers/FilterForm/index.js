@@ -283,7 +283,7 @@ export function FilterForm({
       setSearchInfo(searchQueries.replace(/, $/, "") + ` найдено ${plural(totalData, "наименование", "наименования", "наименований")}.` + actualInfo);
     }
 
-    window.log && console.log("totalData", totalData);
+    window.log && console.log("totalData", totalData, searchData);
 
     if (totalData === 0 && searchData && searchData.hasOwnProperty("res")) {
       let deep = searchData.res.map(item => {
@@ -1076,7 +1076,7 @@ export function FilterForm({
               list={searchData.res}
               relativeTime={itemData !== null}
             />
-          ) : (totalData < 0 || someCategoryUrl) ? null : (
+          ) : someCategoryUrl ? null : elaboration.length > 0 ? (
             <>
               <DeepElaboration data={elaboration} setElaboration={setElaboration} elaboration={elaboration} />
               <OrderForm
@@ -1092,7 +1092,7 @@ export function FilterForm({
                 setElaboration={setElaboration}
                 elaboration={elaboration}
               />
-            </>)
+            </>) : null
           }
         </>
       }
