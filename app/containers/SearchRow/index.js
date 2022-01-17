@@ -66,9 +66,7 @@ const SearchRow = props => {
     priceMatch = findPriceIndex(row.pricebreaks, itemCount);
   }
 
-  console.log("row", row);
-
-  let updInfo = (relativeTime ? dayjs(row.updated_at).fromNow(true) : "").split(" ");
+  let updInfo = (relativeTime ? dayjs(row.updated_at).fromNow(true) : "").replace(/^a/, '1').split(" ");
 
   return (
     <div
