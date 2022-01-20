@@ -270,6 +270,7 @@ export function SearchForm({
                           if (data.error) {
                             setFormBusy(false);
                             notificationFunc("success", `Файл: ${file.name}`, "ошибка обработки");
+                            history.push("/");
                           } else {
                             setFormBusy(false);
                             setSearchData(data);

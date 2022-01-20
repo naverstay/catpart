@@ -496,16 +496,19 @@ export default function App({ history }) {
     const dropContainer = document.getElementById("app");
 
     dropContainer.ondragover = dropContainer.ondragenter = function(evt) {
+      evt.stopPropagation();
       evt.preventDefault();
       setAppDrag(true);
     };
 
     dropContainer.ondragleave = function(evt) {
+      evt.stopPropagation();
       evt.preventDefault();
       setAppDrag(false);
     };
 
     dropContainer.ondrop = function(evt) {
+      evt.stopPropagation();
       evt.preventDefault();
 
       const fileInput = document.getElementById("file");
