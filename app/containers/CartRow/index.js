@@ -102,6 +102,11 @@ const CartRow = props => {
                       className="cart-results__item">{priceFormatter(parseFloat((cartCount * row.pricebreaks[priceMatch].price) / currency.exChange).toFixedCustom(currency.precision), currency.precision)}</span>
                   ) : cell === "supplier" ? (
                     row.supplierAlias
+                  ) : cell === "name" ? (
+                    <>
+                      <span>{row.name}</span>
+                      {row.dc ? <><br /><span>{row.dc}</span></> : null}
+                    </>
                   ) : (
                     row[cell] || <span data-empty={cell} />
                   )}

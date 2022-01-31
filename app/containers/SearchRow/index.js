@@ -66,7 +66,7 @@ const SearchRow = props => {
     priceMatch = findPriceIndex(row.pricebreaks, itemCount);
   }
 
-  let updInfo = (relativeTime ? dayjs(row.updated_at).fromNow(true) : "").replace(/^a/, '1').split(" ");
+  let updInfo = (relativeTime ? dayjs(row.updated_at).fromNow(true) : "").replace(/^a/, "1").split(" ");
 
   return (
     <div
@@ -91,7 +91,12 @@ const SearchRow = props => {
               row.supplierAlias
             ) : row[cell] ? (
               cell === "name" ? (
-                textHighlighter(row[cell], row.bold)
+                <>
+                  {
+                    textHighlighter(row[cell], row.bold)
+                  }
+                  {row.dc ? <><br /><span>{row.dc}</span></> : null}
+                </>
               ) : (
                 row[cell]
               )

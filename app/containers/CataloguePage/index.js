@@ -30,6 +30,7 @@ export default function CataloguePage(props) {
     categoryItems,
     history,
     setCategorySort,
+    categorySortField,
     catColumnsList,
     nestedCategories,
     categoryInfo,
@@ -98,15 +99,17 @@ export default function CataloguePage(props) {
     </div>;
   };
 
-  const getColumnWidth = (accessor, headerText) => {
+  const getColumnWidth = (accessor, headerText, bold) => {
     const maxWidth = 600;
     const padding = 23;
     const cellLength = Math.max(
       ...(headerText || "").split(" ").map(h => {
+        rtCellSizer.style.fontWeight = bold;
         rtCellSizer.innerText = h || "";
         return Math.ceil(padding + rtCellSizer.offsetWidth);
       }),
       ...categoryItems.map(row => {
+        rtCellSizer.style.fontWeight = bold;
         rtCellSizer.innerText = row[accessor] || "";
         return Math.ceil(padding + rtCellSizer.offsetWidth);
       })
@@ -242,11 +245,12 @@ export default function CataloguePage(props) {
                   width: 70
                 },
                 {
-                  Header: <div  onClick={(e) => {
+                  Header: <div onClick={(e) => {
                     if (!e.target.classList.contains("sort-btn")) {
                       setCategorySort("title");
                     }
-                  }} className={"catalogue-page__table-cell text-center"}><span>Номер детали</span></div>,
+                  }} className={"catalogue-page__table-cell text-center"}><span
+                    style={{ fontWeight: categorySortField === "title" ? "bold" : 400 }}>Номер детали</span></div>,
                   accessor: "catPartNum",
                   Cell: tableProps => {
                     return tableProps.row._original.catPartLink ?
@@ -262,7 +266,7 @@ export default function CataloguePage(props) {
                   },
                   // width: 170,
                   minWidth: 10,
-                  width: getColumnWidth("catPartNum", "Номер детали")
+                  width: getColumnWidth("catPartNum", "Номер детали", categorySortField === "title" ? "bold" : 400)
                 },
                 {
                   // Header: <div className={"text-center"}>Производитель</div>,
@@ -274,7 +278,8 @@ export default function CataloguePage(props) {
                                     setCategorySort("manufacturer");
                                   }
                                 }}>
-                      <span>Производитель</span>
+                      <span
+                        style={{ fontWeight: categorySortField === "manufacturer" ? "bold" : 400 }}>Производитель</span>
                       {rtSortExtension("catManufacturer", "m")}
                     </div>;
                   },
@@ -286,7 +291,7 @@ export default function CataloguePage(props) {
                   </span>;
                   },
                   minWidth: 10,
-                  width: getColumnWidth("catManufacturer", "Производитель")
+                  width: getColumnWidth("catManufacturer", "Производитель", categorySortField === "manufacturer" ? "bold" : 400)
                   // width: 110
                 }
               ]
@@ -305,13 +310,14 @@ export default function CataloguePage(props) {
                                   }
                                 }
                               }}>
-                    <span>{c.accessor}</span>
+                    <span
+                      style={{ fontWeight: categorySortField === "attributes." + c.attributeId ? "bold" : 400 }}>{c.accessor}</span>
                     {rtSortExtension(c.accessor, c.attributeId)}
                   </div>;
                 };
 
                 c.minWidth = 10;
-                c.width = getColumnWidth(c.accessor, c.accessor);
+                c.width = getColumnWidth(c.accessor, c.accessor, categorySortField === "attributes." + c.attributeId ? "bold" : 400);
 
                 c.Cell = (cell) => {
                   let name = catColumnsList.find(f => f.attributeId === cell.column.attributeId).accessor;
@@ -537,8 +543,9 @@ export default function CataloguePage(props) {
       </div>
 
       <div ref={tableHolder} className="catalogue-page__full">
-        {showCatPreloader ? <span>Загрузка</span> : catalogHTML}
+        {showCatPreloader ?  <div className={"catalogue-page__loader"} /> : catalogHTML}
       </div>
+
     </>
   );
 }

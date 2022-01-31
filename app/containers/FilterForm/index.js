@@ -765,7 +765,8 @@ export function FilterForm({
 
       {/* todo search and any category/product page */}
       {!cart && someCategoryUrl ? <>
-          <Breadcrumbs bread={breadcrumbs} />
+          {props.match.params.hasOwnProperty("catalogue") && props.match.params.catalogue !== "catalog" ?
+            <Breadcrumbs bread={breadcrumbs} /> : null}
 
           {itemData ? <CatalogueItem
             profile={profile}
@@ -782,6 +783,7 @@ export function FilterForm({
                 nestedCategories={nestedCategories.slice(0)}
                 categoryInfo={categoryInfo}
                 history={history}
+                categorySortField={categorySortField}
                 setCategorySort={setCategorySortFunc}
                 categoryFilterNames={categoryFilterNames}
                 categoryFilter={categoryFilter}

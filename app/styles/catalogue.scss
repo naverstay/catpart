@@ -478,6 +478,23 @@
       }
     }
 
+    &__loader {
+      position: relative;
+      height: 300px;
+
+      &::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 60px;
+        height: 60px;
+        background: url(../images/loader-blue.svg) no-repeat 50% 50%;
+        background-size: contain;
+      }
+    }
+
     &__full {
       position: relative;
       margin: 0 calc((100vw - 100%) / -2) 20px;
