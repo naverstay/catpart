@@ -265,13 +265,13 @@ export function FilterForm({
     if (searchData && searchData.hasOwnProperty("res") && searchData.res.length) {
       let searchQueries = (searchData.res.length > 1 ? "По запросам" : "По запросу") + searchData.res.reduce((total, c) => total + (c.hasOwnProperty("q") ? `«${c.q}», ` : ""), " ");
 
-      window.log && console.log("searchQueries", searchQueries);
+      window.log && console.log("searchQueries", searchQueries, searchData);
 
       let actualInfo = "";
 
       if (searchData.res.length && searchData.res[0].hasOwnProperty("data") && searchData.res[0].data.length && searchData.res[0].data[0].hasOwnProperty("updated_at")) {
 
-        actualInfo = ` Данные актуальны на ${new Date(searchData.res[0].data[0].updated_at).toLocaleDateString("ru-Ru", {
+        actualInfo = ` Время обновления цен: ${new Date(searchData.res[0].data[0].updated_at).toLocaleDateString("ru-Ru", {
           year: "numeric",
           month: "numeric",
           day: "numeric",
@@ -280,7 +280,9 @@ export function FilterForm({
         }).replace(",", "")} МСК`;
       }
 
-      setSearchInfo(searchQueries.replace(/, $/, "") + ` найдено ${plural(totalData, "наименование", "наименования", "наименований")}.` + actualInfo);
+      setSearchInfo(
+        // searchQueries.replace(/, $/, "") + ` найдено ${plural(totalData, "наименование", "наименования", "наименований")}.` +
+        actualInfo);
     }
 
     window.log && console.log("totalData", totalData, searchData);
@@ -978,7 +980,7 @@ export function FilterForm({
                   <span
                     // to={`/search/?art=${encodeURIComponent("max44")}&q=${encodeURIComponent(1)}`}
                     className="btn-inner">
-                    <span>Получить актуальные данные</span>
+                    <span>Получить актуальные цены</span>
                   </span>
                     </Ripples>
                   </div>

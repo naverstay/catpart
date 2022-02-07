@@ -51,6 +51,28 @@
     top: 80px;
   }
 
+  &__similar {
+
+    &-link {
+      font-size: 12px;
+      color: #646464;
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+
+      &:not(:last-child) {
+        padding-right: 3px;
+
+        &::after {
+          content: ',';
+          pointer-events: none;
+        }
+      }
+    }
+  }
+
   &__list {
     display: none;
     flex: 0 0 270px;
@@ -115,23 +137,55 @@
 
       .form-control {
         margin-bottom: 0;
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+
+        .form-check__text {
+          font-size: 0;
+        }
 
         .form-check {
+          position: absolute;
+          top: 0;
+          bottom: 0;
+          left: 0;
+          right: 0;
+
           &::before {
-            content: '';
-            position: absolute;
-            top: -20px;
-            bottom: -20px;
-            left: -7px;
-            right: -7px;
+            display: none;
           }
+
+          .form-check__icon {
+            width: 100%;
+            height: 100%;
+            border: 0;
+            background: transparent;
+          }
+
+          input:checked ~ .form-check__icon {
+            background: $main_gray_hover;
+
+            &::before {
+              display: none;
+            }
+          }
+        }
+
+        ~ span {
+          pointer-events: none;
+          position: relative;
+          z-index: 1;
         }
       }
 
       .catalogue-page__analogue-param {
         overflow: hidden;
         display: grid;
-        grid-template-columns: 2fr 3fr 5fr;
+        position: relative;
+        grid-template-columns: 3.5fr 6.5fr;
 
         h2 {
           grid-column-start: 1;
@@ -211,7 +265,14 @@
           font-size: 14px;
 
           dt {
+            font-size: 12px;
             white-space: nowrap;
+
+            &.hide {
+              + dd {
+                padding-left: 0;
+              }
+            }
           }
 
           dd {
@@ -222,6 +283,26 @@
           dt,
           dd {
             margin: 0 0 13px;
+          }
+
+          &.__ds-mode {
+            align-items: center;
+
+            dt {
+              color: #eb3541;
+            }
+          }
+
+          &.__col-mode {
+            flex-flow: column;
+
+            dd {
+              padding-left: 0;
+            }
+
+            dt {
+              margin-bottom: 5px;
+            }
           }
         }
       }
@@ -325,6 +406,10 @@
 
         &.__odd {
           background: $main_gray_light;
+        }
+
+        &:hover {
+          background: $main_gray_hover;
         }
       }
 

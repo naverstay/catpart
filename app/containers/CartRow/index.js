@@ -105,7 +105,7 @@ const CartRow = props => {
                   ) : cell === "name" ? (
                     <>
                       <span>{row.name}</span>
-                      {row.dc ? <><br /><span>{row.dc}</span></> : null}
+                      {row.dc ? <><br /><span>DC: {row.dc}</span></> : null}
                     </>
                   ) : (
                     row[cell] || <span data-empty={cell} />

@@ -70,7 +70,7 @@ const SearchRow = props => {
 
   return (
     <div
-      className={`search-results__row ${(rowIndex % 2 === 0 ? "__odd" : "__even") + (row.supplier === "Louisyen" ? " __lilu" : "")}`}>
+      className={`search-results__row ${(rowIndex % 2 === 0 ? "__odd" : "__even") + (row.supplier === "Louisyen" ? " __lilu" : "") + (relativeTime ? " __moq-spacer" : "")}`}>
       {Object.keys(tableHeader).map((cell, ci) => (
         <div key={ci} className={`search-results__cell __${cell}`}>
           {cell === "name" ? null : <span className="search-results__label">{tableHeader[cell]}</span>}
@@ -95,7 +95,7 @@ const SearchRow = props => {
                   {
                     textHighlighter(row[cell], row.bold)
                   }
-                  {row.dc ? <><br /><span>{row.dc}</span></> : null}
+                  {row.dc ? <><br /><span>DC: {row.dc}</span></> : null}
                 </>
               ) : (
                 row[cell]
@@ -107,57 +107,52 @@ const SearchRow = props => {
         </div>
       ))}
 
-      <div className="search-results__cell __cart">
-        {relativeTime ?
-          <div className={"search-results__update"}>
-            <span className="search-results__label">Upd</span>
-            <span className="search-results__value"> {updInfo[0]}{updInfo[1].substring(0, 1)}</span>
-          </div>
-          : <label className="search-results__cart">
-            <input
-              ref={inputRef}
-              onChange={e => {
-                // setDisableAddBtn(!e.target.value.length || +e.target.value < 1);
+      <div className={"search-results__cell __cart"}>
+        <label className="search-results__cart">
+          <input
+            ref={inputRef}
+            onChange={e => {
+              // setDisableAddBtn(!e.target.value.length || +e.target.value < 1);
 
-                const val = +(e.target.value || 1);
-                if (val > 0) {
-                  setItemCount(Math.max(row.moq, val));
-                  // updateCart(row.id, val, row.cur);
-                }
+              const val = +(e.target.value || 1);
+              if (val > 0) {
+                setItemCount(Math.max(row.moq, val));
+                // updateCart(row.id, val, row.cur);
+              }
+            }}
+            onBlur={e => {
+              const val = +(e.target.value || 1);
+              if (e.target.value.length && val < row.moq) {
+                e.target.value = `${row.moq}`;
+                setItemCount(row.moq);
+                notificationFunc("success", `Для ${row.name}`, `минимальное количество: ${row.moq}`);
+              }
+              if (e.target.value.length && val > row.quantity) {
+                e.target.value = `${row.quantity}`;
+                setItemCount(row.quantity);
+                notificationFunc("success", `Для ${row.name}`, `максимальное количество: ${row.quantity}`);
+              }
+            }}
+            // value={itemCount}
+            placeholder={itemCount}
+            type="text"
+            className="input"
+          />
+          <div className="search-results__add">
+            <Ripples
+              onClick={() => {
+                updateCart(row.id, +inputRef.current.value || itemCount, currency);
               }}
-              onBlur={e => {
-                const val = +(e.target.value || 1);
-                if (e.target.value.length && val < row.moq) {
-                  e.target.value = `${row.moq}`;
-                  setItemCount(row.moq);
-                  notificationFunc("success", `Для ${row.name}`, `минимальное количество: ${row.moq}`);
-                }
-                if (e.target.value.length && val > row.quantity) {
-                  e.target.value = `${row.quantity}`;
-                  setItemCount(row.quantity);
-                  notificationFunc("success", `Для ${row.name}`, `максимальное количество: ${row.quantity}`);
-                }
-              }}
-              // value={itemCount}
-              placeholder={itemCount}
-              type="text"
-              className="input"
-            />
-            <div className="search-results__add">
-              <Ripples
-                onClick={() => {
-                  updateCart(row.id, +inputRef.current.value || itemCount, currency);
-                }}
-                during={1000}
-                className={`btn __blue${disableAddBtn ? " __disabled" : ""}`}
-              >
-                <button aria-label={row.name} name={`search-add-${row.id}`} disabled={disableAddBtn}
-                        className="btn-inner">
-                  <span className="btn__icon icon icon-cart" />
-                </button>
-              </Ripples>
-            </div>
-          </label>}
+              during={1000}
+              className={`btn __blue${disableAddBtn ? " __disabled" : ""}`}
+            >
+              <button aria-label={row.name} name={`search-add-${row.id}`} disabled={disableAddBtn}
+                      className="btn-inner">
+                <span className="btn__icon icon icon-cart" />
+              </button>
+            </Ripples>
+          </div>
+        </label>
       </div>
     </div>
   );

@@ -41,7 +41,7 @@ export function SearchResults(props) {
   const [rowCount, setRowCount] = useState([]);
   const [hasMore, setHasMore] = useState(true);
 
-  const tableHeader = {
+  let tableHeader = {
     supplier: "Поставщик",
     name: "Наименование",
     manufacturer: "Бренд",
@@ -54,19 +54,29 @@ export function SearchResults(props) {
     delivery_period: "Срок"
   };
 
+  if (relativeTime) {
+    tableHeader = {
+      quantity: "Доступно",
+      moq: "MIN",
+      pricebreaks: "Цена за ед.",
+      total: "Сумма",
+      delivery_period: "Срок"
+    };
+  }
+
   const tHead = (
-    <div className="search-results__row __even __head">
+    <div className={"search-results__row __even __head"  + (relativeTime ? " __moq-spacer" : "")}>
       {Object.keys(tableHeader).map((head, hi) => (
         <div key={hi} className={`search-results__cell __${head}`}>
           {tableHeader[head]}
         </div>
       ))}
-      <div className="search-results__cell __cart">{relativeTime ? "Upd" : <>&nbsp;</>}</div>
+      <div className="search-results__cell __cart">&nbsp;</div>
     </div>
   );
 
   const handleScroll = event => {
-    if (tableHead.current) {
+    if (tableHead.current && !relativeTime) {
       tableHead.current.closest(".main").classList[tableHead.current.getBoundingClientRect().y <= 0 ? "add" : "remove"]("__stick");
     }
 

@@ -81,6 +81,12 @@
       }
     }
 
+    &__moq {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+    }
+
     &__row {
       padding: 16px 10px;
       border-radius: 4px;
@@ -97,6 +103,12 @@
         //position: sticky;
         //top: 0;
 
+
+        &.__moq-spacer {
+          .search-results__cell.__moq {
+            display: none;
+          }
+        }
       }
 
       &.__even {
@@ -154,6 +166,26 @@
         justify-content: space-between;
         grid-template-areas: unset;
         grid-template-columns: unset;
+      }
+
+      @include respond-to-min($wide) {
+        &.__moq-spacer {
+          .search-results__cell.__moq {
+            position: absolute;
+            left: 34.2%;
+            top: 50%;
+            margin-top: 30px;
+            margin-left: 10px;
+
+            .search-results__label {
+              display: unset;
+
+              &::after {
+                content: ':';
+              }
+            }
+          }
+        }
       }
 
       &:not(.__head):hover {
