@@ -43,6 +43,10 @@ import CataloguePage from "../CataloguePage";
 import { getButtonsMap } from "../../utils/getPaginationMap";
 import Breadcrumbs from "../../components/Breadcrumbs";
 import NotFoundPage from "../NotFoundPage/Loadable";
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+
+dayjs.extend(relativeTime);
 
 // const key = 'home';
 const TRIGGER_DROPDOWN_LIMIT = 11;
@@ -172,6 +176,7 @@ export function FilterForm({
   const [prevRequest, setPrevRequest] = useState("");
   const [count, setCount] = useState(0);
   const [searchInfo, setSearchInfo] = useState("");
+  const [updateTime, setUpdateTime] = useState(false);
   const [categoryPage, setCategoryPage] = useState(false);
 
   const [totalData, setTotalData] = useState(-1);
@@ -271,13 +276,19 @@ export function FilterForm({
 
       if (searchData.res.length && searchData.res[0].hasOwnProperty("data") && searchData.res[0].data.length && searchData.res[0].data[0].hasOwnProperty("updated_at")) {
 
-        actualInfo = ` Время обновления цен: ${new Date(searchData.res[0].data[0].updated_at).toLocaleDateString("ru-Ru", {
-          year: "numeric",
-          month: "numeric",
-          day: "numeric",
-          hour: "2-digit",
-          minute: "2-digit"
-        }).replace(",", "")} МСК`;
+        if (dayjs(new Date(searchData.res[0].data[0].updated_at)).isValid()) {
+          const now = new Date();
+
+          setUpdateTime(Math.floor((now - (new Date(searchData.res[0].data[0].updated_at))) / 1000) > 300);
+
+          actualInfo = ` Время обновления цен: ${new Date(searchData.res[0].data[0].updated_at).toLocaleDateString("ru-Ru", {
+            year: "numeric",
+            month: "numeric",
+            day: "numeric",
+            hour: "2-digit",
+            minute: "2-digit"
+          }).replace(",", "")} МСК`;
+        }
       }
 
       setSearchInfo(
@@ -865,204 +876,209 @@ export function FilterForm({
         </div>) : null
       }
 
-      <div className="form-filter">
-        {!cart &&
-          (scrollTriggers.length ? (
-            <div className="form-filter__controls __wide">
-              {scrollTriggers.slice(0, TRIGGER_DROPDOWN_LIMIT).map((t, ti) => (
-                <div key={ti} className="form-filter__control">
-                  {t}
-                </div>
-              ))}
-              {scrollTriggers.length > TRIGGER_DROPDOWN_LIMIT && (
-                <div ref={moreTriggersRef} className="form-filter__control">
-                  <Ripples
-                    onClick={() => {
-                      setOpenMoreTriggers(!openMoreTriggers);
-                    }}
-                    className="btn __gray"
-                    during={1000}
-                  >
-                    <span className="btn-inner">Перейти к</span>
-                  </Ripples>
-                  {openMoreTriggers && (
-                    <div className="dropdown-container">
-                      <ul className="dropdown-list">
-                        {scrollTriggers.slice(TRIGGER_DROPDOWN_LIMIT).map((t, ti) => (
-                          <li key={ti}>{t}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          ) : null)
-        }
-
-        {!cart && showResults && !categoryPage ? <h1 className="form-filter__stat">{searchInfo}</h1> :
-          <div className="form-filter__stat">&nbsp;</div>}
-
-        {busy ? null : (
-          <div className={`form-filter__controls${cart ? " __cart" : ""}`}>
-            {cart ? (
-              <div className="form-filter__controls_left">
-                <div className="form-filter__control">
-                  <Ripples
-                    onClick={() => {
-                      const store = localStorage.getItem("catpart");
-                      if (store) {
-                        xlsDownload([...getJsonData(store)], currency, 0);
-                      } else {
-                        notificationFunc("success", "Корзина пуста.", "Нечего скачивать.");
-                      }
-                    }}
-                    className="btn __gray"
-                    during={1000}
-                  >
-                    <div className="btn-inner">
-                      <span className="btn __blue">
-                        <span className="btn-icon icon icon-download" />
-                      </span>
-                      <span>Скачать список</span>
-                    </div>
-                  </Ripples>
-                </div>
+      <div className="form-filter__holder">
+        <div className="form-filter">
+          {!cart &&
+            (scrollTriggers.length ? (
+              <div className="form-filter__controls __wide">
+                {scrollTriggers.slice(0, TRIGGER_DROPDOWN_LIMIT).map((t, ti) => (
+                  <div key={ti} className="form-filter__control">
+                    {t}
+                  </div>
+                ))}
+                {scrollTriggers.length > TRIGGER_DROPDOWN_LIMIT && (
+                  <div ref={moreTriggersRef} className="form-filter__control">
+                    <Ripples
+                      onClick={() => {
+                        setOpenMoreTriggers(!openMoreTriggers);
+                      }}
+                      className="btn __gray"
+                      during={1000}
+                    >
+                      <span className="btn-inner">Перейти к</span>
+                    </Ripples>
+                    {openMoreTriggers && (
+                      <div className="dropdown-container">
+                        <ul className="dropdown-list">
+                          {scrollTriggers.slice(TRIGGER_DROPDOWN_LIMIT).map((t, ti) => (
+                            <li key={ti}>{t}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
-            ) : someCategoryUrl ? (
-              <>
-                {itemData ? <div className="form-filter__controls_left">
+            ) : null)
+          }
+
+          {!cart && showResults && !categoryPage ? <h1 className="form-filter__stat">{searchInfo}</h1> :
+            <div className="form-filter__stat">&nbsp;</div>}
+
+          {busy ? null : (
+            <div className={`form-filter__controls${cart ? " __cart" : ""}`}>
+              {cart ? (
+                <div className="form-filter__controls_left">
                   <div className="form-filter__control">
                     <Ripples
                       onClick={() => {
-                        onSubmitSearchForm(itemData.title, 1);
+                        const store = localStorage.getItem("catpart");
+                        if (store) {
+                          xlsDownload([...getJsonData(store)], currency, 0);
+                        } else {
+                          notificationFunc("success", "Корзина пуста.", "Нечего скачивать.");
+                        }
                       }}
-                      className="btn __blue"
+                      className="btn __gray"
                       during={1000}
                     >
+                      <div className="btn-inner">
+                      <span className="btn __blue">
+                        <span className="btn-icon icon icon-download" />
+                      </span>
+                        <span>Скачать список</span>
+                      </div>
+                    </Ripples>
+                  </div>
+                </div>
+              ) : someCategoryUrl ? (
+                <>
+                  {itemData ? <div className="form-filter__controls_left">
+                    <div className="form-filter__control">
+                      <Ripples
+                        onClick={() => {
+                          onSubmitSearchForm(itemData.title, 1);
+                        }}
+                        className="btn __blue"
+                        during={1000}
+                      >
                   <span
                     // to={`/search/?art=${encodeURIComponent("max44")}&q=${encodeURIComponent(1)}`}
                     className="btn-inner">
+
                     <span>Получить актуальные цены</span>
                   </span>
-                    </Ripples>
-                  </div>
-                </div> : null}
-              </>
-            ) : totalData > 0 ? (
-              <div className="form-filter__controls_left">
-                <div className="form-filter__control">
-                  <Ripples
-                    onClick={() => {
-                      xlsDownload(searchData.res, currency, searchData.bom ? 1 : -1);
-                    }}
-                    className="btn __gray"
-                    during={1000}
-                  >
+                      </Ripples>
+                    </div>
+                  </div> : null}
+                </>
+              ) : totalData > 0 ? (
+                <div className="form-filter__controls_left">
+                  <div className="form-filter__control">
+                    <Ripples
+                      onClick={() => {
+                        xlsDownload(searchData.res, currency, searchData.bom ? 1 : -1);
+                      }}
+                      className="btn __gray"
+                      during={1000}
+                    >
                     <span className="btn-inner">
                       <span className="btn __blue">
                         <span className="btn-icon icon icon-download" />
                       </span>
                       <span>Скачать результат поиска</span>
                     </span>
-                  </Ripples>
-                </div>
-                <div className="form-filter__control">
-                  <Ripples
-                    onClick={() => {
-                      setOpenShare(true);
-                    }}
-                    className="btn __gray"
-                    during={1000}
-                  >
-                    <span className="btn-inner">Поделиться</span>
-                  </Ripples>
-                  {openShare &&
-                    <Share shareUrl={encodeURIComponent(window.location.href)}
-                           shareText={encodeURIComponent(searchInfo)}
-                           notificationFunc={notificationFunc} setOpenFunc={setOpenShare} />}
-                </div>
-              </div>
-            ) : null}
-
-            {(cart || (totalData > 0 && !categoryPage)) ? (
-              <div onChange={onChangeSwitch} className="form-filter__controls_right">
-                {currencyList &&
-                  currencyList.length > 1 &&
-                  currencyList.map((cur, ind) => (
-                    <Ripples key={ind} className="form-filter__control" during={1000}>
-                      <label className="form-radio__btn">
-                        <input
-                          name="currency"
-                          className="hide"
-                          // checked={}
-                          defaultChecked={currency.name === cur.name ? true : null}
-                          data-currency={cur.name}
-                          type="radio"
-                          value={cur.exChange}
-                        />
-                        <span className="btn __gray">
-                          <b>{cur.name}</b>
-                          {cur.name !== "RUB" && <span>{priceFormatter(cur.exChange, cur.precision)}</span>}
-                        </span>
-                      </label>
                     </Ripples>
-                  ))}
-              </div>) : null
-            }
-          </div>
-        )}
-      </div>
+                  </div>
+                  <div className="form-filter__control">
+                    <Ripples
+                      onClick={() => {
+                        setOpenShare(true);
+                      }}
+                      className="btn __gray"
+                      during={1000}
+                    >
+                      <span className="btn-inner">Поделиться</span>
+                    </Ripples>
+                    {openShare &&
+                      <Share shareUrl={encodeURIComponent(window.location.href)}
+                             shareText={encodeURIComponent(searchInfo)}
+                             notificationFunc={notificationFunc} setOpenFunc={setOpenShare} />}
+                  </div>
+                </div>
+              ) : null}
 
-      {cart ? (
-          <>
-            <CartResults setTableHeadFixed={setTableHeadFixed} setShowTableHeadFixed={setShowTableHeadFixed}
-                         updateCart={updateCart} list={cartData} notificationFunc={notificationFunc}
-                         showResults={showResults} count={count} currency={currency} />
+              {(cart || (totalData > 0 && !categoryPage)) ? (
+                <div onChange={onChangeSwitch} className="form-filter__controls_right">
+                  {currencyList &&
+                    currencyList.length > 1 &&
+                    currencyList.map((cur, ind) => (
+                      <Ripples key={ind} className="form-filter__control" during={1000}>
+                        <label className="form-radio__btn">
+                          <input
+                            name="currency"
+                            className="hide"
+                            // checked={}
+                            defaultChecked={currency.name === cur.name ? true : null}
+                            data-currency={cur.name}
+                            type="radio"
+                            value={cur.exChange}
+                          />
+                          <span className="btn __gray">
+                          <b>{cur.name}</b>
+                            {cur.name !== "RUB" && <span>{priceFormatter(cur.exChange, cur.precision)}</span>}
+                        </span>
+                        </label>
+                      </Ripples>
+                    ))}
+                </div>) : null
+              }
+            </div>
+          )}
+        </div>
 
-            <OrderForm profile={profile} history={history} setOpenAuthPopup={setOpenAuthPopup} setBusyOrder={setBusyOrder}
-                       updateCart={updateCart} notificationFunc={notificationFunc} setOrderSent={setOrderSent}
-                       totalCart={totalCart} currency={currency} delivery />
-          </>
-        ) :
-        <>
-          {busy || categoryPage ? null : (totalData > 0 && !categoryPage) ? (
-            <SearchResults
-              scrollTriggers={scrollTriggers}
-              setScrollTriggers={setScrollTriggers}
-              setTableHeadFixed={setTableHeadFixed}
-              setShowTableHeadFixed={setShowTableHeadFixed}
-              updateCart={updateCart}
-              notificationFunc={notificationFunc}
-              highlight={decodeURIComponent(query.get("art") || "")}
-              showResults={showResults}
-              count={query.get("q") || ""}
-              currencyList={currencyList}
-              currency={currency}
-              bom={searchData.bom}
-              list={searchData.res}
-              relativeTime={itemData !== null}
-            />
-          ) : someCategoryUrl ? null : elaboration.length > 0 ? (
+        {cart ? (
             <>
-              <DeepElaboration data={elaboration} setElaboration={setElaboration} elaboration={elaboration} />
-              <OrderForm
-                profile={profile}
-                history={history}
-                setOpenAuthPopup={setOpenAuthPopup}
-                setBusyOrder={setBusyOrder}
+              <CartResults setTableHeadFixed={setTableHeadFixed} setShowTableHeadFixed={setShowTableHeadFixed}
+                           updateCart={updateCart} list={cartData} notificationFunc={notificationFunc}
+                           showResults={showResults} count={count} currency={currency} />
+
+              <OrderForm profile={profile} history={history} setOpenAuthPopup={setOpenAuthPopup}
+                         setBusyOrder={setBusyOrder}
+                         updateCart={updateCart} notificationFunc={notificationFunc} setOrderSent={setOrderSent}
+                         totalCart={totalCart} currency={currency} delivery />
+            </>
+          ) :
+          <>
+            {busy || categoryPage ? null : (totalData > 0 && !categoryPage) ? (
+              <SearchResults
+                updateTime={updateTime}
+                scrollTriggers={scrollTriggers}
+                setScrollTriggers={setScrollTriggers}
+                setTableHeadFixed={setTableHeadFixed}
+                setShowTableHeadFixed={setShowTableHeadFixed}
                 updateCart={updateCart}
                 notificationFunc={notificationFunc}
-                setOrderSent={setOrderSent}
-                totalCart={totalCart}
+                highlight={decodeURIComponent(query.get("art") || "")}
+                showResults={showResults}
+                count={query.get("q") || ""}
+                currencyList={currencyList}
                 currency={currency}
-                setElaboration={setElaboration}
-                elaboration={elaboration}
+                bom={searchData.bom}
+                list={searchData.res}
+                relativeTime={itemData !== null}
               />
-            </>) : null
-          }
-        </>
-      }
+            ) : someCategoryUrl ? null : elaboration.length > 0 ? (
+              <>
+                <DeepElaboration data={elaboration} setElaboration={setElaboration} elaboration={elaboration} />
+                <OrderForm
+                  profile={profile}
+                  history={history}
+                  setOpenAuthPopup={setOpenAuthPopup}
+                  setBusyOrder={setBusyOrder}
+                  updateCart={updateCart}
+                  notificationFunc={notificationFunc}
+                  setOrderSent={setOrderSent}
+                  totalCart={totalCart}
+                  currency={currency}
+                  setElaboration={setElaboration}
+                  elaboration={elaboration}
+                />
+              </>) : null
+            }
+          </>
+        }
+      </div>
     </>
   );
 }

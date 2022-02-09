@@ -234,6 +234,60 @@
       @include respond-to-min($wide) {
         float: left;
         width: calc(50% - 15px);
+
+        ~ .form-filter__holder {
+          float: right;
+          width: calc(50% - 15px);
+          position: sticky;
+          top: -50px;
+
+          .form-filter__stat {
+            margin-bottom: 8px;
+            margin-top: 70px;
+            font-size: 12px;
+          }
+
+          .search-results {
+            padding-top: 0;
+
+            .search-results__cell {
+              &.__quantity {
+                width: 10%;
+                padding-left: 2px;
+              }
+
+              &.__pricebreaks {
+                width: 16%;
+              }
+
+              &.__total {
+                width: 29%;
+              }
+
+              &.__delivery_period {
+                width: 22%;
+              }
+
+              &.__cart {
+                flex: 1 0 112px;
+              }
+            }
+
+            .search-results__table {
+              > .search-results__row {
+                min-height: 70px;
+              }
+            }
+
+            .search-results__row.__moq-spacer {
+
+              .search-results__cell.__moq {
+                left: 76%;
+                margin-top: 20px;
+              }
+            }
+          }
+        }
       }
     }
 

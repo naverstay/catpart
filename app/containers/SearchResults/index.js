@@ -18,6 +18,7 @@ export function SearchResults(props) {
     bom,
     list,
     cart,
+    updateTime,
     relativeTime,
     scrollTriggers,
     setScrollTriggers,
@@ -180,6 +181,7 @@ export function SearchResults(props) {
                   {query.hasOwnProperty("data")
                     ? query.data.map((row, ri) => <SearchRow key={ri} updateCart={updateCart} tableHeader={tableHeader}
                                                              defaultCount={query.c} currencyList={currencyList}
+                                                             updateTime={updateTime}
                                                              currency={currency} highlight={query.q}
                                                              notificationFunc={notificationFunc} row={row}
                                                              relativeTime={relativeTime} rowIndex={ri} />)
@@ -199,6 +201,7 @@ export function SearchResults(props) {
                 //.filter(f => f.supplier === 'Louisyen')
                 .map((row, ri) => <SearchRow key={ri} updateCart={updateCart} tableHeader={tableHeader}
                                              defaultCount={list[0].c} currencyList={currencyList} currency={currency}
+                                             updateTime={updateTime}
                                              highlight={list[0].q} notificationFunc={notificationFunc} row={row}
                                              relativeTime={relativeTime} rowIndex={ri} />)
               : null

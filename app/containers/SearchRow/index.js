@@ -14,7 +14,17 @@ function escapeRegExp(string) {
 }
 
 const SearchRow = props => {
-  let { rowIndex, tableHeader, currency, row, relativeTime, defaultCount, updateCart, notificationFunc } = props;
+  let {
+    rowIndex,
+    tableHeader,
+    currency,
+    row,
+    relativeTime,
+    updateTime,
+    defaultCount,
+    updateCart,
+    notificationFunc
+  } = props;
   defaultCount = +defaultCount;
 
   if (!defaultCount || defaultCount < row.moq) {
@@ -141,10 +151,14 @@ const SearchRow = props => {
           <div className="search-results__add">
             <Ripples
               onClick={() => {
-                updateCart(row.id, +inputRef.current.value || itemCount, currency);
+                if (updateTime) {
+                  notificationFunc("success", "Цены устарели.", "Получите актуальные цены.");
+                } else {
+                  updateCart(row.id, +inputRef.current.value || itemCount, currency);
+                }
               }}
               during={1000}
-              className={`btn __blue${disableAddBtn ? " __disabled" : ""}`}
+              className={`btn ${updateTime ? "__gray" : "__blue"} ${disableAddBtn ? " __disabled" : ""}`}
             >
               <button aria-label={row.name} name={`search-add-${row.id}`} disabled={disableAddBtn}
                       className="btn-inner">
