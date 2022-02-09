@@ -61,6 +61,7 @@ export default function App({ history }) {
   const [searchCount, setSearchCount] = useState(1);
   const [cartCount, setCartCount] = useState(0);
   const [totalCart, setTotalCart] = useState(0);
+  const [globalPageStatus, setGlobalPageStatus] = useState(200);
   const [openAuthPopup, setOpenAuthPopup] = useState(false);
 
   const [searchResult, setSearchResult] = useState(false);
@@ -459,6 +460,16 @@ export default function App({ history }) {
     // setPageY(event.target.scrollTop);
   };
 
+  const apiGETBridge = (requestURL, options, cb) => {
+    apiGET(requestURL, options, data => {
+      setGlobalPageStatus(data.hasOwnProperty("error") ? 404 : 200);
+
+      if (typeof cb === "function") {
+        cb(data);
+      }
+    });
+  };
+
   useEffect(() => {
     updateLocationParams(window.location);
 
@@ -766,6 +777,7 @@ export default function App({ history }) {
 
                 <Route
                   path={["/order", "/search", "/:catalogue/:page/", "/:catalogue"]}
+                  status={globalPageStatus}
                   render={props => {
                     let goto = "";
 
@@ -776,6 +788,7 @@ export default function App({ history }) {
                     return goto ? <Redirect to={goto} /> : <FilterForm
                       cart={props.match.path === "/order"}
                       someCategoryUrl={!(props.match.path === "/search" || props.match.path === "/order")}
+                      apiGETBridge={apiGETBridge}
                       sendSearchRequest={sendSearchRequest}
                       setSearchData={setSearchData}
                       setErrorPage={setErrorPage}

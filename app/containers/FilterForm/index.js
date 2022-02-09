@@ -25,7 +25,6 @@ import { changeCurrency } from "./actions";
 import Share from "../../components/Share";
 import { SearchResults } from "../SearchResults";
 import { CartResults } from "../CartResults";
-import apiGET from "../../utils/search";
 import { OrderForm } from "../OrderForm";
 import priceFormatter from "../../utils/priceFormatter";
 import { xlsDownload } from "../../utils/xlsDownload";
@@ -54,6 +53,7 @@ const TRIGGER_DROPDOWN_LIMIT = 11;
 export function FilterForm({
   props,
   someCategoryUrl,
+  apiGETBridge,
   cart,
   profile,
   RUB,
@@ -148,7 +148,7 @@ export function FilterForm({
       if (prevRequestAttr !== requestURL + JSON.stringify(options)) {
         setPrevRequestAttr(requestURL + JSON.stringify(options));
 
-        apiGET(requestURL, { ids: ids }, data => {
+        apiGETBridge(requestURL, { ids: ids }, data => {
           setCategoryFilterNames(filterNames.concat(options.a.map(m => {
             return {
               id: m.id,
@@ -215,7 +215,7 @@ export function FilterForm({
 
     const requestURL = "/currencies";
 
-    apiGET(requestURL, {}, data => {
+    apiGETBridge(requestURL, {}, data => {
       setCurrencyList(
         Object.keys(data)
           .map(c => ({
@@ -434,7 +434,7 @@ export function FilterForm({
       setItemData(null);
       setNodataText("");
 
-      apiGET(requestURL, options, data => {
+      apiGETBridge(requestURL, options, data => {
         if (data.error) {
           console.log("NO DATA", requestURL, data.error);
 
