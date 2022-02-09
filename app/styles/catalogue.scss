@@ -148,6 +148,7 @@
         }
 
         .form-check {
+          overflow: hidden;
           position: absolute;
           top: 0;
           bottom: 0;
@@ -193,7 +194,7 @@
         }
 
         > span {
-          padding-left: 15px;
+          padding-left: 5px;
         }
 
         .form-check {
@@ -205,16 +206,6 @@
         .form-check:not(:hover) {
           .form-check__text {
             opacity: 0;
-          }
-        }
-
-        &:first-child {
-          margin-bottom: 16px;
-          height: auto;
-          min-height: 58px;
-
-          .form-control {
-            margin: 15px 0 8px;
           }
         }
 
@@ -232,12 +223,60 @@
           }
         }
       }
+
+      &-wrapper {
+        position: relative;
+        padding: 16px 0;
+      }
+    }
+
+    &__product {
+      @include respond-to-min($wide) {
+        float: left;
+        width: calc(50% - 15px);
+      }
+    }
+
+    &__controls {
+      //position: absolute;
+      //bottom: 0;
+      //right: 0;
+      //left: 0;
+      display: flex;
+      align-items: center;
+      grid-column-gap: 20px;
+
+      .btn {
+        &.dropdown-holder {
+          .btn-inner {
+            width: 100%;
+            padding: 0 20px 0 10px;
+            position: relative;
+          }
+
+          .icon {
+            position: absolute;
+            right: 0;
+            top: 0;
+            line-height: 10px;
+            transition: transform .3s;
+          }
+
+          &:not(.__opened) {
+            .icon {
+              transform: rotate(180deg);
+            }
+          }
+        }
+
+        &:last-child {
+          margin-left: auto;
+        }
+      }
     }
 
     &__item {
       display: flex;
-      padding-top: 10px;
-      margin-bottom: -15px;
 
       &-image {
         flex: 0 0 270px;
@@ -258,11 +297,11 @@
       &-info {
         flex: 0 1 auto;
         padding-left: 30px;
-        margin: 5px 0;
+        margin: 15px 0;
 
         .description {
           display: flex;
-          font-size: 14px;
+          font-size: 12px;
 
           dt {
             font-size: 12px;
@@ -282,7 +321,7 @@
 
           dt,
           dd {
-            margin: 0 0 13px;
+            margin: 0 0 20px;
           }
 
           &.__ds-mode {
@@ -290,6 +329,7 @@
 
             dt {
               color: #eb3541;
+              text-decoration: underline;
             }
           }
 
@@ -298,6 +338,7 @@
 
             dd {
               padding-left: 0;
+              font-size: 14px;
             }
 
             dt {
@@ -401,7 +442,7 @@
         font-size: 12px;
         color: $main_gray;
         padding: 5px;
-        height: 58px;
+        height: 31px;
         overflow: hidden;
 
         &.__odd {
@@ -812,7 +853,6 @@
           min-width: 80px;
 
           > .btn {
-
             .btn-inner {
               width: 100%;
               padding: 0 20px 0 10px;

@@ -380,9 +380,6 @@ export function FilterForm({
   };
 
   const getCategoryList = (category, attributes, page) => {
-    // setNodataText("");
-    // setCatPage(page);
-
     if (attributes && attributes.hasOwnProperty("a") && typeof attributes.a === "object" && !Array.isArray(attributes.a)) {
       attributes.a = Object.keys(attributes.a).map(k => attributes.a[k]);
     }
@@ -407,10 +404,6 @@ export function FilterForm({
       if (manufacturer) {
         options.manufacturer = manufacturer.v;
       }
-
-      // if (limit) {
-      //   options.limit = manufacturer.v;
-      // }
     }
 
     if (attributes && attributes.hasOwnProperty("m")) {
@@ -422,18 +415,6 @@ export function FilterForm({
         [categorySortField]: categorySortAsc ? "asc" : "desc"
       };
     }
-
-    // if (attributes && attributes.hasOwnProperty("l")) {
-    //   const paramsLimit = params.hasOwnProperty("l") ? parseInt(params.l) : 10;
-    // setCatPageLimit(pageLimitList.indexOf(paramsLimit) > -1 ? paramsLimit : 10);
-    // attributes.l = catPageLimit;
-    // history.replace(history.location.pathname + qs.stringify(attributes));
-    // history.replace({
-    //   pathname: history.location.pathname,
-    //   search: qs.stringify(attributes),
-    //   state: { isActive: true }
-    // });
-    // }
 
     if (prevRequest !== requestURL + JSON.stringify(options)) {
       setPrevRequest(requestURL + JSON.stringify(options));
@@ -459,18 +440,10 @@ export function FilterForm({
             if (data.hasOwnProperty("histories") && data.histories.res) {
               setSearchData(data.histories);
             }
-
-            // sendSearchRequest({
-            //   q: props.match.url.replace(/\//g, ""),
-            //   c: 1
-            // });
           } else if (data.hasOwnProperty("items")) {
             setCategoryPage(true);
             setItemData(null);
             let items = [];
-
-            // setItemSlugLinks(itemSlugLinks.concat(responseData.items.map(d => d.slug)).concat(responseData.hasOwnProperty("breadcrumbs") ? responseData.breadcrumbs : []));
-
             if (data.items.length) {
               data.items.forEach((d, di) => {
                 let params = {};
@@ -650,16 +623,6 @@ export function FilterForm({
       updateFilterNames(options, attrIds);
 
       getCategoryList(url, options, catPage);
-
-      // if (catPageLimit !== 10) {
-      //   options.l = catPageLimit;
-      // }
-
-      // history.replace({
-      //   pathname: (url || "/catalog") + "/" + (catPage > 1 ? `${catPage}/` : ""),
-      //   search: qs.stringify(options),
-      //   state: { isActive: true }
-      // });
     } else {
       setShowCatPreloader(false);
       setItemData(null);
@@ -809,10 +772,10 @@ export function FilterForm({
                             className={"btn __gray" + (openPaginationDropdown ? " __opened" : "")}
                             during={1000}
                           >
-                      <span className="btn-inner">
-                        <span>{catPageLimit}</span>
-                        <span className={"icon icon-chevron-up"} />
-                      </span>
+                            <span className="btn-inner">
+                              <span>{catPageLimit}</span>
+                              <span className={"icon icon-chevron-up"} />
+                            </span>
                           </Ripples>
                           {openPaginationDropdown && (
                             <div className="dropdown-container">

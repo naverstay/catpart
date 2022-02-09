@@ -17,12 +17,14 @@
     margin: 15px 0 8px;
   }
 
-  a {
-    text-decoration: underline;
-    color: inherit;
+  > *:not(.catalogue-page__item) {
+    a {
+      text-decoration: underline;
+      color: inherit;
 
-    &:hover {
-      color: $main_blue_light;
+      &:hover {
+        color: $main_blue_light;
+      }
     }
   }
 
