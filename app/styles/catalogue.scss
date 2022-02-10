@@ -54,7 +54,7 @@
   &__similar {
     display: flex;
     flex-flow: row wrap;
-    margin-top: -15px;
+    margin: -15px 0 20px;
 
     &-link {
       margin-top: 3px;
@@ -236,6 +236,18 @@
     }
 
     &__product {
+      @include respond-to-min($dt) {
+
+        ~ .form-filter__holder {
+
+          .search-results {
+            .search-results__row {
+              grid-template-columns: 0 130px 1fr 2fr 3.5fr 122px;
+            }
+          }
+        }
+      }
+
       @include respond-to-min($wide) {
         float: left;
         width: calc(50% - 15px);
@@ -280,15 +292,18 @@
 
             .search-results__table {
               > .search-results__row {
-                min-height: 70px;
+                min-height: 80px;
               }
             }
 
-            .search-results__row.__moq-spacer {
+            .search-results__row {
 
-              .search-results__cell.__moq {
-                left: 76%;
-                margin-top: 20px;
+              &.__moq-spacer {
+
+                .search-results__cell.__moq {
+                  left: 76%;
+                  margin-top: 18px;
+                }
               }
             }
           }

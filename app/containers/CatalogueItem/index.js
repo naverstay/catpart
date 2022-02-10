@@ -65,6 +65,8 @@ export default function CatalogueItem(props) {
 
     if (params.length) {
       setAnalogLink("/catalog/?" + qs.stringify({ a: params }));
+    } else {
+      setAnalogLink("");
     }
   }, [snippetCheckValue]);
 
@@ -91,12 +93,14 @@ export default function CatalogueItem(props) {
                 <dd>{itemData.snippet.manufacturer.name || ""}</dd>
               </div> : null}
 
-              {itemData.snippet.best_datasheet ? <div className={"description __ds-mode"}>
-                <dt>Datasheet:</dt>
-                <dd>
-                  <a className="orders-chronology__link __red" href={itemData.snippet.best_datasheet}>pdf</a>
-                </dd>
-              </div> : null}
+              {itemData.snippet.best_datasheet && itemData.snippet.best_datasheet.url ?
+                <div className={"description __ds-mode"}>
+                  <dt>Datasheet:</dt>
+                  <dd>
+                    <a target="_blank" className="orders-chronology__link __red"
+                       href={itemData.snippet.best_datasheet.url}>pdf</a>
+                  </dd>
+                </div> : null}
 
               {/*{itemData.snippet.sellers && itemData.snippet.sellers.length ?*/}
               {/*  <div itemProp="offers" itemScope itemType="http://schema.org/Offer" className={"description"}>*/}
@@ -122,52 +126,51 @@ export default function CatalogueItem(props) {
           {itemData.snippet.specs && itemData.snippet.specs.length ?
             <>
               <article className="article __catalogue">
-                <div className={"catalogue-page__specs"}>
-                  <p>Технические спецификации</p>
+                <p>Технические спецификации</p>
+              </article>
+              <div className={"catalogue-page__specs"}>
+                <SlideDown transitionOnAppear={false}>
+                  <div className="catalogue-page__specs-wrapper">
+                    {itemData.snippet.specs.slice(0, openMoreSpecs ? itemData.snippet.specs.length : 10).map((s, si) => {
+                      return <div key={si}
+                                  className={"catalogue-page__analogue-param " + ((si % 2 === 0 ? "__odd" : "__even"))}>
+                        <FormCheck
+                          onChange={handleChange.bind(this, s.attribute.id)}
+                          checked={snippetCheckValue.indexOf(s.attribute.id) > -1}
+                          id={s.attribute.id}
+                          name={s.attribute.id}
+                          value={s.display_value}
+                          error={null}
+                          label={""}
+                          inputRef={null}
+                        />
+                        <span>{s.hasOwnProperty("attribute") && (s.attribute.name || s.attribute.id || "")}</span>
+                        <span>{s.display_value}</span>
+                      </div>;
+                    })}
+                  </div>
+                </SlideDown>
 
-                  <SlideDown transitionOnAppear={false}>
-                    <div className="catalogue-page__specs-wrapper">
-                      {itemData.snippet.specs.slice(0, openMoreSpecs ? itemData.snippet.specs.length : 10).map((s, si) => {
-                        return <div key={si}
-                                    className={"catalogue-page__analogue-param " + ((si % 2 === 0 ? "__odd" : "__even"))}>
-                          <FormCheck
-                            onChange={handleChange.bind(this, s.attribute.id)}
-                            checked={snippetCheckValue.indexOf(s.attribute.id) > -1}
-                            id={s.attribute.id}
-                            name={s.attribute.id}
-                            value={s.display_value}
-                            error={null}
-                            label={""}
-                            inputRef={null}
-                          />
-                          <span>{s.hasOwnProperty("attribute") && (s.attribute.name || s.attribute.id || "")}</span>
-                          <span>{s.display_value}</span>
-                        </div>;
-                      })}
-                    </div>
-                  </SlideDown>
-
-                  <div className="catalogue-page__controls">
-                    <Ripples
-                      onClick={() => {
-                        setOpenMoreSpecs(!openMoreSpecs);
-                      }}
-                      className={"btn dropdown-holder __gray" + (openMoreSpecs ? " __opened" : "")}
-                      during={1000}
-                    >
+                <div className="catalogue-page__controls">
+                  {itemData.snippet.specs.length > 10 ? <Ripples
+                    onClick={() => {
+                      setOpenMoreSpecs(!openMoreSpecs);
+                    }}
+                    className={"btn dropdown-holder __gray" + (openMoreSpecs ? " __opened" : "")}
+                    during={1000}
+                  >
                         <span className="btn-inner __name">
                           <span>Показать полностью</span>
                           <span className={"icon icon-chevron-up"} />
                         </span>
-                    </Ripples>
+                  </Ripples> : null}
 
-                    {analogLink ?
-                      <Link to={analogLink} className="btn __blue"><span
-                        className="btn-inner">Отфильтровать по заданному</span></Link> :
-                      <span className="btn __gray">Отфильтровать по заданному</span>}
-                  </div>
+                  {analogLink ?
+                    <Link to={analogLink} className="btn __blue"><span
+                      className="btn-inner">Отфильтровать по заданному</span></Link> :
+                    <span className="btn __gray">Отфильтровать по заданному</span>}
                 </div>
-              </article>
+              </div>
             </>
             : null}
 

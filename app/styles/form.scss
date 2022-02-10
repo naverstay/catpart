@@ -162,6 +162,37 @@
     position: relative;
   }
 
+  &-supply {
+
+    &__caption {
+      color: #878787;
+      font-size: 18px;
+      font-style: italic;
+      margin: 15px 0 25px;
+    }
+
+    &__control {
+      padding-bottom: 20px;
+
+      @include respond-to-min($tablet) {
+        display: flex;
+        flex-flow: row nowrap;
+
+        .form-control {
+
+          &.custom-input {
+            width: 250px;
+          }
+
+          + .form-control {
+            margin-left: -4px;
+          }
+        }
+      }
+    }
+
+  }
+
   &-order {
     width: 100%;
     padding-top: 10px;

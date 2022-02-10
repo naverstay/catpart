@@ -28,6 +28,8 @@ import { CartResults } from "../CartResults";
 import { OrderForm } from "../OrderForm";
 import priceFormatter from "../../utils/priceFormatter";
 import SimilarSlider from "../SimilarSlider";
+import SupplyNotification from "../SupplyNotification";
+
 import { xlsDownload } from "../../utils/xlsDownload";
 import { findPriceIndex } from "../../utils/findPriceIndex";
 // import Skeleton from '../Skeleton';
@@ -91,6 +93,8 @@ export function FilterForm({
 }) {
   // useInjectReducer({ key, reducer });
   // useInjectSaga({ key, saga });
+  let actualTimer;
+
   const params = qs.parse((props.location.search.substring(1)));
 
   const pageLimitList = [
@@ -260,11 +264,40 @@ export function FilterForm({
     }
   };
 
+  const actualInfoChecker = (date) => {
+    let actualInfo = "";
+
+    if (dayjs(date).isValid()) {
+      const now = new Date();
+      const secDiff = Math.floor(now - date) / 1000;
+
+      setUpdateTime(secDiff > 300);
+
+      if (secDiff <= 300) {
+        actualTimer = setTimeout(() => {
+          setUpdateTime(true);
+        }, (300 - secDiff) * 1000);
+      }
+
+      actualInfo = ` Время обновления цен: ${date.toLocaleDateString("ru-Ru", {
+        year: "numeric",
+        month: "numeric",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
+      }).replace(",", "")} МСК`;
+    }
+
+    setSearchInfo(
+      // searchQueries.replace(/, $/, "") + ` найдено ${plural(totalData, "наименование", "наименования", "наименований")}.` +
+      actualInfo);
+  };
+
   useEffect(() => {
     window.log && console.log("searchData", cart, !cart && searchData && searchData.hasOwnProperty("res"), searchData);
 
     if (!cart && searchData && searchData.hasOwnProperty("res")) {
-      console.log(searchData.res.reduce((total, c) => total + (c.hasOwnProperty("data") ? c.data.length : 0), 0));
+      window.log && console.log("setTotalData", searchData.res.reduce((total, c) => total + (c.hasOwnProperty("data") ? c.data.length : 0), 0));
       setTotalData(searchData.res.reduce((total, c) => total + (c.hasOwnProperty("data") ? c.data.length : 0), 0));
     }
 
@@ -273,28 +306,10 @@ export function FilterForm({
 
       window.log && console.log("searchQueries", searchQueries, searchData);
 
-      let actualInfo = "";
 
       if (searchData.res.length && searchData.res[0].hasOwnProperty("data") && searchData.res[0].data.length && searchData.res[0].data[0].hasOwnProperty("updated_at")) {
-
-        if (dayjs(new Date(searchData.res[0].data[0].updated_at)).isValid()) {
-          const now = new Date();
-
-          setUpdateTime(Math.floor((now - (new Date(searchData.res[0].data[0].updated_at))) / 1000) > 300);
-
-          actualInfo = ` Время обновления цен: ${new Date(searchData.res[0].data[0].updated_at).toLocaleDateString("ru-Ru", {
-            year: "numeric",
-            month: "numeric",
-            day: "numeric",
-            hour: "2-digit",
-            minute: "2-digit"
-          }).replace(",", "")} МСК`;
-        }
+        actualInfoChecker(new Date(searchData.res[0].data[0].updated_at));
       }
-
-      setSearchInfo(
-        // searchQueries.replace(/, $/, "") + ` найдено ${plural(totalData, "наименование", "наименования", "наименований")}.` +
-        actualInfo);
     }
 
     window.log && console.log("totalData", totalData, searchData);
@@ -539,6 +554,13 @@ export function FilterForm({
   useEffect(() => {
     setPageLimitTrigger(pageLimitTrigger + 1);
   }, [catPage]);
+
+  useEffect(() => {
+
+    return () => {
+      clearTimeout(actualTimer);
+    };
+  }, []);
 
   useEffect(() => {
     if (categoryPage && someCategoryUrl) {
@@ -860,7 +882,7 @@ export function FilterForm({
         : null
       }
 
-      {!cart && busy ? (
+      {(!cart && busy && itemData === null) ? (
         <div className="skeleton-holder">
           <div className="skeleton skeleton-mob">
             <SkeletonWide />
@@ -916,7 +938,7 @@ export function FilterForm({
           {!cart && showResults && !categoryPage ? <h1 className="form-filter__stat">{searchInfo}</h1> :
             <div className="form-filter__stat">&nbsp;</div>}
 
-          {busy ? null : (
+          {(busy && itemData === null) ? null : (
             <div className={`form-filter__controls${cart ? " __cart" : ""}`}>
               {cart ? (
                 <div className="form-filter__controls_left">
@@ -944,21 +966,29 @@ export function FilterForm({
                 </div>
               ) : someCategoryUrl ? (
                 <>
-                  {itemData ? <div className="form-filter__controls_left">
+                  {itemData !== null ? <div className="form-filter__controls_left">
                     <div className="form-filter__control">
                       <Ripples
                         onClick={() => {
-                          onSubmitSearchForm(itemData.title, 1);
+                          // onSubmitSearchForm(itemData.title, 1);
+                          sendSearchRequest({
+                            q: itemData.title,
+                            c: 1
+                          });
+
+                          actualInfoChecker(new Date());
+
+
                         }}
-                        className="btn __blue"
+                        className={"btn __blue" + (busy ? " __loader" : "")}
                         during={1000}
                       >
-                  <span
-                    // to={`/search/?art=${encodeURIComponent("max44")}&q=${encodeURIComponent(1)}`}
-                    className="btn-inner">
+                        <span
+                          // to={`/search/?art=${encodeURIComponent("max44")}&q=${encodeURIComponent(1)}`}
+                          className="btn-inner">
 
-                    <span>Получить актуальные цены</span>
-                  </span>
+                          <span>Получить актуальные цены</span>
+                        </span>
                       </Ripples>
                     </div>
                   </div> : null}
@@ -1041,7 +1071,7 @@ export function FilterForm({
             </>
           ) :
           <>
-            {busy || categoryPage ? null : (totalData > 0 && !categoryPage) ? (
+            {(busy || categoryPage) ? null : (totalData > 0 && !categoryPage) ? (
               <>
                 <SearchResults
                   updateTime={updateTime}
@@ -1060,10 +1090,6 @@ export function FilterForm({
                   list={searchData.res}
                   relativeTime={itemData !== null}
                 />
-
-                {!categoryPage && itemData !== null ?
-                  <SimilarSlider itemData={itemData} />
-                  : null}
               </>
             ) : someCategoryUrl ? null : elaboration.length > 0 ? (
               <>
@@ -1082,6 +1108,14 @@ export function FilterForm({
                   elaboration={elaboration}
                 />
               </>) : null
+            }
+
+            {!categoryPage && itemData !== null ?
+              <>
+                {totalData > 0 ? null : <SupplyNotification notificationFunc={notificationFunc} itemData={itemData} />}
+                <SimilarSlider searchData={searchData} itemData={itemData} />
+              </>
+              : null
             }
           </>
         }

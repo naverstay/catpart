@@ -5,7 +5,9 @@ import { uniqArray } from "../../utils/uniqArray";
 import { Manipulation, Navigation } from "swiper";
 
 const SimilarSlider = props => {
-  const { itemData } = props;
+  const { itemData, searchData } = props;
+
+  console.log("searchData", searchData);
 
   const navigationPrevRef = useRef();
   const navigationNextRef = useRef();
@@ -44,7 +46,7 @@ const SimilarSlider = props => {
   const similarItems = useMemo(() => {
     return similarSlides.length ?
       similarSlides.map((s, si) => {
-        return <Link className={"catalogue__similar-link"} key={si} to={s.slug}>{s.part_no}</Link>;
+        return <Link className={"catalogue__similar-link"} key={si} to={"/" + s.slug}>{s.part_no}</Link>;
       }) : null;
   }, [similarSlides]);
 
