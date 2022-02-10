@@ -54,13 +54,16 @@
   &__similar {
     display: flex;
     flex-flow: row wrap;
+    margin-top: -15px;
 
     &-link {
+      margin-top: 3px;
       font-size: 12px;
       color: #646464;
       text-decoration: none;
 
       &:hover {
+        color: $main_blue;
         text-decoration: underline;
       }
 
@@ -250,7 +253,7 @@
           }
 
           .search-results {
-            padding-top: 0;
+            padding: 0 0 18px;
 
             .search-results__cell {
               &.__quantity {

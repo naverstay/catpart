@@ -27,6 +27,7 @@ import { SearchResults } from "../SearchResults";
 import { CartResults } from "../CartResults";
 import { OrderForm } from "../OrderForm";
 import priceFormatter from "../../utils/priceFormatter";
+import SimilarSlider from "../SimilarSlider";
 import { xlsDownload } from "../../utils/xlsDownload";
 import { findPriceIndex } from "../../utils/findPriceIndex";
 // import Skeleton from '../Skeleton';
@@ -1041,23 +1042,29 @@ export function FilterForm({
           ) :
           <>
             {busy || categoryPage ? null : (totalData > 0 && !categoryPage) ? (
-              <SearchResults
-                updateTime={updateTime}
-                scrollTriggers={scrollTriggers}
-                setScrollTriggers={setScrollTriggers}
-                setTableHeadFixed={setTableHeadFixed}
-                setShowTableHeadFixed={setShowTableHeadFixed}
-                updateCart={updateCart}
-                notificationFunc={notificationFunc}
-                highlight={decodeURIComponent(query.get("art") || "")}
-                showResults={showResults}
-                count={query.get("q") || ""}
-                currencyList={currencyList}
-                currency={currency}
-                bom={searchData.bom}
-                list={searchData.res}
-                relativeTime={itemData !== null}
-              />
+              <>
+                <SearchResults
+                  updateTime={updateTime}
+                  scrollTriggers={scrollTriggers}
+                  setScrollTriggers={setScrollTriggers}
+                  setTableHeadFixed={setTableHeadFixed}
+                  setShowTableHeadFixed={setShowTableHeadFixed}
+                  updateCart={updateCart}
+                  notificationFunc={notificationFunc}
+                  highlight={decodeURIComponent(query.get("art") || "")}
+                  showResults={showResults}
+                  count={query.get("q") || ""}
+                  currencyList={currencyList}
+                  currency={currency}
+                  bom={searchData.bom}
+                  list={searchData.res}
+                  relativeTime={itemData !== null}
+                />
+
+                {!categoryPage && itemData !== null ?
+                  <SimilarSlider itemData={itemData} />
+                  : null}
+              </>
             ) : someCategoryUrl ? null : elaboration.length > 0 ? (
               <>
                 <DeepElaboration data={elaboration} setElaboration={setElaboration} elaboration={elaboration} />
