@@ -13,7 +13,7 @@ function ListItem(props) {
 }
 
 ListItem.propTypes = {
-  item: PropTypes.any,
+  name: PropTypes.any,
 };
 
 export default ListItem;

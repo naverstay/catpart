@@ -5,6 +5,9 @@
 const path = require('path');
 const webpack = require('webpack');
 
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const devMode = process.env.NODE_ENV !== 'production';
+
 module.exports = options => ({
   mode: options.mode,
   entry: options.entry,
@@ -28,12 +31,23 @@ module.exports = options => ({
         },
       },
       {
-        // Preprocess our own .css files
-        // This is the place to add your own loaders (e.g. sass/less etc.)
-        // for a list of loaders, see https://webpack.js.org/loaders/#styling
-        test: /\.css$/,
+        test: /\.(sa|sc)ss$/,
         exclude: /node_modules/,
-        use: ['style-loader', 'css-loader'],
+        use: [
+          /* // for development mode
+          {
+              loader: "style-loader",
+              options: {
+                  singleton: true
+              }
+          },
+          */
+          {
+            loader: MiniCssExtractPlugin.loader,
+          },
+          { loader: 'css-loader' },
+          { loader: 'sass-loader' },
+        ],
       },
       {
         // Preprocess 3rd party .css files located in node_modules
@@ -111,6 +125,14 @@ module.exports = options => ({
     // Always expose NODE_ENV to webpack, in order to use `process.env.NODE_ENV`
     // inside your code for any environment checks; Terser will automatically
     // drop any unreachable code.
+
+    new MiniCssExtractPlugin({
+      // Options similar to the same options in webpackOptions.output
+      // all options are optional
+      filename: '[name].css',
+      chunkFilename: '[id].css',
+      ignoreOrder: false, // Enable to remove warnings about conflicting order
+    }),
     new webpack.EnvironmentPlugin({
       NODE_ENV: 'development',
     }),

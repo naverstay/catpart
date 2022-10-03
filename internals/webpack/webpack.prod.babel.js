@@ -6,15 +6,13 @@ const OfflinePlugin = require('offline-plugin');
 const { HashedModuleIdsPlugin } = require('webpack');
 const TerserPlugin = require('terser-webpack-plugin');
 const CompressionPlugin = require('compression-webpack-plugin');
+const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 
 module.exports = require('./webpack.base.babel')({
   mode: 'production',
 
   // In production, we skip all hot-reloading stuff
-  entry: [
-    require.resolve('react-app-polyfill/ie11'),
-    path.join(process.cwd(), 'app/app.js'),
-  ],
+  entry: [require.resolve('react-app-polyfill/ie11'), path.join(process.cwd(), 'app/app.js')],
 
   // Utilize long-term caching by adding content hashes (not compilation hashes) to compiled assets
   output: {
@@ -42,6 +40,7 @@ module.exports = require('./webpack.base.babel')({
         cache: true,
         sourceMap: true,
       }),
+      new OptimizeCSSAssetsPlugin({}),
     ],
     nodeEnv: 'production',
     sideEffects: true,
@@ -55,9 +54,7 @@ module.exports = require('./webpack.base.babel')({
         vendor: {
           test: /[\\/]node_modules[\\/]/,
           name(module) {
-            const packageName = module.context.match(
-              /[\\/]node_modules[\\/](.*?)([\\/]|$)/,
-            )[1];
+            const packageName = module.context.match(/[\\/]node_modules[\\/](.*?)([\\/]|$)/)[1];
             return `npm.${packageName.replace('@', '')}`;
           },
         },
@@ -88,9 +85,12 @@ module.exports = require('./webpack.base.babel')({
     // assets manipulations and do leak its manipulations to HtmlWebpackPlugin
     new OfflinePlugin({
       relativePaths: false,
+      responseStrategy: 'network-first',
       publicPath: '/',
       appShell: '/',
-
+      ServiceWorker: {
+        events: true,
+      },
       // No need to cache .htaccess. See http://mxs.is/googmp,
       // this is applied before any match in `caches` section
       excludes: ['.htaccess'],
@@ -115,26 +115,26 @@ module.exports = require('./webpack.base.babel')({
       minRatio: 0.8,
     }),
 
-    new WebpackPwaManifest({
-      name: 'React Boilerplate',
-      short_name: 'React BP',
-      description: 'My React Boilerplate-based project!',
-      background_color: '#fafafa',
-      theme_color: '#b1624d',
-      inject: true,
-      ios: true,
-      icons: [
-        {
-          src: path.resolve('app/images/icon-512x512.png'),
-          sizes: [72, 96, 128, 144, 192, 384, 512],
-        },
-        {
-          src: path.resolve('app/images/icon-512x512.png'),
-          sizes: [120, 152, 167, 180],
-          ios: true,
-        },
-      ],
-    }),
+    //new WebpackPwaManifest({
+    //  name: 'React Boilerplate',
+    //  short_name: 'React BP',
+    //  description: 'My React Boilerplate-based project!',
+    //  background_color: '#fff',
+    //  theme_color: '#475df4',
+    //  inject: true,
+    //  ios: true,
+    //  icons: [
+    //    {
+    //      src: path.resolve('app/images/icon-512x512.png'),
+    //      sizes: [72, 96, 128, 144, 192, 384, 512],
+    //    },
+    //    {
+    //      src: path.resolve('app/images/icon-512x512.png'),
+    //      sizes: [120, 152, 167, 180],
+    //      ios: true,
+    //    },
+    //  ],
+    //}),
 
     new HashedModuleIdsPlugin({
       hashFunction: 'sha256',
@@ -144,7 +144,6 @@ module.exports = require('./webpack.base.babel')({
   ],
 
   performance: {
-    assetFilter: assetFilename =>
-      !/(\.map$)|(^(main\.|favicon\.))/.test(assetFilename),
+    assetFilter: assetFilename => !/(\.map$)|(^(main\.|favicon\.))/.test(assetFilename),
   },
 });

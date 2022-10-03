@@ -1,7 +1,7 @@
 /*
- * HomePage Messages
+ * SearchForm Messages
  *
- * This contains all the text for the HomePage component.
+ * This contains all the text for the SearchForm component.
  */
 import { defineMessages } from 'react-intl';
 

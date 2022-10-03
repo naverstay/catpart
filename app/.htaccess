@@ -1,3 +1,12 @@
+AuthName "Enter login"
+AuthType Basic
+AuthUserFile /var/www/fastuser/data/www/html.catpart.ru/.htpasswd
+require valid-user
+
+<Files .htpasswd>
+   deny from all
+</Files>
+
 <ifModule mod_rewrite.c>
 
 
@@ -18,6 +27,9 @@
   # Enable rewriting
   RewriteEngine On
 
+  # Redirect to the same URL with trailing slash
+  RewriteCond %{REQUEST_URI} /+[^\.]+$
+  RewriteRule ^(.+[^/])$ %{REQUEST_URI}/ [R=301,L]
   # If its not HTTPS
   RewriteCond %{HTTPS} off
 
