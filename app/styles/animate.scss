@@ -1934,6 +1934,32 @@
   animation-name: fadeIn;
 }
 
+/* Fading entrances  */
+@-webkit-keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0;
+  }
+}
+
+.animate__fadeOut {
+  -webkit-animation-name: fadeIn;
+  animation-name: fadeIn;
+}
+
 @-webkit-keyframes fadeInDown {
   from {
     opacity: 0;

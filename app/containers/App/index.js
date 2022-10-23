@@ -285,6 +285,8 @@ export default function App({ history }) {
   const createNotification = (type, title, text) => {
     window.log && console.log("createNotification", type, text);
 
+    console.log('store', store);
+
     switch (type) {
       case "info":
         break;
@@ -692,11 +694,15 @@ export default function App({ history }) {
 
                 <Route
                   path={["/contacts", "/about", "/test", "/delivery", "/privacy-policy"]}
-                  render={routeProps => <FeaturePage setTableHeadFixed={setTableHeadFixed} updateCart={updateCart}
-                                                     notificationFunc={createNotification} setOrderSent={setOrderSent}
-                                                     totalCart={totalCart} currency={currency}
-                                                     setOpenCatalogue={setOpenCatalogue}
-                                                     setOpenMobMenu={setOpenMobMenu} {...routeProps} />}
+                  render={routeProps => <FeaturePage
+                    setTableHeadFixed={setTableHeadFixed}
+                    updateCart={updateCart}
+                    notificationFunc={createNotification}
+                    setOrderSent={setOrderSent}
+                    totalCart={totalCart} currency={currency}
+                    setOpenCatalogue={setOpenCatalogue}
+                    setOpenMobMenu={setOpenMobMenu} {...routeProps}
+                  />}
                 />
 
                 <Route

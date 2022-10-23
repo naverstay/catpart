@@ -4,6 +4,10 @@
     padding: 10px 0;
     overflow: hidden;
 
+    &__wrapper {
+      //transition: opacity .3s;
+    }
+
     &__trigger {
       padding: 16px 10px;
       border-radius: 4px;

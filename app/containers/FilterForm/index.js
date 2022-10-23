@@ -181,6 +181,7 @@ export function FilterForm({
   const [prevRequest, setPrevRequest] = useState("");
   const [count, setCount] = useState(0);
   const [searchInfo, setSearchInfo] = useState("");
+  const [searchFadeOut, setSearchFadeOut] = useState(false);
   const [updateTime, setUpdateTime] = useState(false);
   const [categoryPage, setCategoryPage] = useState(false);
 
@@ -977,10 +978,9 @@ export function FilterForm({
                           });
 
                           actualInfoChecker(new Date());
-
-
+                          setSearchFadeOut(true);
                         }}
-                        className={"btn __blue" + (busy ? " __loader" : "")}
+                        className={"btn " + (updateTime ? "__blue" : "__gray")}
                         during={1000}
                       >
                         <span
@@ -1071,8 +1071,8 @@ export function FilterForm({
             </>
           ) :
           <>
-            {(busy || categoryPage) ? null : (totalData > 0 && !categoryPage) ? (
-              <>
+            {(busy || (categoryPage)) ? null : (totalData > 0 && !categoryPage) ? (
+              <div className={'search-results__wrapper ' + (searchFadeOut ? 'animate__animated animate__fadeOut' : '')}>
                 <SearchResults
                   updateTime={updateTime}
                   scrollTriggers={scrollTriggers}
@@ -1090,7 +1090,7 @@ export function FilterForm({
                   list={searchData.res}
                   relativeTime={itemData !== null}
                 />
-              </>
+              </div>
             ) : someCategoryUrl ? null : elaboration.length > 0 ? (
               <>
                 <DeepElaboration data={elaboration} setElaboration={setElaboration} elaboration={elaboration} />
